@@ -47,10 +47,17 @@
     return r.text();
   }
 
+  /* ================= 笔记面板显隐 ================= */
+  /** 只有课文页/大测验页才需要笔记；首页、复习页整个收起面板 */
+  function setNotesVisible(on) {
+    document.body.classList.toggle('no-notes', !on);
+  }
+
   /* ================= 书单首页 ================= */
   async function renderHome() {
     book = null; current = null;
     closeSidebar();
+    setNotesVisible(false);
     Notes.reset(T().notes.noLesson || '');
     $('toc').innerHTML = `<div class="toc-chapter">${T().toc.all}</div>` +
       `<button class="toc-item" data-go-review><span class="n">🔁</span><span class="t">${T().toc.review}</span></button>`;
@@ -167,6 +174,7 @@
 
     const art = $('lesson');
     art.innerHTML = `<div class="loading">${T().loading || '加载中…'}</div>`;
+    setNotesVisible(true);
     // 先清空笔记面板：切章瞬间就不能再显示上一节的笔记
     Notes.reset();
 
@@ -225,6 +233,7 @@
 
     const art = $('lesson');
     art.innerHTML = `<div class="loading">…</div>`;
+    setNotesVisible(true);
     Notes.reset();
 
     let md;
@@ -258,6 +267,7 @@
   async function renderReview() {
     isTestMode = false; current = null;
     renderTOC();
+    setNotesVisible(false);
     Notes.reset(T().notes.noLesson || '');
     const art = $('lesson');
     const due = Review.dueList();

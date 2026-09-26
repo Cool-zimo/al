@@ -585,27 +585,27 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
 }
 .gate-box { width: 100%; max-width: 400px; margin: auto; }
 
-/* 头部：logo 与标题并排，省掉两行高度 */
-.gate-head { display: flex; align-items: center; gap: 13px; margin-bottom: 20px; }
+/* 头部：logo 居中、标题在其下 */
+.gate-head { text-align: center; margin-bottom: 18px; }
 .gate-logo {
-  width: 46px; height: 46px; border-radius: 14px; flex: none;
-  background: var(--grad); display: grid; place-items: center; font-size: 23px;
-  box-shadow: 0 8px 22px rgba(99,102,241,.36);
+  width: 52px; height: 52px; border-radius: 15px; margin: 0 auto 12px;
+  background: var(--grad); display: grid; place-items: center; font-size: 26px;
+  box-shadow: 0 8px 22px rgba(99,102,241,.34);
 }
-.gate-names { min-width: 0; }
-.gate h1 { font-size: 25px; font-weight: 740; letter-spacing: -.025em; margin: 0; line-height: 1.2; }
+.gate h1 { font-size: 26px; font-weight: 740; letter-spacing: -.025em; margin: 0; line-height: 1.2; }
 .gate .slogan {
-  font-size: 10.5px; letter-spacing: .26em; color: var(--faint);
-  text-transform: uppercase; margin: 2px 0 0; font-weight: 600;
+  font-size: 10.5px; letter-spacing: .3em; color: var(--faint);
+  text-transform: uppercase; margin: 4px 0 0; font-weight: 600;
 }
 
 .gate-card {
   background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
-  padding: 18px; box-shadow: var(--shadow);
+  padding: 20px; box-shadow: var(--shadow);
 }
 .gate input {
-  width: 100%; padding: 12px 14px; border-radius: var(--r-sm); border: 1px solid var(--border);
-  background: var(--panel-2); color: var(--text); font-family: var(--mono); font-size: 13.5px; outline: none;
+  display: block; width: 100%; padding: 12px 14px; border-radius: var(--r-sm);
+  border: 1px solid var(--border); background: var(--panel-2); color: var(--text);
+  font-family: var(--mono); font-size: 13.5px; line-height: 1.4; outline: none;
 }
 .gate input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .gate-err { color: var(--red); font-size: 12.5px; margin-top: 9px; display: none; }
@@ -618,7 +618,7 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
   color: var(--faint); font-size: 12.5px; cursor: pointer; border-radius: 8px; transition: .15s;
 }
 .gate-toggle:hover { color: var(--accent); background: var(--accent-soft); }
-.gate-toggle svg { width: 15px; height: 15px; transition: transform .2s; }
+.gate-toggle svg { width: 15px; height: 15px; flex: none; transition: transform .2s; }
 .gate-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
 .gate-more { margin-top: 4px; animation: fade .2s ease; }
 .gate-more[hidden] { display: none; }
@@ -636,8 +636,8 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
 .gate-lang a { color: var(--accent); font-weight: 560; }
 
 @media (max-width: 860px) {
-  .gate h1 { font-size: 22px; }
-  .gate-logo { width: 40px; height: 40px; font-size: 20px; }
+  .gate h1 { font-size: 23px; }
+  .gate-logo { width: 46px; height: 46px; font-size: 23px; }
 }
 
 /* 休息提醒 */
@@ -690,3 +690,12 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
   .user-chip span { display: none; }
   .user-chip { padding: 3px; }
 }
+
+/* ============================================================
+   非课文页（首页 / 复习页）收起笔记面板
+   这些页面不属于任何一课，留一个空的笔记栏只会让人误以为
+   "笔记还在"，所以连面板带悬浮按钮一起隐藏，正文顺势占满宽度
+   ============================================================ */
+body.no-notes .notes { display: none; }
+body.no-notes .note-fab { display: none !important; }
+body.no-notes .main { margin-right: 0; max-width: 1040px; }

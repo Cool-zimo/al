@@ -89,6 +89,8 @@ const Notes = (() => {
     if (prev) prev.innerHTML = MD.render(placeholderText || N().emptyPreview);
     if (input) input.hidden = true;
     if (prev) prev.hidden = false;
+    const tt = document.querySelector('.notes-title');
+    if (tt) tt.textContent = N().title;
     const bp = document.getElementById('btn-note-preview');
     const be = document.getElementById('btn-note-edit');
     if (bp) bp.classList.add('active');
