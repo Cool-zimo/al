@@ -1,0 +1,33 @@
+[
+  {
+    "title": "Chapter 1 · Your First Conversation with Python",
+    "items": [
+      {
+        "id": "01",
+        "title": "What Programming Actually Is",
+        "summary": "The problem it solves, and why Python"
+      },
+      {
+        "id": "02",
+        "title": "Making the Computer Understand You",
+        "summary": "A runtime: in the browser, or installed locally"
+      },
+      {
+        "id": "03",
+        "title": "Your First Program",
+        "summary": "print, strings, and the order of execution"
+      },
+      {
+        "id": "04",
+        "title": "Writing for Humans",
+        "summary": "Comments — why they matter more than the code"
+      },
+      {
+        "id": "05",
+        "title": "Errors Don't Mean You're Wrong",
+        "summary": "Read tracebacks and treat them as a free tutor"
+      }
+    ],
+    "test": "test-01"
+  }
+]

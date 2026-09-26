@@ -1,0 +1,128 @@
+[
+  {
+    "id": "py-basics-1",
+    "title": "Python Basics 1",
+    "subtitle": "From absolute zero, every line explained",
+    "desc": "For complete beginners. Assumes no prior programming knowledge — every concept starts from what problem it solves, with runnable examples and instant exercises.",
+    "stage": "Fundamentals",
+    "level": "Beginner",
+    "ready": true
+  },
+  {
+    "id": "py-basics-2",
+    "title": "Python Basics 2",
+    "subtitle": "Data structures and functions",
+    "desc": "Lists, tuples, dicts, sets — how to use them and when to pick which. Function arguments, scope, recursion.",
+    "stage": "Fundamentals",
+    "level": "Beginner",
+    "ready": false
+  },
+  {
+    "id": "py-basics-3",
+    "title": "Python Basics 3",
+    "subtitle": "Files, exceptions, modules & OOP",
+    "desc": "Reading and writing files, catching errors, organising modules, and a complete mental model of classes and objects.",
+    "stage": "Fundamentals",
+    "level": "Intermediate",
+    "ready": false
+  },
+  {
+    "id": "py-essentials",
+    "title": "Essentials · Learn",
+    "subtitle": "The whole language in two days",
+    "desc": "For those who have learned once and need to pick it back up fast. Main trunk only, no warm-up.",
+    "stage": "Fundamentals",
+    "level": "Refresher",
+    "ready": false
+  },
+  {
+    "id": "py-essentials-2",
+    "title": "Essentials · Drill",
+    "subtitle": "Nail the basics with exercises",
+    "desc": "No re-teaching. Fully exercise-driven — sweep away every common trap of the fundamentals stage in one pass.",
+    "stage": "Fundamentals",
+    "level": "Refresher",
+    "ready": false
+  },
+  {
+    "id": "data-analysis-1",
+    "title": "Python Data Analysis 1",
+    "subtitle": "NumPy and array thinking",
+    "desc": "Switching your brain from Python lists to ndarray: vectorisation, broadcasting, indexing tricks.",
+    "stage": "Data",
+    "level": "Intermediate",
+    "ready": false
+  },
+  {
+    "id": "data-analysis-2",
+    "title": "Python Data Analysis 2",
+    "subtitle": "pandas and tabular data",
+    "desc": "The full DataFrame toolkit: cleaning, grouping, merging, time series.",
+    "stage": "Data",
+    "level": "Intermediate",
+    "ready": false
+  },
+  {
+    "id": "data-analysis-3",
+    "title": "Python Data Analysis 3",
+    "subtitle": "Visualisation and practice",
+    "desc": "Charting with matplotlib / seaborn, plus one end-to-end real-world analysis project.",
+    "stage": "Data",
+    "level": "Practice",
+    "ready": false
+  },
+  {
+    "id": "gui-beginner-1",
+    "title": "Python Desktop 1",
+    "subtitle": "tkinter fundamentals",
+    "desc": "Windows, widgets, layouts, event binding — build your first usable desktop app.",
+    "stage": "Desktop",
+    "level": "Beginner",
+    "ready": false
+  },
+  {
+    "id": "gui-beginner-2",
+    "title": "Python Desktop 2",
+    "subtitle": "Advanced tkinter & pygame",
+    "desc": "Menus, dialogs, Canvas drawing; pygame's game loop and sprites.",
+    "stage": "Desktop",
+    "level": "Intermediate",
+    "ready": false
+  },
+  {
+    "id": "gui-beginner-3",
+    "title": "Python Desktop 3",
+    "subtitle": "A complete desktop project",
+    "desc": "Build a practical tool with data storage — from requirements all the way to packaging and release.",
+    "stage": "Desktop",
+    "level": "Practice",
+    "ready": false
+  },
+  {
+    "id": "qt-1",
+    "title": "Python Desktop Advanced 1",
+    "subtitle": "PyQt / PySide core",
+    "desc": "Signals and slots, layout management, common widgets, style sheets — the Qt mental model.",
+    "stage": "Desktop",
+    "level": "Intermediate",
+    "ready": false
+  },
+  {
+    "id": "qt-2",
+    "title": "Python Desktop Advanced 2",
+    "subtitle": "Qt advanced topics & shipping",
+    "desc": "Model/view, threading, custom widgets, i18n, and packaging into an installer.",
+    "stage": "Desktop",
+    "level": "Advanced",
+    "ready": false
+  },
+  {
+    "id": "engineering",
+    "title": "Python Engineering Practice",
+    "subtitle": "From working code to shippable code",
+    "desc": "Virtual environments, project layout, Git collaboration, unit testing, logging, packaging.",
+    "stage": "Engineering",
+    "level": "Practice",
+    "ready": false
+  }
+]

@@ -1,0 +1,116 @@
+name: 内容自检
+
+# 内容用 Markdown 写，最容易出的错是 toc.json 里列了一课、但 .md 忘了提交。
+# 这个 workflow 每次推送都校验一遍中英文两个语言站。
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 校验 JSON
+        run: |
+          python3 -c "
+          import json, sys, os
+          ok = True
+          for root, _, files in os.walk('content'):
+              for f in files:
+                  if not f.endswith('.json'): continue
+                  p = os.path.join(root, f)
+                  try:
+                      json.load(open(p, encoding='utf-8'))
+                      print('OK  ', p)
+                  except Exception as e:
+                      ok = False
+                      print('FAIL', p, e)
+          sys.exit(0 if ok else 1)
+          "
+
+      - name: 校验目录与课文一一对应
+        run: |
+          python3 -c "
+          import json, sys, os
+          ok = True
+          for lang in ('zh', 'en'):
+              root = f'content/{lang}'
+              if not os.path.exists(f'{root}/books.json'):
+                  print(f'SKIP {lang}'); continue
+              books = json.load(open(f'{root}/books.json', encoding='utf-8'))
+              for b in books:
+                  bid = b['id']
+                  toc_path = f'{root}/books/{bid}/toc.json'
+                  if not os.path.exists(toc_path):
+                      print(f'SKIP {lang}/{bid}: 还没有目录'); continue
+                  toc = json.load(open(toc_path, encoding='utf-8'))
+                  for ch in toc:
+                      for it in ch['items']:
+                          p = f'{root}/books/{bid}/lessons/{it[\"id\"]}.md'
+                          if not os.path.exists(p):
+                              ok = False; print('MISS', p)
+                      if ch.get('test'):
+                          p = f'{root}/books/{bid}/lessons/{ch[\"test\"]}.md'
+                          if not os.path.exists(p):
+                              ok = False; print('MISS', p)
+                  n = sum(len(c['items']) for c in toc)
+                  print(f'OK   {lang}/{bid}: {len(toc)} 章 / {n} 课')
+          sys.exit(0 if ok else 1)
+          "
+
+      - name: 校验题目格式
+        run: |
+          python3 -c "
+          import re, sys, os
+          def parse(text):
+              d = {}; lines = text.split('\n'); i = 0
+              while i < len(lines):
+                  m = re.match(r'^(\w+)\s*:\s*(.*)$', lines[i])
+                  if not m: i += 1; continue
+                  k, v = m.group(1), m.group(2)
+                  if v in ('|', '>'):
+                      buf = []; i += 1
+                      while i < len(lines) and (re.match(r'^\s{2,}', lines[i]) or not lines[i].strip()):
+                          if lines[i].strip(): buf.append(re.sub(r'^\s{2}', '', lines[i]))
+                          i += 1
+                      d[k] = '\n'.join(buf); continue
+                  if v == '':
+                      buf = []; i += 1
+                      while i < len(lines) and re.match(r'^\s*-\s+', lines[i]):
+                          buf.append(re.sub(r'^\s*-\s+', '', lines[i]).strip()); i += 1
+                      d[k] = buf; continue
+                  d[k] = v.strip(); i += 1
+              return d
+          ok = True; total = 0
+          for root, _, files in os.walk('content'):
+              for f in files:
+                  if not f.endswith('.md'): continue
+                  md = open(os.path.join(root, f), encoding='utf-8').read()
+                  for m in re.finditer(r'\`\`\`quiz\n([\s\S]*?)\`\`\`', md):
+                      q = parse(m.group(1)); total += 1
+                      t = q.get('type')
+                      if t == 'code' and (not q.get('starter') or not q.get('tests')):
+                          ok = False; print('BAD code quiz in', os.path.join(root, f))
+                      if t == 'choice' and (not q.get('options') or q.get('answer') is None):
+                          ok = False; print('BAD choice quiz in', os.path.join(root, f))
+                      if t == 'project' and not (q.get('checklist') or q.get('checks')):
+                          ok = False; print('BAD project quiz in', os.path.join(root, f))
+          print(f'题目总数 {total}')
+          sys.exit(0 if ok else 1)
+          "
+
+      - name: JS 语法检查
+        run: |
+          for f in js/*.js i18n/*.js; do node --check "$f" || exit 1; done
+          echo "JS 全部通过"
+
+      - name: 检查两个语言站入口存在
+        run: |
+          test -f zh/index.html || (echo "missing zh/index.html" && exit 1)
+          test -f en/index.html || (echo "missing en/index.html" && exit 1)
+          echo "zh / en 入口齐全"
