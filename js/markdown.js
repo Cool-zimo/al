@@ -146,7 +146,7 @@ const MD = (() => {
     return { html, blocks, quizzes };
   }
 
-  return { render, renderLesson, extract, parseQuiz: parseQuizText };
+  return { render, renderLesson, extract, parseQuiz: parseQuizText, parseQuizText };
 
   /** 供外部直接用：把 quiz 文本解析成对象 */
   function parseQuizText(text) {

@@ -53,7 +53,8 @@ window.I18N = {
     back: 'Back to lesson',
     passed: '🎉 All passed — this lesson is complete',
     notPassed: 'Some questions still failing — revisit the examples above',
-    noQuiz: 'No quiz has been set for this lesson yet'
+    noQuiz: 'No quiz has been set for this lesson yet',
+    noQuizHint: 'The exercises inside the lesson are for practising as you read — they do not count as the quiz.'
   },
 
   notes: {

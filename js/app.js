@@ -14,7 +14,8 @@
   let BOOKS = [];
   let TOC = [];
   let LESSON_BLOCKS = [];   // 当前课的 python 代码块，实验室用
-  let LESSON_QUIZ_COUNT = {};  // 当前课的小测题数，决定"学完"的判定方式
+  let LESSON_QUIZ_COUNT = {};  // 当前课的正式测验题数，决定"学完"的判定方式
+  let LESSON_EXAM = [];        // 当前课的正式测验题（带 exam: true，不内联到正文）
   let flat = [];
   let book = null;
   let current = null;
@@ -234,7 +235,21 @@
   function paint(art, md, ctxKey) {
     const { html, blocks, quizzes } = MD.renderLesson(md);
     LESSON_BLOCKS = blocks.filter(b => b.lang === 'python' || b.lang === 'py');
-    LESSON_QUIZ_COUNT[ctxKey.split('/').pop()] = quizzes.length;
+
+    // 题目分两类：
+    //   带 exam: true  -> 正式测验题，只在小测页出现，不内联进正文
+    //   其余          -> 正文里的随堂练习，边读边练，不计入"是否学完"
+    const lessonId = ctxKey.split('/').pop();
+    LESSON_EXAM = [];
+    const inline = [];
+    quizzes.forEach(text => {
+      const q = MD.parseQuizText(text);
+      const isExam = String(q.exam || '').toLowerCase() === 'true';
+      if (isExam) LESSON_EXAM.push(q);
+      else inline.push({ q, text });
+    });
+    LESSON_QUIZ_COUNT[lessonId] = LESSON_EXAM.length;
+
     art.innerHTML = html;
 
     art.querySelectorAll('[data-codeblock]').forEach(holder => {
@@ -252,7 +267,19 @@
       }
     });
 
+    // exam 题已从正文移除，对应挂载点也要一起删掉，否则会留下空白 div
+    const examIdx = new Set();
     quizzes.forEach((text, i) => {
+      const q = MD.parseQuizText(text);
+      if (String(q.exam || '').toLowerCase() === 'true') examIdx.add(i);
+    });
+
+    quizzes.forEach((text, i) => {
+      if (examIdx.has(i)) {
+        const holder = art.querySelector(`[data-quiz="${i}"]`);
+        if (holder) holder.remove();
+        return;
+      }
       const q = MD.parseQuizText(text);
       const box = Quiz.render(q, i, { key: ctxKey });
       const holder = art.querySelector(`[data-quiz="${i}"]`);
@@ -260,7 +287,7 @@
       else art.appendChild(box);
     });
 
-    return quizzes.length;
+    return quizzes.length - examIdx.size;
   }
 
   /* ================= 单课小测（独立页面） ================= */
@@ -288,9 +315,12 @@
       return;
     }
 
-    const quizzes = Quiz.extractBlocks(md).filter(q => q.type);
+    // 只取带 exam: true 的正式测验题
+    const quizzes = Quiz.extractBlocks(md)
+      .filter(q => q.type && String(q.exam || '').toLowerCase() === 'true');
     if (!quizzes.length) {
-      art.innerHTML = `<h1>${T().lq.noQuiz}</h1>`;
+      art.innerHTML = `<h1>${T().lq.noQuiz}</h1>` +
+        `<p class="dim">${T().lq.noQuizHint || ''}</p>`;
       return;
     }
 
