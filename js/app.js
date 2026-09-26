@@ -14,6 +14,7 @@
   let BOOKS = [];
   let TOC = [];
   let LESSON_BLOCKS = [];   // 当前课的 python 代码块，实验室用
+  let LESSON_QUIZ_COUNT = {};  // 当前课的小测题数，决定"学完"的判定方式
   let flat = [];
   let book = null;
   let current = null;
@@ -233,6 +234,7 @@
   function paint(art, md, ctxKey) {
     const { html, blocks, quizzes } = MD.renderLesson(md);
     LESSON_BLOCKS = blocks.filter(b => b.lang === 'python' || b.lang === 'py');
+    LESSON_QUIZ_COUNT[ctxKey.split('/').pop()] = quizzes.length;
     art.innerHTML = html;
 
     art.querySelectorAll('[data-codeblock]').forEach(holder => {
@@ -259,6 +261,79 @@
     });
 
     return quizzes.length;
+  }
+
+  /* ================= 单课小测（独立页面） ================= */
+  /**
+   * 每课底部都有一个小测入口，点进去是这个页面。
+   * 与章末大测验的区别：题目少（一般 1~2 题），但**必须通过**才算学完这一课。
+   */
+  async function renderLessonQuiz(bookId, lessonId) {
+    isTestMode = true;
+    const item = flat.find(x => String(x.id) === String(lessonId));
+    if (!item) { location.hash = '#/'; return; }
+    current = item;
+    renderTOC();
+
+    const art = $('lesson');
+    art.innerHTML = `<div class="loading">…</div>`;
+    resetLab();
+    setNotesVisible(false);
+
+    let md;
+    try {
+      md = await fetchText(`${CONTENT}/books/${bookId}/lessons/${lessonId}.md`);
+    } catch (e) {
+      art.innerHTML = `<h1>${T().loadFailTitle || '加载失败'}</h1>`;
+      return;
+    }
+
+    const quizzes = Quiz.extractBlocks(md).filter(q => q.type);
+    if (!quizzes.length) {
+      art.innerHTML = `<h1>${T().lq.noQuiz}</h1>`;
+      return;
+    }
+
+    const k = keyOf(bookId, lessonId);
+    const title = `${T().lq.title} · ${item.title}`;
+
+    const headTitle = document.createElement('h1');
+    headTitle.className = 'exam-title';
+    headTitle.textContent = title;
+
+    const back = document.createElement('a');
+    back.className = 'lq-back';
+    back.href = `#/book/${bookId}/${lessonId}`;
+    back.textContent = '← ' + T().lq.back;
+
+    const exam = Exam.create({
+      quizzes,
+      key: k,
+      title,
+      onFinish: g => {
+        const passed = g.right >= g.total;
+        Store.update(Store.K.PROGRESS, {}, p => {
+          p[k] = { done: passed, viaQuiz: true, updatedAt: new Date().toISOString() };
+          return p;
+        });
+        if (passed) {
+          Review.learn(k);
+          toast(T().lq.passed);
+        } else {
+          toast(T().lq.notPassed);
+        }
+        if (sync) sync.schedulePush();
+      }
+    });
+
+    art.innerHTML = '';
+    art.appendChild(back);
+    art.appendChild(headTitle);
+    art.appendChild(exam);
+
+    $('lesson-nav').innerHTML = '';
+    document.title = title;
+    window.scrollTo({ top: 0 });
   }
 
   /* ================= 章末大测验 ================= */
@@ -313,6 +388,126 @@
     $('lesson-nav').innerHTML = '';
     document.title = `${title} · ${book ? book.title : ''}`;
     window.scrollTo({ top: 0 });
+  }
+
+  /* ================= 复习 ================= */
+  async function renderReview() {
+    isTestMode = false; current = null;
+    renderTOC();
+    setNotesVisible(false);
+    Notes.reset(T().notes.noLesson || '');
+    const art = $('lesson');
+    const due = Review.dueList();
+    const up = Review.upcoming(7);
+    const R = T().review;
+
+    let html = `
+      <div class="home-hero">
+        <h1>${R.title}</h1>
+        <p class="home-sub">${escapeHtml(R.sub)}</p>
+      </div>`;
+
+    if (!due.length) {
+      html += `<div class="empty-state">
+        <div class="empty-icon">🎉</div>
+        <p>${R.empty}</p>
+        <p class="dim">${R.emptyDesc}</p>
+      </div>`;
+    } else {
+      html += `<h2 class="home-stage">${R.dueTitle(due.length)}</h2><div class="review-list">`;
+      for (const d of due) {
+        const [bid, lid] = String(d.key).split('/');
+        const b = BOOKS.find(x => x.id === bid);
+        html += `
+          <div class="review-item">
+            <div class="review-meta">
+              <span class="review-book">${escapeHtml(b ? b.title : bid)}</span>
+              <span class="review-stage">${escapeHtml(Review.stageLabel(d.stage))}</span>
+            </div>
+            <div class="review-title">${escapeHtml(lid)}</div>
+            <a class="review-go" href="#/book/${bid}/${lid}">${R.go}</a>
+          </div>`;
+      }
+      html += `</div>`;
+    }
+
+    if (up.length) {
+      html += `<h2 class="home-stage">${R.upcoming}</h2><div class="review-up">`;
+      for (const u of up) {
+        html += `<div class="up-item"><span>${escapeHtml(u.key)}</span><span class="faint">${Review.humanDue(u.due)}</span></div>`;
+      }
+      html += `</div>`;
+    }
+
+    art.innerHTML = html;
+    $('lesson-nav').innerHTML = '';
+    document.title = `${R.title} · ${T().brand}`;
+  }
+
+  /* ================= 完成标记 ================= */
+  /** 该课是否有小测（决定"学完"的判定方式） */
+  function lessonQuizCount(lessonId) {
+    return LESSON_QUIZ_COUNT[lessonId] || 0;
+  }
+
+  /**
+   * 课文底部的"学完"区域
+   *
+   * 规则：有小测的课，必须通过小测才算学完 —— 没有手动标记按钮。
+   *       没小测的课（理论上不该有），保留手动标记作为兜底。
+   */
+  function buildDoneBar(item) {
+    const k = keyOf(book.id, item.id);
+    const progress = Store.get(Store.K.PROGRESS, {}) || {};
+    const done = !!progress[k]?.done;
+    const rv = (Store.get(Store.K.REVIEW, {}) || {})[k];
+    const L = T().lesson;
+    const nQuiz = lessonQuizCount(item.id);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'lesson-done' + (done ? ' done' : '');
+
+    if (nQuiz > 0) {
+      // 有小测：完成与否完全由测验决定
+      const span = document.createElement('span');
+      span.innerHTML = done
+        ? `${L.done} <span class="hint">· ${L.nextReview} ${Review.humanDue(rv?.due)}</span>`
+        : L.needQuiz;
+      wrap.appendChild(span);
+
+      const btn = document.createElement('a');
+      btn.className = done ? 'ghost' : 'primary';
+      btn.href = `#/book/${book.id}/quiz/${item.id}`;
+      btn.textContent = done ? L.quizAgain : L.goQuiz(nQuiz);
+      wrap.appendChild(btn);
+      return wrap;
+    }
+
+    // 兜底：没有小测的课才允许手动标记
+    const span = document.createElement('span');
+    span.innerHTML = done
+      ? `${L.done} <span class="hint">· ${L.nextReview} ${Review.humanDue(rv?.due)}</span>`
+      : L.undone;
+    wrap.appendChild(span);
+
+    const btn = document.createElement('button');
+    btn.textContent = done ? L.unmark : L.markDone;
+    btn.onclick = () => {
+      const nowDone = !done;
+      Store.update(Store.K.PROGRESS, {}, p => {
+        if (nowDone) p[k] = { done: true, updatedAt: new Date().toISOString() };
+        else delete p[k];
+        return p;
+      });
+      if (nowDone) { Review.learn(k); toast(T().toast.addedReview); }
+      else Review.unlearn(k);
+      if (sync) sync.schedulePush();
+      const old = $('lesson').querySelector('.lesson-done');
+      if (old) old.replaceWith(buildDoneBar(item));
+      renderTOC();
+    };
+    wrap.appendChild(btn);
+    return wrap;
   }
 
   /* ================= 复习 ================= */
@@ -640,6 +835,7 @@
         catch (e) { toast(T().toast.noContent); location.hash = '#/'; return; }
       }
       if (parts[2] === 'test' && parts[3]) return renderTest(bid, parts[3]);
+      if (parts[2] === 'quiz' && parts[3]) return renderLessonQuiz(bid, parts[3]);
       if (parts[2]) return renderLesson(bid, parts[2]);
       const last = Store.get(Store.K.LAST_POS, null);
       const target = (last && last.bookId === bid) ? last.lessonId : (flat[0] && flat[0].id);

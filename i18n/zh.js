@@ -41,7 +41,20 @@ window.I18N = {
 
   toc: { all: '全部教程', review: '今日复习', chapterTest: '本章大测验' },
 
-  lesson: { done: '✅ 已完成这一节', undone: '⭕ 学完这一节？', markDone: '标记完成', unmark: '取消标记', nextReview: '下次复习' },
+  lesson: {
+    done: '✅ 已完成这一节', undone: '⭕ 学完这一节？', markDone: '标记完成', unmark: '取消标记',
+    nextReview: '下次复习',
+    needQuiz: '⭕ 通过本节测试，才算学完这一节',
+    goQuiz: (n) => `去做本节测试（${n} 题）→`,
+    quizAgain: '再做一次测试'
+  },
+  lq: {
+    title: '本节测试',
+    back: '回到课文',
+    passed: '🎉 全部通过 —— 这一节算学完了',
+    notPassed: '还有题没通过，再看看课文里的例子',
+    noQuiz: '这一节还没有配测试题'
+  },
 
   notes: {
     title: '📝 本节笔记', edit: '编辑', preview: '预览', clear: '清空', syncNow: '立即同步',

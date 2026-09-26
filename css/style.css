@@ -990,3 +990,24 @@ body.no-notes .main { margin-right: 0; max-width: 1040px; }
   .exam-dot { width: 25px; height: 25px; font-size: 11.5px; }
   .result-acts { flex-direction: column; }
 }
+
+/* ============================================================
+   单课小测入口（课文底部）
+   有小测的课：必须通过才算学完，所以入口做成主 CTA
+   ============================================================ */
+.lesson-done a {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 20px; border-radius: 10px; text-decoration: none;
+  font-size: 14px; font-weight: 600; transition: .15s; cursor: pointer;
+}
+.lesson-done a.primary { background: var(--grad); color: #fff; box-shadow: 0 4px 14px rgba(99,102,241,.32); }
+.lesson-done a.primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.lesson-done a.ghost { border: 1px solid var(--border); color: var(--dim); }
+.lesson-done a.ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+/* 小测页返回链接 */
+.lq-back {
+  display: inline-block; margin-bottom: 14px;
+  font-size: 13.5px; color: var(--faint); text-decoration: none; transition: .15s;
+}
+.lq-back:hover { color: var(--accent); }

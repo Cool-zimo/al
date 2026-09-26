@@ -41,7 +41,20 @@ window.I18N = {
 
   toc: { all: 'All tutorials', review: 'Review today', chapterTest: 'Chapter test' },
 
-  lesson: { done: '✅ Completed', undone: '⭕ Finished this lesson?', markDone: 'Mark as done', unmark: 'Undo', nextReview: 'Next review' },
+  lesson: {
+    done: '✅ Lesson complete', undone: '⭕ Finished this lesson?', markDone: 'Mark done', unmark: 'Undo',
+    nextReview: 'Next review',
+    needQuiz: '⭕ Pass the quiz to complete this lesson',
+    goQuiz: (n) => `Take the quiz (${n}) →`,
+    quizAgain: 'Retake quiz'
+  },
+  lq: {
+    title: 'Lesson quiz',
+    back: 'Back to lesson',
+    passed: '🎉 All passed — this lesson is complete',
+    notPassed: 'Some questions still failing — revisit the examples above',
+    noQuiz: 'No quiz has been set for this lesson yet'
+  },
 
   notes: {
     title: '📝 Notes', edit: 'Edit', preview: 'Preview', clear: 'Clear', syncNow: 'Sync now',
