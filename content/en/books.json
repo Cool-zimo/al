@@ -124,5 +124,32 @@
     "stage": "Engineering",
     "level": "Practice",
     "ready": false
+  },
+  {
+    "id": "algo-1",
+    "title": "Python Algorithms 1",
+    "subtitle": "Complexity, arrays & strings",
+    "stage": "Algorithms",
+    "level": "Intermediate",
+    "ready": false,
+    "desc": "Starts with how to measure speed: time and space complexity. Then arrays and strings — the two most-tested foundations. Every exercise is really executed and graded in the page."
+  },
+  {
+    "id": "algo-2",
+    "title": "Python Algorithms 2",
+    "subtitle": "Linked lists, stacks, queues, hashing & recursion",
+    "stage": "Algorithms",
+    "level": "Intermediate",
+    "ready": false,
+    "desc": "The next layer of data structures: linked lists, stacks, queues, hash tables, plus recursion — the one idea that unlocks everything else once it clicks."
+  },
+  {
+    "id": "algo-3",
+    "title": "Python Algorithms 3",
+    "subtitle": "Trees, graphs, sorting & DP",
+    "stage": "Algorithms",
+    "level": "Advanced",
+    "ready": false,
+    "desc": "The main battlefield: binary trees and heaps, graph traversal, the ten classic sorts, and the walk from brute force to an optimised DP solution."
   }
 ]

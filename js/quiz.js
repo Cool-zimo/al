@@ -81,10 +81,20 @@ const Quiz = (() => {
     head.className = 'quiz-head';
     const q0 = Q();
     const badge = ({
-      choice: q0.choice, fill: q0.fill, code: q0.code, project: q0.project
+      choice: q0.choice, fill: q0.fill, code: q0.code,
+      function: q0.function || q0.code, project: q0.project
     })[q.type] || '练习';
     head.innerHTML = `<span class="quiz-badge">${badge}</span><span class="quiz-q">${escapeHtml(q.q || '')}</span>`;
     box.appendChild(head);
+
+    // 题干引用的示例代码（只读展示）—— 之前代码写在 q: 后面会被解析吞掉，
+    // 导致"下面这段代码运行结果是什么？"却看不到代码
+    if (q.code) {
+      const pre = document.createElement('div');
+      pre.className = 'quiz-snippet';
+      pre.innerHTML = `<pre><code>${escapeHtml(String(q.code).replace(/\n$/, ''))}</code></pre>`;
+      box.appendChild(pre);
+    }
 
     const body = document.createElement('div');
     body.className = 'quiz-body';

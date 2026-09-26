@@ -73,25 +73,34 @@ explain: Full-width and ASCII brackets look nearly identical, but Python only ac
 
 ---
 
-## Part 2 · Algorithm
+## Part 2 · Hands-on
 
-Not just "can use it" — "understands it". Both of these are **machine-graded**: one checks your program's output, the other actually calls your function and compares return values.
+Not just "can read it" — "can write it". Both are machine-graded: edit the code, hit "Run & check", and the page really executes it and checks the output.
 
 ```quiz
-type: function
-q: Complete make_card(): join name and hobby into one line of card text, and return it
-func: make_card
+type: code
+q: With a single print call, output this triangle of asterisks
 starter: |
-  def make_card(name, hobby):
-      # Join name and hobby into the format "Name: xxx · Hobby: xxx"
-      # Key point: return the result — don't just print it
-      return ""
-cases: |
-  "Alex", "coding" -> "Name: Alex · Hobby: coding"
-  "Sam", "climbing" -> "Name: Sam · Hobby: climbing"
-  "Jo", "drawing" -> "Name: Jo · Hobby: drawing"
-hint: Join the pieces with +: return "Name: " + name + " · Hobby: " + hobby. Don't wrap the whole expression in extra quotes.
-explain: This is the one question that actually calls your function — the page runs make_card("Alex", "coding") and compares the return value case by case. The key to a function is return: print shows something on screen, return hands a result back to the caller. Completely different things.
+  # Target shape:
+  # *
+  # **
+  # ***
+  # ****
+  # *****
+  #
+  # Hint: strings support multiplication!
+  #   "*" * 3   gives  "***"
+  #   "ab" * 2  gives  "abab"
+  #
+  # Hint 2: join the 5 lines with \n into one string, then print it once
+  
+  print("start editing here")
+tests:
+- assert __out.count("\n") >= 4
+- assert __out.strip().split("\n")[0].strip() == "*"
+- assert "***" in __out
+hint: Try running print("*" * 3) on its own first. Then work out how to join 5 asterisk strings of different lengths with \n into one big string.
+explain: String multiplication "*" * n builds n asterisks quickly — a neat Python trick. You could of course write 5 print lines, but "multiply + join with \n" trains you to abstract a repeating pattern, which is the heart of thinking algorithmically.
 ```
 
 ```quiz
@@ -108,7 +117,7 @@ tests:
 - assert "Hobby: coding" in __out
 - assert "City: London" in __out
 hint: The three errors: line 2 is missing a closing bracket, line 3 has "Hobby: coding" without quotes, line 4 is commented out entirely.
-explain: These three map exactly onto this chapter's classic traps: unmatched bracket (SyntaxError), string without quotes (NameError), and a line commented out (it never runs). Spotting all three first try means you genuinely absorbed the chapter.
+explain: These map exactly onto this chapter's classic traps: unmatched bracket (SyntaxError), string without quotes (NameError), and a line commented out (it never runs). Spotting all three first try means you genuinely absorbed the chapter.
 ```
 
 ---

@@ -1011,3 +1011,14 @@ body.no-notes .main { margin-right: 0; max-width: 1040px; }
   font-size: 13.5px; color: var(--faint); text-decoration: none; transition: .15s;
 }
 .lq-back:hover { color: var(--accent); }
+
+/* 题干引用的示例代码（只读） */
+.quiz-snippet {
+  margin: 0 18px 4px; border-radius: var(--r-sm); overflow: hidden;
+  border: 1px solid var(--border-soft); background: var(--code-bg);
+}
+.quiz-snippet pre { margin: 0; padding: 12px 15px; overflow-x: auto; }
+.quiz-snippet code {
+  font-family: var(--mono); font-size: 13px; line-height: 1.65;
+  color: var(--text); white-space: pre;
+}
