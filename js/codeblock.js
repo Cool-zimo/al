@@ -71,6 +71,15 @@ const CodeBlock = (() => {
     };
     btnCE.onclick = () => window.open(Godbolt.buildUrl(ta.value), '_blank', 'noopener');
 
+    // 送进代码实验室：左侧文件树 / 右上编辑器 / 右下终端
+    const btnLab = mkBtn('🧪 ' + (L.lab || '实验室'), 'btn-copy btn-lab');
+    btnLab.title = L.labTip || '在代码实验室里打开这段代码';
+    head.appendChild(btnLab);
+    btnLab.onclick = () => {
+      if (window.__openLab) window.__openLab(ta.value);
+      else window.open(Godbolt.buildUrl(ta.value), '_blank', 'noopener');
+    };
+
     /* --- 输出区 --- */
     const writer = {
       write(cls, text) {

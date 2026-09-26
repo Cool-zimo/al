@@ -699,3 +699,152 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
 body.no-notes .notes { display: none; }
 body.no-notes .note-fab { display: none !important; }
 body.no-notes .main { margin-right: 0; max-width: 1040px; }
+
+/* ============================================================
+   代码实验室（IDE）
+   布局：左侧文件资源管理器 / 右上编辑器 / 右下终端
+   ============================================================ */
+.lab {
+  position: fixed; inset: var(--topbar-h) 0 0 0; z-index: 70;
+  background: var(--bg); display: flex; flex-direction: column;
+}
+.lab[hidden] { display: none; }
+
+.ide { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+
+/* --- 顶栏：运行按钮必须是全页最显眼的东西 --- */
+.ide-bar {
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  padding: 9px 12px; border-bottom: 1px solid var(--border);
+  background: var(--bg-soft); flex: none;
+}
+.ide-run {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 20px; border: 0; border-radius: 10px; cursor: pointer;
+  background: var(--grad); color: #fff; font-size: 14.5px; font-weight: 620;
+  box-shadow: 0 4px 14px rgba(99,102,241,.36);
+  transition: .15s;
+}
+.ide-run b { font-weight: 700; }
+.ide-run:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+.ide-run:disabled { opacity: .55; cursor: default; transform: none; }
+.ide-sep { width: 1px; height: 22px; background: var(--border); margin: 0 3px; }
+.ide-btn {
+  border: 1px solid var(--border); background: var(--panel); color: var(--dim);
+  padding: 6px 13px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: .15s;
+}
+.ide-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ide-btn.danger:hover { border-color: var(--red); color: var(--red); background: var(--red-soft); }
+.ide-btn.ghost { background: transparent; }
+.ide-close { margin-left: auto; }
+.ide-badge {
+  margin-left: 6px; padding: 5px 11px; border-radius: 99px; cursor: pointer;
+  background: var(--accent-soft); color: var(--accent);
+  font-size: 12px; font-weight: 560; white-space: nowrap; transition: .15s;
+}
+.ide-badge:hover { filter: brightness(1.1); }
+
+/* --- 主体两栏 --- */
+.ide-body { flex: 1; display: flex; min-height: 0; }
+
+.ide-side {
+  width: 208px; flex: none; border-right: 1px solid var(--border);
+  background: var(--bg-soft); display: flex; flex-direction: column; min-height: 0;
+}
+.ide-side-head {
+  padding: 10px 13px; font-size: 10.5px; font-weight: 700; letter-spacing: .13em;
+  color: var(--faint); text-transform: uppercase; border-bottom: 1px solid var(--border-soft);
+}
+.ide-files { flex: 1; overflow-y: auto; padding: 6px; }
+.ide-group {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .1em; color: var(--faint);
+  padding: 11px 8px 5px; text-transform: uppercase;
+}
+.ide-file {
+  display: flex; align-items: center; gap: 7px; width: 100%;
+  padding: 7px 9px; border: 0; border-radius: 7px; background: transparent;
+  color: var(--dim); font-size: 13px; text-align: left; cursor: pointer; font-family: inherit;
+  transition: .12s;
+}
+.ide-file:hover { background: var(--accent-soft); color: var(--text); }
+.ide-file.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.ide-file .ico { flex: none; font-size: 12px; }
+.ide-file .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ide-file .dot { margin-left: auto; color: var(--amber); font-size: 10px; flex: none; }
+.ide-empty { padding: 5px 10px; font-size: 12px; color: var(--faint); font-style: italic; }
+
+/* --- 右侧：编辑器 + 终端 --- */
+.ide-right { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+
+.ide-pane-head {
+  display: flex; align-items: center; gap: 9px; padding: 7px 13px; flex: none;
+  background: var(--bg-soft); border-bottom: 1px solid var(--border-soft);
+}
+.ide-pane-title { font-size: 11.5px; font-weight: 650; color: var(--faint); letter-spacing: .04em; }
+.ide-curname {
+  font-size: 12px; color: var(--accent); font-family: var(--mono);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ide-mini {
+  margin-left: auto; border: 1px solid var(--border); background: transparent;
+  color: var(--dim); padding: 3px 10px; border-radius: 99px; font-size: 11.5px; cursor: pointer;
+  transition: .15s;
+}
+.ide-mini:hover { border-color: var(--accent); color: var(--accent); }
+
+/* 编辑器 */
+.ide-editor {
+  flex: 1; min-height: 120px; display: flex; overflow: hidden;
+  background: var(--code-bg); position: relative;
+}
+.ide-gutter {
+  flex: none; width: 46px; padding: 13px 9px 13px 0; text-align: right;
+  font-family: var(--mono); font-size: 13.5px; line-height: 1.72;
+  color: var(--faint); background: var(--code-head);
+  border-right: 1px solid var(--border-soft);
+  overflow: hidden; white-space: pre; user-select: none;
+}
+.ide-ta {
+  flex: 1; border: 0; outline: none; resize: none; padding: 13px 15px;
+  background: var(--code-bg); color: var(--text);
+  font-family: var(--mono); font-size: 13.8px; line-height: 1.72;
+  tab-size: 4; white-space: pre; overflow: auto;
+}
+
+/* 终端 */
+.ide-term {
+  height: 40%; min-height: 150px; flex: none;
+  display: flex; flex-direction: column; border-top: 1px solid var(--border);
+  background: var(--code-bg);
+}
+.ide-term-body {
+  flex: 1; overflow: auto; padding: 11px 15px;
+  font-family: var(--mono); font-size: 13px; line-height: 1.7;
+  white-space: pre-wrap; word-break: break-word;
+}
+.ide-term-body .err { color: var(--red); }
+.ide-term-body .sys { color: var(--faint); }
+.ide-term-body .ok { color: var(--faint); font-size: 11.5px; }
+.ide-ce { width: 100%; height: 280px; margin: 6px 0; }
+
+/* 顶栏"实验室"按钮 */
+.lab-btn {
+  display: inline-grid; place-items: center; width: 36px; height: 36px;
+  border: 0; border-radius: 10px; background: transparent; color: var(--dim); cursor: pointer;
+  transition: .15s;
+}
+.lab-btn:hover { background: var(--accent-soft); color: var(--accent); }
+.lab-btn svg { width: 19px; height: 19px; }
+
+/* 代码块上的"实验室"小按钮 */
+.btn-lab { margin-left: 4px; }
+.btn-lab:hover { border-color: var(--accent); color: var(--accent); }
+
+@media (max-width: 860px) {
+  .ide-side { width: 150px; }
+  .ide-gutter { width: 34px; font-size: 12px; }
+  .ide-run { padding: 8px 14px; font-size: 13.5px; }
+  .ide-btn { padding: 5px 10px; font-size: 12px; }
+  .ide-badge { display: none; }
+  .ide-term { height: 46%; }
+}

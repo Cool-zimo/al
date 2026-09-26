@@ -44,6 +44,7 @@ const Store = (() => {
       REVIEW: 'review',      // { [lessonKey]: { stage, due, lastOk, history } }
       GUARD: 'guard',        // { date, dayTotal, session, lastActive, breaks }
       LAST_POS: 'lastPos',   // 上次阅读位置 { bookId, lessonId }
+      IDE_FILES: 'ideFiles', // 代码实验室里的"我的文件" { [name]: { text, updatedAt } }
       SYNCED_AT: 'syncedAt',
       DARK: 'dark'
     },

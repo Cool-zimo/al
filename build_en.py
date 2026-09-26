@@ -38,6 +38,9 @@ REPLACES = [
      '<!-- ===================== Main app ===================== -->'),
     ('aria-label="目录"', 'aria-label="Table of contents"'),
     ('aria-label="笔记"', 'aria-label="Notes"'),
+    ('aria-label="代码实验室" title="代码实验室"', 'aria-label="Code lab" title="Code lab"'),
+    ('<!-- ===================== 代码实验室（全屏面板） ===================== -->',
+     '<!-- ===================== Code lab (full-screen panel) ===================== -->'),
 ]
 
 

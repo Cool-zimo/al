@@ -13,6 +13,7 @@
 
   let BOOKS = [];
   let TOC = [];
+  let LESSON_BLOCKS = [];   // 当前课的 python 代码块，实验室用
   let flat = [];
   let book = null;
   let current = null;
@@ -47,6 +48,39 @@
     return r.text();
   }
 
+  /* ================= 代码实验室 ================= */
+  let labPanel = null;
+
+  function openLab(code, name) {
+    const lab = $('lab');
+    if (!lab) return;
+    lab.hidden = false;
+    if (!labPanel) {
+      labPanel = IDE.create({ blocks: LESSON_BLOCKS, lessonKey: book ? book.id : '' });
+      lab.appendChild(labPanel);
+      labPanel._btnClose.onclick = closeLab;
+    }
+    if (code != null) labPanel.api.open(code, name);
+    labPanel.api.focus();
+    document.body.classList.add('lab-open');
+  }
+
+  function closeLab() {
+    const lab = $('lab');
+    if (lab) lab.hidden = true;
+    document.body.classList.remove('lab-open');
+  }
+
+  /** 换课/回首页时销毁实验室面板，下次打开会用新课的示例重建 */
+  function resetLab() {
+    const lab = $('lab');
+    if (lab) { lab.hidden = true; lab.innerHTML = ''; }
+    labPanel = null;
+    document.body.classList.remove('lab-open');
+  }
+
+  window.__openLab = (code, name) => openLab(code, name);
+
   /* ================= 笔记面板显隐 ================= */
   /** 只有课文页/大测验页才需要笔记；首页、复习页整个收起面板 */
   function setNotesVisible(on) {
@@ -57,6 +91,7 @@
   async function renderHome() {
     book = null; current = null;
     closeSidebar();
+    resetLab();
     setNotesVisible(false);
     Notes.reset(T().notes.noLesson || '');
     $('toc').innerHTML = `<div class="toc-chapter">${T().toc.all}</div>` +
@@ -174,6 +209,7 @@
 
     const art = $('lesson');
     art.innerHTML = `<div class="loading">${T().loading || '加载中…'}</div>`;
+    resetLab();
     setNotesVisible(true);
     // 先清空笔记面板：切章瞬间就不能再显示上一节的笔记
     Notes.reset();
@@ -196,6 +232,7 @@
 
   function paint(art, md, ctxKey) {
     const { html, blocks, quizzes } = MD.renderLesson(md);
+    LESSON_BLOCKS = blocks.filter(b => b.lang === 'python' || b.lang === 'py');
     art.innerHTML = html;
 
     art.querySelectorAll('[data-codeblock]').forEach(holder => {
@@ -397,6 +434,11 @@
       sync.syncNow().then(ok => toast(ok ? T().toast.syncOk : T().toast.syncFail));
     };
 
+    $('btn-lab').onclick = () => openLab();
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !$('lab').hidden) closeLab();
+    });
+
     $('btn-modal-close').onclick = () => { $('modal').hidden = true; };
     $('modal').onclick = e => { if (e.target.id === 'modal') $('modal').hidden = true; };
 
@@ -472,6 +514,7 @@
       sync = new ConfigSync(api, 'anylearn-notes');
       sync.onStateChange = syncState;
       await sync.init();
+      window.__sync = sync;
       Notes.attach(sync, () => book && renderTOC());
       return true;
     } catch (e) {
