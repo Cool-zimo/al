@@ -71,6 +71,19 @@ const CodeBlock = (() => {
     };
     btnCE.onclick = () => window.open(Godbolt.buildUrl(ta.value), '_blank', 'noopener');
 
+    // 一键用 VS Code 打开：源码进剪贴板 + .py 下载 + 唤起 vscode://
+    const btnVS = mkBtn('VSCode ↗', 'btn-copy btn-vs');
+    btnVS.title = L.vscodeTip || '用 VS Code 打开这段代码';
+    head.appendChild(btnVS);
+    btnVS.onclick = async () => {
+      const fname = lessonId ? (String(lessonId).split('/').pop() || 'code') + '.py' : 'code.py';
+      const r = await VSCode.open(ta.value, fname);
+      if (r && r.copied) {
+        btnVS.textContent = L.vscodeDone || '已复制 ✓';
+        setTimeout(() => btnVS.textContent = 'VSCode ↗', 1800);
+      }
+    };
+
     // 送进代码实验室：左侧文件树 / 右上编辑器 / 右下终端
     const btnLab = mkBtn('🧪 ' + (L.lab || '实验室'), 'btn-copy btn-lab');
     btnLab.title = L.labTip || '在代码实验室里打开这段代码';

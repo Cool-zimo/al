@@ -95,10 +95,112 @@ const Quiz = (() => {
     box.appendChild(foot);
 
     ({
-      choice: renderChoice, fill: renderFill, code: renderCode, project: renderProject
+      choice: renderChoice, fill: renderFill, code: renderCode,
+      function: renderFunction, project: renderProject
     }[q.type] || renderChoice)(q, body, foot, id, ctx);
 
     return box;
+  }
+
+  /* --- 函数题：真正调用用户写的函数，比对返回值 --- */
+  function renderFunction(q, body, foot, id, ctx) {
+    const starter = q.starter || '';
+    const funcName = (q.func || '').trim();
+    const cases = parseCases(q.cases || '');
+
+    const wrap = document.createElement('div');
+    wrap.className = 'quiz-code';
+    const ta = document.createElement('textarea');
+    ta.className = 'quiz-ta';
+    ta.spellcheck = false;
+    ta.value = starter;
+    wrap.appendChild(ta);
+    body.appendChild(wrap);
+
+    const out = document.createElement('div');
+    out.className = 'quiz-out';
+    body.appendChild(out);
+
+    const btnRun = mkBtn(Q().run, 'primary');
+    const btnHint = mkBtn(Q().hint, 'ghost');
+    const btnReset = mkBtn(Q().reset, 'ghost');
+
+    btnReset.onclick = () => { ta.value = starter; out.className = 'quiz-out'; out.textContent = ''; };
+    btnHint.onclick = () => {
+      out.className = 'quiz-out show hint';
+      out.textContent = '💡 ' + (q.hint || Q().noHint);
+    };
+
+    btnRun.onclick = async () => {
+      btnRun.disabled = true;
+      btnRun.textContent = Q().running;
+      out.className = 'quiz-out show';
+      out.textContent = Q().running;
+
+      const r = await Runner.execFunction(ta.value, funcName, cases, 'fn:' + id);
+
+      if (r.error) {
+        out.className = 'quiz-out show err';
+        out.textContent = '❌ ' + r.error;
+        finish(id, false, q, foot, null);
+        btnRun.disabled = false;
+        btnRun.textContent = Q().retry;
+        return;
+      }
+
+      const pass = r.results.filter(x => x.ok).length;
+      const ok = r.ok;
+      const lines = r.results.map(x => {
+        const flag = x.ok ? '✅' : '❌';
+        let s = `${flag} ${funcName}(${x.args.slice(1, -1)})`;
+        if (x.ok) s += ` → ${x.got}`;
+        else s += `  期望 ${x.expect}，实际 ${x.got === null ? (x.error || '报错') : x.got}`;
+        return s;
+      });
+      out.className = 'quiz-out show ' + (ok ? 'ok' : 'err');
+      out.textContent = lines.join('\n') +
+        `\n\n${pass} / ${r.results.length} ` + (window.I18N.lang === 'zh' ? '个用例通过' : 'cases passed');
+
+      finish(id, ok, q, foot, null);
+      if (ok) { btnRun.textContent = Q().passed; }
+      else { btnRun.disabled = false; btnRun.textContent = Q().retry; }
+    };
+
+    foot.appendChild(btnRun);
+    if (q.hint) foot.appendChild(btnHint);
+    foot.appendChild(btnReset);
+
+    const saved = getResult(id);
+    if (saved && saved.ok) { btnRun.textContent = Q().passed; }
+  }
+
+  /** 解析用例：每行 "参数 -> 期望值"，参数用逗号分隔，值用 Python 字面量写法 */
+  function parseCases(block) {
+    if (Array.isArray(block)) block = block.join('\n');
+    return String(block || '').split('\n')
+      .map(l => l.trim())
+      .filter(l => l && l.includes('->'))
+      .map(line => {
+        const [a, e] = line.split('->');
+        const argStr = a.trim();
+        const args = argStr === '' ? [] : argStr.split(',').map(s => literal(s.trim()));
+        return { args, expect: literal(e.trim()) };
+      });
+  }
+
+  /** 把 Python 字面量写法转成 JS 值 */
+  function literal(s) {
+    if (/^-?\d+$/.test(s)) return parseInt(s, 10);
+    if (/^-?\d*\.\d+$/.test(s)) return parseFloat(s);
+    if (s === 'True') return true;
+    if (s === 'False') return false;
+    if (s === 'None') return null;
+    if (/^".*"$/.test(s)) return s.slice(1, -1);
+    if (/^'.*'$/.test(s)) return s.slice(1, -1);
+    if (/^[[{]/.test(s)) {
+      try { return JSON.parse(s.replace(/'/g, '"')); } catch (e) { /* 落到底下当字符串 */ }
+    }
+    return s;
   }
 
   /* --- 选择题 --- */
@@ -226,41 +328,88 @@ const Quiz = (() => {
     if (saved && saved.ok) { btnRun.textContent = Q().passed; btnRun.disabled = false; }
   }
 
-  /* --- 小项目：验收清单自评 --- */
+  /* --- 小项目：验收清单自评 + 「能跑通」验证 --- */
   function renderProject(q, body, foot, id, ctx) {
     const checks = q.checklist || q.checks || [];
-    if (typeof checks === 'string') checks = [checks];
+    const list = [].concat(checks || []);
 
-    const list = document.createElement('div');
-    list.className = 'quiz-checks';
+    const wrap = document.createElement('div');
+    wrap.className = 'quiz-checks';
     const boxes = [];
-    checks.forEach(text => {
+    list.forEach(text => {
       const row = document.createElement('label');
       row.className = 'quiz-check';
       row.innerHTML = `<input type="checkbox"><span>${escapeHtml(text)}</span>`;
-      list.appendChild(row);
+      wrap.appendChild(row);
       boxes.push(row.querySelector('input'));
     });
-    body.appendChild(list);
+    body.appendChild(wrap);
 
+    // 代码区：可留空。填了就必须能跑通，跑不通不给过
     const ta = document.createElement('textarea');
     ta.className = 'quiz-ta';
-    ta.placeholder = Q().project;
+    ta.placeholder = (Q().projectPlaceholder || '');
+    if (q.starter) ta.value = q.starter;
     body.appendChild(ta);
 
-    const btn = mkBtn(Q().done, 'primary');
-    btn.onclick = () => {
+    const out = document.createElement('div');
+    out.className = 'quiz-out';
+    body.appendChild(out);
+
+    const note = document.createElement('div');
+    note.className = 'quiz-note';
+    note.textContent = Q().projectNote || '';
+    body.appendChild(note);
+
+    const btnCheck = mkBtn(Q().verify, 'ghost');
+    const btnDone = mkBtn(Q().done, 'primary');
+
+    let ran = false;    // 是否已验证过代码能跑
+
+    btnCheck.onclick = async () => {
+      const code = ta.value.trim();
+      if (!code) {
+        // 没写代码也算通过验证 —— 项目允许在别处完成
+        ran = true;
+        out.className = 'quiz-out show ok';
+        out.textContent = '✅ ' + (Q().noCodeOk || '');
+        return;
+      }
+      btnCheck.disabled = true;
+      btnCheck.textContent = Q().running;
+      out.className = 'quiz-out show';
+      out.textContent = Q().running;
+      const r = await Runner.execCheck(code, 'proj:' + id);
+      if (r.ok) {
+        ran = true;
+        out.className = 'quiz-out show ok';
+        out.textContent = '✅ ' + (Q().noBug || '') +
+          (r.stdout ? '\n' + r.stdout : '');
+      } else {
+        out.className = 'quiz-out show err';
+        out.textContent = '❌ ' + (Q().hasBug || '') + '\n' + r.error;
+      }
+      btnCheck.disabled = false;
+      btnCheck.textContent = Q().verify;
+    };
+
+    btnDone.onclick = () => {
       const done = boxes.filter(b => b.checked).length;
       if (done < boxes.length) return toast(Q().remain(boxes.length - done));
+      const code = ta.value.trim();
+      if (code && !ran) return toast(Q().verifyFirst || '');
       finish(id, true, q, foot, null);
-      btn.textContent = Q().finished;
-      btn.disabled = true;
+      btnDone.textContent = Q().finished;
+      btnDone.disabled = true;
       ta.disabled = true;
+      btnCheck.disabled = true;
     };
-    foot.appendChild(btn);
+
+    foot.appendChild(btnCheck);
+    foot.appendChild(btnDone);
 
     const saved = getResult(id);
-    if (saved && saved.ok) { btn.textContent = Q().finished; btn.disabled = true; }
+    if (saved && saved.ok) { btnDone.textContent = Q().finished; btnDone.disabled = true; }
   }
 
   /* ================= 结果 ================= */

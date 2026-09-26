@@ -60,6 +60,14 @@ window.I18N = {
     remain: (n) => `${n} item(s) still unchecked — review them yourself first`,
     noHint: 'Re-read the example above. Remember: a function must return its result.',
     refAnswer: 'Answer: '
+  ,
+    verify: '▶ Check it runs',
+    noBug: 'Runs clean, no errors',
+    hasBug: "It doesn't run yet — fix this first:",
+    noCodeOk: 'No code pasted is fine — you can build the project in your own editor',
+    verifyFirst: 'Click "Check it runs" first to confirm there are no errors',
+    projectPlaceholder: 'Paste your code here (optional). If you paste it, it must run clean; if not, you can still submit — build it in VS Code instead.',
+    projectNote: 'Mini projects are not judged on functionality (too subjective). The bar is: it runs + you ticked the checklist above.'
   },
 
   review: {
@@ -118,7 +126,7 @@ window.I18N = {
     invalidToken: 'token is invalid or expired',
     exportOk: 'Exported'
   },
-  codeblock: { edit:'Edit', run:'▶ Run', copy:'Copy', reset:'Reset', done:'Done', copied:'Copied', lab:'Lab', labTip:'Open this code in the code lab', running:'Running…', copyFail:'Copy failed — select manually' },
+  codeblock: { edit:'Edit', run:'▶ Run', copy:'Copy', reset:'Reset', done:'Done', copied:'Copied', vscodeTip:'Open this code in VS Code (copied + .py downloaded)', vscodeDone:'Copied ✓', lab:'Lab', labTip:'Open this code in the code lab', running:'Running…', copyFail:'Copy failed — select manually' },
   logout: 'Sign out',
   confirmLogout: 'Sign out? Local notes are kept.',
   prevLabel: 'Previous',
@@ -164,5 +172,51 @@ window.I18N = {
     ceToast: 'Opened in Compiler Explorer',
     welcome: 'Tip: Ctrl / Cmd + Enter runs the file, Ctrl / Cmd + S saves it.',
     opened: 'Opened in the lab'
+  },
+
+  exam: {
+    pos: (n, t) => `Question ${n} of ${t}`,
+    score: (r, d) => `${r} correct　${d} answered`,
+    prev: '← Previous',
+    next: 'Next →',
+    finish: 'Submit & see score',
+    kindChoice: 'Multiple choice',
+    kindFill: 'Fill in the blank',
+    kindFunction: 'Algorithm · write a function',
+    kindCode: 'Coding',
+    kindProject: 'Mini project',
+    kindConcept: 'Concepts',
+    kindAlgorithm: 'Algorithms',
+    kindProjectName: 'Project',
+    grade: {
+      excellent: 'Excellent — you have really got this chapter',
+      good: 'Good — mostly solid, a couple of points to revisit',
+      pass: 'Pass — redo the ones you missed',
+      again: 'Not yet — no rush, go back over the lesson'
+    },
+    wrongTitle: (n) => `${n} question(s) not passed yet`,
+    wrongTip: 'These go into your review schedule automatically — you will be tested again tomorrow.',
+    allOk: '🎊 All passed — this chapter is done',
+    retryWrong: 'Try again',
+    back: 'Back to library'
+  },
+
+  vscode: {
+    copied: 'Code copied to clipboard',
+    copyFail: 'Copy failed — please select the code manually',
+    downloaded: ', .py file downloaded'
+  },
+
+  perm: {
+    none: 'Not connected',
+    fineTitle: 'Fine-grained token ✓',
+    fineDesc: 'The scope is decided by which repository you ticked on GitHub — nothing outside it is reachable. This is the recommended setup.',
+    wideTitle: '⚠️ This token is broader than needed',
+    wideDesc: 'This site only needs Contents read/write on one repository. Switch to a fine-grained token limited to a single repo.',
+    regen: 'Generate a new one',
+    okTitle: 'Classic token',
+    okDesc: 'Current scopes shown below. For tighter control, switch to a fine-grained token limited to one repository.',
+    unknown: 'Could not read the scope',
+    fail: 'Scope check failed'
   },
 };

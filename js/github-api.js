@@ -42,7 +42,47 @@ class GitHubAPI {
       err.data = data;
       throw err;
     }
+    // 把最后一次响应挂在实例上，供读取 X-OAuth-Scopes 这类响应头
+    this.lastResponse = res;
     return data;
+  }
+
+  /**
+   * 读取当前 token 的实际授权范围。
+   *
+   * 为什么要有这个：站点只需要一个仓库的写权限，但用户可能给了全权限的
+   * classic token。让权限可见，是"这个页面到底能碰什么"唯一能被验证的方式。
+   *
+   * @returns {Promise<{type:'fine-grained'|'classic', scopes:string[], accepted:string, raw:string|null}>}
+   */
+  async getScopes() {
+    const res = await fetch(this.base + '/user', {
+      method: 'GET',
+      headers: this._headers()
+    });
+    // X-OAuth-Scopes 只有 classic token 会返回；fine-grained 返回的是
+    // X-OAuth-Token-Type: app 且不带 scopes
+    const scopesHeader = res.headers.get('X-OAuth-Scopes');
+    const tokenType = res.headers.get('X-OAuth-Token-Type');
+    const accepted = res.headers.get('X-Accepted-OAuth-Scopes') || '';
+
+    if (!res.ok) {
+      const err = new Error('HTTP ' + res.status);
+      err.status = res.status;
+      throw err;
+    }
+
+    const scopes = (scopesHeader || '')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    return {
+      type: tokenType === 'app' ? 'fine-grained' : (scopes.length ? 'classic' : 'unknown'),
+      scopes,
+      accepted: accepted.split(',').map(s => s.trim()).filter(Boolean),
+      raw: scopesHeader
+    };
   }
 
   /** 校验 token、取用户名 */

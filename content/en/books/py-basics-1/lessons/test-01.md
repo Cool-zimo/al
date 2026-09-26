@@ -75,49 +75,40 @@ explain: Full-width and ASCII brackets look nearly identical, but Python only ac
 
 ## Part 2 · Algorithm
 
-Not just "can use it" — "understands it".
+Not just "can use it" — "understands it". Both of these are **machine-graded**: one checks your program's output, the other actually calls your function and compares return values.
 
 ```quiz
-type: code
-q: With a single print, output this triangle of asterisks
+type: function
+q: Complete make_card(): join name and hobby into one line of card text, and return it
+func: make_card
 starter: |
-  # Target shape:
-  # *
-  # **
-  # ***
-  # ****
-  # *****
-  #
-  # Hint: strings can be multiplied!
-  #   "*" * 3  gives  "***"
-  #   "ab" * 2 gives  "abab"
-  #
-  # Hint 2: join the 5 lines into one string with \n, then print once
-  
-  print("start editing here")
-tests:
-- assert __out.count("\n") >= 4
-- assert __out.strip().split("\n")[0].strip() == "*"
-- assert "***" in __out
-hint: Try running print("*" * 3) on its own first. Then work out how to join 5 different-length strings of asterisks into one big string using \n.
-explain: Multiplying a string, "*" * n, produces n asterisks instantly — a neat Python trait. You could of course write 5 separate prints, but the "multiply + join with \n" route trains you to abstract a repeating pattern out — which is exactly what algorithmic thinking is.
+  def make_card(name, hobby):
+      # Join name and hobby into the format "Name: xxx · Hobby: xxx"
+      # Key point: return the result — don't just print it
+      return ""
+cases: |
+  "Alex", "coding" -> "Name: Alex · Hobby: coding"
+  "Sam", "climbing" -> "Name: Sam · Hobby: climbing"
+  "Jo", "drawing" -> "Name: Jo · Hobby: drawing"
+hint: Join the pieces with +: return "Name: " + name + " · Hobby: " + hobby. Don't wrap the whole expression in extra quotes.
+explain: This is the one question that actually calls your function — the page runs make_card("Alex", "coding") and compares the return value case by case. The key to a function is return: print shows something on screen, return hands a result back to the caller. Completely different things.
 ```
 
 ```quiz
 type: code
-q: Repair this broken business-card program so it prints 4 lines correctly
+q: Find the 3 errors in this code and fix it so it prints 4 lines
 starter: |
-  # This program has 3 errors — find and fix them all
-  print("Name: Zhang San"
+  # This program has 3 errors — find them one by one
+  print("Name: Alex"
   print(Hobby: coding)
-  # print("City: Hangzhou"
+  # print("City: London"
   print("Motto: a little better every day")
 tests:
-- assert "Name: Zhang San" in __out
+- assert "Name: Alex" in __out
 - assert "Hobby: coding" in __out
-- assert "City: Hangzhou" in __out
-hint: The three errors are: line 1 missing its closing bracket, line 2's "Hobby: coding" missing quotes, line 3 commented out entirely. Fix them one by one.
-explain: These three map exactly onto this chapter's classic traps: unmatched bracket (SyntaxError), string without quotes (NameError), and a line commented out (code never runs). Finding all three first try means you genuinely absorbed the chapter.
+- assert "City: London" in __out
+hint: The three errors: line 2 is missing a closing bracket, line 3 has "Hobby: coding" without quotes, line 4 is commented out entirely.
+explain: These three map exactly onto this chapter's classic traps: unmatched bracket (SyntaxError), string without quotes (NameError), and a line commented out (it never runs). Spotting all three first try means you genuinely absorbed the chapter.
 ```
 
 ---

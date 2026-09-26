@@ -144,5 +144,135 @@ const Runner = (() => {
     return result;
   }
 
-  return { run, execWithTests, ensure, resetNamespace, get ready() { return !!pyodide; } };
+  /**
+   * 函数题判分：执行用户代码 -> 取出指定函数 -> 逐个用例调用并比对返回值
+   *
+   * 这是"算法题能自动批阅"的关键：不比对 stdout，而是真正调用用户写的函数，
+   * 看返回值是否符合预期。比 execWithTests 更结构化，能给出逐用例的对比表。
+   *
+   * @param {string} code 用户代码
+   * @param {string} funcName 要调用的函数名
+   * @param {Array<{args:Array, expect:any}>} cases 测试用例
+   * @param {string} nsKey
+   * @returns {Promise<{ok:boolean, results:Array, error:string|null, stdout:string}>}
+   */
+  async function execFunction(code, funcName, cases, nsKey = '__fn__') {
+    const result = { ok: false, results: [], error: null, stdout: '' };
+    try {
+      await ensure();
+    } catch (e) {
+      result.error = '运行环境加载失败：' + e.message;
+      return result;
+    }
+
+    if (nsOwner !== nsKey || !ns) {
+      ns = pyodide.runPython('{}');
+      nsOwner = nsKey;
+    }
+    let buf = '';
+    pyodide.setStdout({ batched: s => { buf += s + '\n'; } });
+    pyodide.setStderr({ batched: s => { buf += s + '\n'; } });
+
+    // 1) 先执行用户代码
+    try {
+      pyodide.runPython(code, { globals: ns });
+    } catch (e) {
+      result.error = String(e.message || e);
+      result.stdout = buf;
+      return result;
+    }
+
+    // 2) 取函数对象
+    let fn;
+    try {
+      fn = ns.get(funcName);
+    } catch (e) { fn = undefined; }
+    if (fn === undefined || fn === null) {
+      result.error = `没有找到名为 ${funcName} 的函数 —— 检查一下是不是拼错了，或者忘了用 def 定义`;
+      result.stdout = buf;
+      return result;
+    }
+    if (typeof fn !== 'function' && !(fn && fn.type === 'function')) {
+      result.error = `${funcName} 不是一个可以调用的函数`;
+      result.stdout = buf;
+      return result;
+    }
+
+    // 3) 在 Python 端逐用例调用并比对
+    pyodide.globals.set('__fn_obj', fn);
+    pyodide.globals.set('__cases_json', JSON.stringify(cases));
+
+    const py = `
+import json as __json
+__cs = __json.loads(__cases_json)
+__res = []
+for __c in __cs:
+    __args = __c.get("args", []) or []
+    __exp = __c.get("expect")
+    __row = {"args": __repr(__args), "expect": __repr(__exp), "got": None, "ok": False}
+    try:
+        __got = __fn_obj(*__args)
+        __row["got"] = __repr(__got)
+        # 严格比较：避免 1 == True 这种"值相等但类型不同"的误判
+        # 但 int / float 之间放宽（用户写 6.0 和 6 都算对）
+        __same_kind = (
+            type(__got) is type(__exp)
+            or (isinstance(__got, (int, float)) and isinstance(__exp, (int, float))
+                and not isinstance(__got, bool) and not isinstance(__exp, bool))
+        )
+        __row["ok"] = bool((__got == __exp) and __same_kind)
+    except Exception as __e:
+        __row["got"] = None
+        __row["error"] = str(__e)
+    __res.append(__row)
+__json.dumps(__res, ensure_ascii=False)
+`;
+
+    try {
+      const jsonStr = pyodide.runPython(py);
+      result.results = JSON.parse(jsonStr);
+      result.ok = result.results.length > 0 && result.results.every(r => r.ok);
+    } catch (e) {
+      result.error = String(e.message || e);
+    }
+    result.stdout = buf;
+    return result;
+  }
+
+  /**
+   * 小项目验收：只要求"跑得通"—— 没有语法错误、没有未捕获异常。
+   * 不做功能正确性判断（开放式项目自动批阅本就不现实），
+   * 是否满足需求由用户自己勾选验收清单来确认。
+   *
+   * @returns {Promise<{ok:boolean, error:string|null, stdout:string, lines:number}>}
+   */
+  async function execCheck(code, nsKey = '__proj__') {
+    const result = { ok: false, error: null, stdout: '', lines: 0 };
+    try {
+      await ensure();
+    } catch (e) {
+      result.error = '运行环境加载失败：' + e.message;
+      return result;
+    }
+    if (nsOwner !== nsKey || !ns) {
+      ns = pyodide.runPython('{}');
+      nsOwner = nsKey;
+    }
+    let buf = '';
+    pyodide.setStdout({ batched: s => { buf += s + '\n'; } });
+    pyodide.setStderr({ batched: s => { buf += s + '\n'; } });
+
+    result.lines = code.split('\n').filter(l => l.trim()).length;
+
+    try {
+      pyodide.runPython(code, { globals: ns });
+      result.ok = true;
+    } catch (e) {
+      result.error = String(e.message || e);
+    }
+    result.stdout = buf;
+    return result;
+  }
+
+  return { run, execWithTests, execFunction, execCheck, ensure, resetNamespace, get ready() { return !!pyodide; } };
 })();

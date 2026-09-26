@@ -52,7 +52,14 @@ window.I18N = {
     noLesson: '_（选一节课，就能为它单独记笔记）_'
   },
 
-  quiz: { choice: '选择题', fill: '填空题', code: '程序题', project: '小项目', submit: '提交', run: '▶ 运行并检查', running: '检查中…', hint: '提示', reset: '还原初始代码', done: '我完成了', finished: '已完成 ✅', passed: '已通过', retry: '再试一次', right: '对了。', wrong: '再看看。', pickFirst: '先选一个答案', remain: (n) => `还有 ${n} 项没勾，先自己验收一遍`, noHint: '再读一遍上面的示例代码，注意函数要用 return 把结果返回出去。', refAnswer: '参考答案：' },
+  quiz: { choice: '选择题', fill: '填空题', code: '程序题', project: '小项目', submit: '提交', run: '▶ 运行并检查', running: '检查中…', hint: '提示', reset: '还原初始代码', done: '我完成了', finished: '已完成 ✅', passed: '已通过', retry: '再试一次', right: '对了。', wrong: '再看看。', pickFirst: '先选一个答案', remain: (n) => `还有 ${n} 项没勾，先自己验收一遍`, noHint: '再读一遍上面的示例代码，注意函数要用 return 把结果返回出去。', refAnswer: '参考答案：' ,
+    verify: '▶ 检查能不能跑通',
+    noBug: '代码能跑通，没有报错',
+    hasBug: '代码跑不通，先修一下：',
+    noCodeOk: '没填代码也没关系 —— 项目可以在你自己的编辑器里完成',
+    verifyFirst: '先点「检查能不能跑通」，确认没报错再提交',
+    projectPlaceholder: '把你的代码贴在这里（可选）。贴了就必须能跑通，没贴也能提交 —— 项目可以在 VSCode 里完成。',
+    projectNote: '小项目不判功能对不对（那太主观了），只要求：代码跑得通 + 你自己对照上面的清单验收。' },
 
   review: {
     title: '🔁 今日复习',
@@ -110,7 +117,7 @@ window.I18N = {
     invalidToken: 'token 无效或已过期',
     exportOk: '已导出'
   },
-  codeblock: { edit:'编辑', run:'▶ 运行', copy:'复制', reset:'还原', done:'完成', copied:'已复制', lab:'实验室', labTip:'在代码实验室里打开这段代码', running:'运行中…', copyFail:'复制失败，请手动选择' },
+  codeblock: { edit:'编辑', run:'▶ 运行', copy:'复制', reset:'还原', done:'完成', copied:'已复制', vscodeTip:'用 VS Code 打开这段代码（源码已复制 + .py 已下载）', vscodeDone:'已复制 ✓', lab:'实验室', labTip:'在代码实验室里打开这段代码', running:'运行中…', copyFail:'复制失败，请手动选择' },
   logout: '退出登录',
   confirmLogout: '退出登录？本地笔记会保留。',
   prevLabel: '上一节',
@@ -156,5 +163,51 @@ window.I18N = {
     ceToast: '已在 Compiler Explorer 打开',
     welcome: '提示：Ctrl / Cmd + Enter 直接运行，Ctrl / Cmd + S 保存。',
     opened: '已在实验室里打开'
+  },
+
+  exam: {
+    pos: (n, t) => `第 ${n} 题 / 共 ${t} 题`,
+    score: (r, d) => `答对 ${r}　已答 ${d}`,
+    prev: '← 上一题',
+    next: '下一题 →',
+    finish: '交卷，看成绩',
+    kindChoice: '选择题',
+    kindFill: '填空题',
+    kindFunction: '算法题 · 写函数',
+    kindCode: '程序题',
+    kindProject: '小项目',
+    kindConcept: '概念',
+    kindAlgorithm: '算法',
+    kindProjectName: '项目',
+    grade: {
+      excellent: '优秀 —— 这一章是真的会了',
+      good: '良好 —— 主体掌握，个别点再看看',
+      pass: '及格 —— 建议把错题重做一遍',
+      again: '还差一点 —— 别急，回去再看一遍课文'
+    },
+    wrongTitle: (n) => `还有 ${n} 题没通过`,
+    wrongTip: '这些题会自动进入你的复习计划，明天再来考你一次。',
+    allOk: '🎊 全部通过 —— 这一章可以毕业了',
+    retryWrong: '重做一遍',
+    back: '回到书单'
+  },
+
+  vscode: {
+    copied: '代码已复制到剪贴板',
+    copyFail: '复制失败，请手动选中代码复制',
+    downloaded: '，.py 文件已下载'
+  },
+
+  perm: {
+    none: '未连接',
+    fineTitle: 'Fine-grained token ✓',
+    fineDesc: '权限范围由你在 GitHub 上勾选的仓库决定，站点碰不到范围外的东西。这是推荐用法。',
+    wideTitle: '⚠️ 这个 token 的权限偏大',
+    wideDesc: '本站只需要一个仓库的 Contents 读写权限。建议换成只授权单个仓库的 Fine-grained token。',
+    regen: '去重新生成',
+    okTitle: 'Classic token',
+    okDesc: '当前权限范围如下。若想更稳妥，可换成只授权单个仓库的 Fine-grained token。',
+    unknown: '无法读取权限范围',
+    fail: '权限检查失败'
   },
 };

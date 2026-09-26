@@ -270,8 +270,8 @@
 
     const art = $('lesson');
     art.innerHTML = `<div class="loading">…</div>`;
-    setNotesVisible(true);
-    Notes.reset();
+    resetLab();
+    setNotesVisible(false);        // 测验页不挂笔记，专心答题
 
     let md;
     try {
@@ -281,23 +281,38 @@
       return;
     }
 
-    const ctxKey = keyOf(bookId, testId);
-    const total = paint(art, md, ctxKey);
-    Notes.load(ctxKey, current.title || T().toc.chapterTest);
-    document.title = `${T().toc.chapterTest} · ${book.title}`;
+    // 只取题目，不要正文 —— 测验是"考"，不是"读"
+    const quizzes = Quiz.extractBlocks(md).filter(q => q.type);
 
-    if (window.__checkAll) document.removeEventListener('quiz:done', window.__checkAll);
-    window.__checkAll = () => {
-      const results = Store.get(Store.K.QUIZ, {}) || {};
-      const mine = Object.keys(results).filter(k => k.startsWith(ctxKey + ':'));
-      const passed = mine.filter(k => results[k].ok).length;
-      if (total > 0 && passed >= total) {
-        toast(T().toast.chapterPass);
-        Review.record(ctxKey, true);
+    if (!quizzes.length) {
+      art.innerHTML = `<h1>${T().toast.noContent}</h1>`;
+      return;
+    }
+
+    const title = (ch ? ch.title : T().toc.chapterTest);
+    const headTitle = document.createElement('h1');
+    headTitle.className = 'exam-title';
+    headTitle.textContent = title;
+
+    const exam = Exam.create({
+      quizzes,
+      key: keyOf(bookId, testId),
+      title,
+      onFinish: g => {
+        const allOk = g.right >= g.total;
+        Review.record(keyOf(bookId, testId), allOk);
+        if (allOk) toast(T().toast.chapterPass);
         if (sync) sync.schedulePush();
       }
-    };
-    document.addEventListener('quiz:done', window.__checkAll);
+    });
+
+    art.innerHTML = '';
+    art.appendChild(headTitle);
+    art.appendChild(exam);
+
+    $('lesson-nav').innerHTML = '';
+    document.title = `${title} · ${book ? book.title : ''}`;
+    window.scrollTo({ top: 0 });
   }
 
   /* ================= 复习 ================= */
@@ -485,6 +500,14 @@
       if (ok) { $('modal').hidden = true; toast(S.connected); }
     };
 
+    // 权限自检：让"这个页面到底能碰什么"变成看得见的东西
+    const permBox = document.createElement('div');
+    permBox.className = 'callout';
+    permBox.id = 'perm-box';
+    permBox.innerHTML = '<span class="dim">检查 token 权限…</span>';
+    $('modal-body').appendChild(permBox);
+    showPerms(permBox);
+
     $('btn-logout').onclick = () => {
       if (confirm(T().confirmLogout || '退出登录？本地笔记会保留。')) Gate.logout();
     };
@@ -496,6 +519,62 @@
       a.download = `anylearn-notes-${new Date().toISOString().slice(0, 10)}.md`;
       a.click(); URL.revokeObjectURL(a.href);
     };
+  }
+
+  /* ================= token 权限自检 ================= */
+  /** 权限过宽的判定：站点只需要单个仓库的 Contents 读写 */
+  const DANGEROUS = {
+    'delete_repo': '可以删除你的仓库',
+    'admin:org': '可以管理你的组织',
+    'admin:public_key': '可以管理你的 SSH 密钥',
+    'admin:gpg_key': '可以管理你的 GPG 密钥',
+    'workflow': '可以修改 GitHub Actions 工作流',
+    'gist': '可以读写你的 Gist',
+    'user': '可以读写你的个人资料'
+  };
+
+  async function showPerms(box) {
+    const P = T().perm || {};
+    if (!api) { box.innerHTML = '<span class="dim">' + (P.none || '未连接') + '</span>'; return; }
+    try {
+      const info = await api.getScopes();
+      let html = '';
+
+      if (info.type === 'fine-grained') {
+        box.className = 'callout';
+        html = '<b>' + (P.fineTitle || 'Fine-grained token') + '</b><br>' +
+          '<span class="dim">' + (P.fineDesc || '权限范围由你在 GitHub 上勾选的仓库决定，站点碰不到范围外的东西。') + '</span>';
+      } else if (info.scopes.length) {
+        const bad = info.scopes.filter(s => DANGEROUS[s]);
+        // 只需要 repo（或 public_repo），其余都算超发
+        const wide = info.scopes.filter(s => s !== 'repo' && s !== 'public_repo');
+        if (bad.length || wide.length > 1) {
+          box.className = 'callout err';
+          html = '<b>' + (P.wideTitle || '⚠️ 这个 token 权限偏大') + '</b><br>' +
+            '<div style="font-family:var(--mono);font-size:12.5px;margin:7px 0;line-height:1.8">' +
+            info.scopes.map(s => `<code>${escapeHtml(s)}</code>`).join(' ') + '</div>';
+          if (bad.length) {
+            html += '<div style="margin:6px 0">' + bad.map(s => '· ' + DANGEROUS[s]).join('<br>') + '</div>';
+          }
+          html += '<div class="dim">' + (P.wideDesc || '本站只需要一个仓库的 Contents 读写权限。建议换成只授权单个仓库的 Fine-grained token。') + '</div>' +
+            ' <a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener">' +
+            (P.regen || '去重新生成') + ' →</a>';
+        } else {
+          box.className = 'callout warn';
+          html = '<b>' + (P.okTitle || 'Classic token') + '</b><br>' +
+            '<span class="dim">' + (P.okDesc || '') + '</span>' +
+            '<div style="font-family:var(--mono);font-size:12.5px;margin-top:6px">' +
+            info.scopes.map(s => `<code>${escapeHtml(s)}</code>`).join(' ') + '</div>';
+        }
+      } else {
+        box.className = 'callout';
+        html = '<span class="dim">' + (P.unknown || '无法读取权限范围') + '</span>';
+      }
+      box.innerHTML = html;
+    } catch (e) {
+      box.className = 'callout err';
+      box.innerHTML = '<span class="dim">' + (P.fail || '权限检查失败') + '</span>';
+    }
   }
 
   /* ================= 同步 ================= */
