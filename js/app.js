@@ -168,6 +168,24 @@
     rev.onclick = () => { location.hash = '#/review'; closeSidebar(); };
     nav.appendChild(rev);
 
+    // 今日额度：按当前书的难度显示还剩几节新课
+    if (book && book.level) {
+      const cap = Quota.capOf(book.level);
+      const u = Quota.used(book.level);
+      const lft = Math.max(0, cap - u);
+      const q = document.createElement('div');
+      q.className = 'quota-bar' + (lft === 0 ? ' full' : '');
+      q.innerHTML =
+        `<div class="quota-top"><span class="quota-label">${escapeHtml(T().quota.side)}</span>` +
+        `<span class="quota-num">${u} / ${cap}</span></div>` +
+        `<div class="quota-track"><i style="width:${cap ? Math.min(100, u / cap * 100) : 0}%"></i></div>` +
+        `<div class="quota-note">${lft === 0
+          ? escapeHtml(T().quota.usedUp)
+          : escapeHtml(T().quota.remain(lft))}</div>` +
+        `<div class="quota-meta">${escapeHtml(book.level)} · ${escapeHtml(T().quota.capNote(cap))}</div>`;
+      nav.appendChild(q);
+    }
+
     TOC.forEach(ch => {
       const h = document.createElement('div');
       h.className = 'toc-chapter';
@@ -349,6 +367,7 @@
         if (passed) {
           Review.learn(k);
           toast(T().lq.passed);
+          onLessonCompleted(k, book ? book.level : '', book ? book.title : '');
         } else {
           toast(T().lq.notPassed);
         }
@@ -418,6 +437,36 @@
     $('lesson-nav').innerHTML = '';
     document.title = `${title} · ${book ? book.title : ''}`;
     window.scrollTo({ top: 0 });
+  }
+
+  /* ================= 每日配额提醒 ================= */
+  function showQuotaPanel(level, bookTitle) {
+    const Q = T().quota;
+    const cap = Quota.capOf(level);
+    $('modal-title').textContent = Q.title;
+    $('modal-body').innerHTML = `
+      <div class="break-hero">🫗</div>
+      <p style="text-align:center;font-size:15px;line-height:1.85;margin:0 0 16px">
+        ${Q.msg(bookTitle, level, cap)}
+      </p>
+      <div class="callout">${Q.hint}</div>
+      <a class="primary-btn" href="#/review" id="btn-quota-review" style="display:block;text-align:center;text-decoration:none">
+        ${Q.goReview}
+      </a>
+      <button class="ghost-btn" id="btn-quota-continue">${Q.continueAnyway}</button>
+    `;
+    $('modal').hidden = false;
+    $('btn-quota-review').onclick = () => { $('modal').hidden = true; };
+    $('btn-quota-continue').onclick = () => { $('modal').hidden = true; };
+  }
+
+  /** 一课完成后调用：记额度 + 用完了就提醒 */
+  function onLessonCompleted(k, level, bookTitle) {
+    const isNew = Quota.consume(k, level);
+    renderTOC();
+    if (isNew && Quota.exhausted(level)) {
+      setTimeout(() => showQuotaPanel(level, bookTitle), 700);
+    }
   }
 
   /* ================= 复习 ================= */
@@ -529,8 +578,14 @@
         else delete p[k];
         return p;
       });
-      if (nowDone) { Review.learn(k); toast(T().toast.addedReview); }
-      else Review.unlearn(k);
+      if (nowDone) {
+        Review.learn(k);
+        toast(T().toast.addedReview);
+        onLessonCompleted(k, book ? book.level : '', book ? book.title : '');
+      } else {
+        Review.unlearn(k);
+        Quota.release(k);
+      }
       if (sync) sync.schedulePush();
       const old = $('lesson').querySelector('.lesson-done');
       if (old) old.replaceWith(buildDoneBar(item));

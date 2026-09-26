@@ -224,4 +224,17 @@ window.I18N = {
     unknown: '无法读取权限范围',
     fail: '权限检查失败'
   },
+
+  quota: {
+    side: '今日新课额度',
+    remain: (n) => `还能学 ${n} 节`,
+    usedUp: '今天的额度用完了',
+    capNote: (n) => `每天 ${n} 节`,
+    title: '🫗 今天的额度用完了',
+    msg: (bookTitle, level, cap) =>
+      `《${bookTitle}》属于<b>${level}</b>难度，每天建议最多 <b>${cap}</b> 节新课。<br>今天已经学满了。`,
+    hint: '这不是限制你，是替你踩刹车。新知识要靠睡眠来固化 —— 今天再灌进去的，明天大概率还回来。把已经学过的复习一遍，收益比开新课高得多。',
+    goReview: '去复习已学的 →',
+    continueAnyway: '我知道了，还是要继续'
+  },
 };

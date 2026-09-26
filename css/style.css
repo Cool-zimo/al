@@ -1022,3 +1022,24 @@ body.no-notes .main { margin-right: 0; max-width: 1040px; }
   font-family: var(--mono); font-size: 13px; line-height: 1.65;
   color: var(--text); white-space: pre;
 }
+
+/* ============================================================
+   今日额度（侧栏）
+   ============================================================ */
+.quota-bar {
+  margin: 10px 12px 4px; padding: 11px 13px; border-radius: var(--r-sm);
+  background: var(--panel-2); border: 1px solid var(--border-soft);
+}
+.quota-bar.full { border-color: color-mix(in srgb, var(--amber) 55%, var(--border)); background: var(--amber-soft); }
+.quota-top { display: flex; align-items: baseline; gap: 8px; margin-bottom: 7px; }
+.quota-label { font-size: 11.5px; font-weight: 650; color: var(--dim); letter-spacing: .04em; }
+.quota-num {
+  margin-left: auto; font-size: 13px; font-weight: 700; color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.quota-bar.full .quota-num { color: var(--amber); }
+.quota-track { height: 5px; border-radius: 99px; background: var(--border); overflow: hidden; }
+.quota-track i { display: block; height: 100%; background: var(--grad); border-radius: 99px; transition: width .4s; }
+.quota-bar.full .quota-track i { background: linear-gradient(135deg, var(--amber), var(--red)); }
+.quota-note { font-size: 12px; color: var(--dim); margin-top: 7px; line-height: 1.5; }
+.quota-meta { font-size: 11px; color: var(--faint); margin-top: 3px; }

@@ -29,5 +29,36 @@
       }
     ],
     "test": "test-01"
+  },
+  {
+    "title": "Chapter 2 · Variables & Data Types",
+    "items": [
+      {
+        "id": "06",
+        "title": "Variables: naming your data",
+        "summary": "Why variables exist, and what assignment really does"
+      },
+      {
+        "id": "07",
+        "title": "Numbers: integers and floats",
+        "summary": "int, float, and the rules of arithmetic"
+      },
+      {
+        "id": "08",
+        "title": "Strings: working with text",
+        "summary": "Quotes, concatenation, indexing and common methods"
+      },
+      {
+        "id": "09",
+        "title": "Booleans and comparisons",
+        "summary": "True/False, comparison and logical operators"
+      },
+      {
+        "id": "10",
+        "title": "Type conversion & type()",
+        "summary": "Why 1 and '1' differ, and how to convert between them"
+      }
+    ],
+    "test": "test-02"
   }
 ]

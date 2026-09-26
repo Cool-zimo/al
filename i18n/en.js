@@ -233,4 +233,17 @@ window.I18N = {
     unknown: 'Could not read the scope',
     fail: 'Scope check failed'
   },
+
+  quota: {
+    side: 'New lessons today',
+    remain: (n) => `${n} more available`,
+    usedUp: 'Daily limit reached',
+    capNote: (n) => `${n} per day`,
+    title: '🫗 Daily limit reached',
+    msg: (bookTitle, level, cap) =>
+      `<b>${bookTitle}</b> is <b>${level}</b> level, which allows at most <b>${cap}</b> new lessons a day.<br>You have hit that today.`,
+    hint: 'This is not a restriction — it is a brake on your behalf. New knowledge consolidates during sleep; anything you cram in now is likely gone by tomorrow. Reviewing what you already studied pays far better than opening something new.',
+    goReview: 'Review what I learned →',
+    continueAnyway: 'Got it, continuing anyway'
+  },
 };
