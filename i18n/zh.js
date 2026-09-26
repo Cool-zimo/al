@@ -5,26 +5,20 @@ window.I18N = {
   brandSub: '通学万义',
 
   gate: {
-    tagline: '浏览器里真跑代码的编程教程 · 会记笔记 · 会安排复习',
-    feats: ['代码现场运行', '艾宾浩斯复习', '跨设备同步', '节奏守护'],
-    cardTitle: '用 GitHub 登录',
-    cardDesc: '你的笔记、进度和复习计划都存在你自己的私有仓库里 —— 不经过任何第三方服务器。',
-    stepTitle: '三步拿到令牌',
+    toggleText: '怎么获取令牌？',
     steps: [
       '打开 <a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener">GitHub → Personal access tokens</a>',
-      '选 <b>Fine-grained token</b>，只勾一个权限：<code>Contents: Read and write</code>',
-      '有效期建议 90 天，生成后复制（只显示一次）'
+      '选 <b>Fine-grained token</b>，只勾 <code>Contents: Read and write</code>',
+      '有效期设 90 天，复制生成的令牌（只显示一次）'
     ],
-    inputPlaceholder: 'github_pat_... 或 ghp_...',
-    submit: '登录并开始学习',
-    submitting: '正在验证…',
-    note: '🔒 令牌只保存在你自己的浏览器里。本站是纯静态页面，没有后端，也无法把你的数据发到任何地方。',
-    foot: '没有 GitHub 账号？<a href="https://github.com/signup" target="_blank" rel="noopener">免费注册一个</a>，一分钟就好。',
-    errEmpty: '请先粘贴令牌',
+    inputPlaceholder: '粘贴 GitHub 令牌（ghp_ 或 github_pat_ 开头）',
+    submit: '登录',
+    submitting: '验证中…',
+    note: '🔒 令牌只存你自己的浏览器。本站无后端，无处可发。',
+    errEmpty: '先粘贴令牌',
     err401: '令牌无效或已过期，请重新生成',
     errNetwork: '连不上 GitHub，检查网络后重试',
-    errOther: '登录失败：',
-    switchLang: 'English →'
+    errOther: '登录失败：'
   },
 
   topbar: { home: '回到书单', settings: '设置', sync: '同步' },

@@ -15,15 +15,11 @@ const Gate = (() => {
 
   function fill() {
     const g = window.I18N.gate;
-    $('g-tagline').textContent = g.tagline;
-    $('g-title').textContent = g.cardTitle;
-    $('g-desc').textContent = g.cardDesc;
-    $('g-note').innerHTML = g.note;
-    $('g-steps-title').textContent = g.stepTitle;
-    $('g-steps').innerHTML = g.steps.map(s => `<li>${s}</li>`).join('');
     $('g-token').placeholder = g.inputPlaceholder;
     $('g-submit').textContent = g.submit;
-    $('g-foot').innerHTML = g.foot;
+    $('g-toggle-text').textContent = g.toggleText;
+    $('g-steps').innerHTML = g.steps.map(s => `<li>${s}</li>`).join('');
+    $('g-note').innerHTML = g.note;
   }
 
   function err(msg) {
@@ -38,7 +34,6 @@ const Gate = (() => {
   async function verify(token) {
     const api = new GitHubAPI(token);
     const login = await api.getUsername();
-    // 顺便拿头像
     let avatar = '';
     try {
       const r = await fetch('https://api.github.com/user', {
@@ -92,17 +87,20 @@ const Gate = (() => {
     if (onSuccess) onSuccess(info);
   }
 
-  /**
-   * 初始化登录门
-   * @param {Function} successCb 登录成功后回调（由 app.js 启动主逻辑）
-   */
   function init(successCb) {
     onSuccess = successCb;
     fill();
+
     $('g-submit').onclick = submit;
-    $('g-token').addEventListener('keydown', e => {
-      if (e.key === 'Enter') submit();
-    });
+    $('g-token').addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+
+    const toggle = $('g-toggle');
+    const more = $('g-more');
+    toggle.onclick = () => {
+      const open = more.hidden;
+      more.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+    };
 
     // 已有 token：静默验证，通过直接进
     const saved = Store.get(Store.K.TOKEN, '');
@@ -115,16 +113,17 @@ const Gate = (() => {
           enter(info);
         })
         .catch(() => {
-          // 过期了就当没登录过
           Store.del(Store.K.TOKEN);
           Store.del(Store.K.OWNER);
           $('g-submit').disabled = false;
           $('g-submit').textContent = window.I18N.gate.submit;
         });
+    } else {
+      // 首次进入自动聚焦输入框
+      setTimeout(() => $('g-token').focus(), 120);
     }
   }
 
-  /** 退出登录 */
   function logout() {
     Store.del(Store.K.TOKEN);
     Store.del(Store.K.OWNER);

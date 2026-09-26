@@ -574,57 +574,71 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
 .callout.warn { background: var(--amber-soft); }
 .callout.err { background: var(--red-soft); }
 
-/* ==== 登录门 ==== */
+/* ==== 登录门（精简版）==== */
 .gate {
   position: fixed; inset: 0; z-index: 500; display: flex; align-items: center; justify-content: center;
   padding: 20px; overflow-y: auto;
   background:
-    radial-gradient(1100px 620px at 12% -8%, rgba(99,102,241,.22), transparent 60%),
-    radial-gradient(900px 560px at 88% 108%, rgba(34,211,238,.18), transparent 60%),
+    radial-gradient(1000px 560px at 15% -10%, rgba(99,102,241,.2), transparent 62%),
+    radial-gradient(820px 520px at 85% 110%, rgba(34,211,238,.16), transparent 62%),
     var(--bg);
 }
-.gate-box { width: 100%; max-width: 468px; margin: auto; }
+.gate-box { width: 100%; max-width: 400px; margin: auto; }
+
+/* 头部：logo 与标题并排，省掉两行高度 */
+.gate-head { display: flex; align-items: center; gap: 13px; margin-bottom: 20px; }
 .gate-logo {
-  width: 66px; height: 66px; border-radius: 20px; margin: 0 auto 20px;
-  background: var(--grad); display: grid; place-items: center; font-size: 32px;
-  box-shadow: 0 12px 34px rgba(99,102,241,.4);
+  width: 46px; height: 46px; border-radius: 14px; flex: none;
+  background: var(--grad); display: grid; place-items: center; font-size: 23px;
+  box-shadow: 0 8px 22px rgba(99,102,241,.36);
 }
-.gate h1 {
-  text-align: center; font-size: 33px; font-weight: 760; letter-spacing: -.03em; margin: 0 0 6px;
-}
+.gate-names { min-width: 0; }
+.gate h1 { font-size: 25px; font-weight: 740; letter-spacing: -.025em; margin: 0; line-height: 1.2; }
 .gate .slogan {
-  text-align: center; font-size: 12px; letter-spacing: .32em; color: var(--faint);
-  text-transform: uppercase; margin: 0 0 8px; font-weight: 600;
+  font-size: 10.5px; letter-spacing: .26em; color: var(--faint);
+  text-transform: uppercase; margin: 2px 0 0; font-weight: 600;
 }
-.gate .tagline { text-align: center; color: var(--dim); font-size: 14.5px; margin: 0 0 28px; line-height: 1.7; }
+
 .gate-card {
-  background: var(--panel); border: 1px solid var(--border); border-radius: 18px;
-  padding: 24px; box-shadow: var(--shadow);
+  background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+  padding: 18px; box-shadow: var(--shadow);
 }
-.gate-card h2 { font-size: 15px; margin: 0 0 6px; font-weight: 650; }
-.gate-card > p { font-size: 13.5px; color: var(--dim); margin: 0 0 16px; line-height: 1.7; }
-.gate-steps { font-size: 13.5px; color: var(--dim); padding-left: 19px; margin: 0 0 16px; }
-.gate-steps li { margin: 7px 0; line-height: 1.65; }
 .gate input {
   width: 100%; padding: 12px 14px; border-radius: var(--r-sm); border: 1px solid var(--border);
   background: var(--panel-2); color: var(--text); font-family: var(--mono); font-size: 13.5px; outline: none;
 }
 .gate input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-.gate-err { color: var(--red); font-size: 13px; margin-top: 11px; display: none; }
+.gate-err { color: var(--red); font-size: 12.5px; margin-top: 9px; display: none; }
 .gate-err.show { display: block; }
-.gate-foot { text-align: center; font-size: 12px; color: var(--faint); margin-top: 20px; line-height: 1.8; }
-.gate-note {
-  display: flex; gap: 10px; padding: 12px 14px; border-radius: var(--r-sm);
-  background: var(--grad-soft); border: 1px solid var(--border-soft);
-  font-size: 12.5px; color: var(--dim); line-height: 1.65; margin-bottom: 18px;
+
+/* 折叠区 */
+.gate-toggle {
+  display: flex; align-items: center; justify-content: center; gap: 5px; width: 100%;
+  margin-top: 11px; padding: 5px; border: 0; background: transparent;
+  color: var(--faint); font-size: 12.5px; cursor: pointer; border-radius: 8px; transition: .15s;
 }
-.gate-feats { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 26px; }
-.gate-feat {
-  font-size: 12px; padding: 5px 12px; border-radius: 99px;
-  background: var(--panel); border: 1px solid var(--border); color: var(--dim);
+.gate-toggle:hover { color: var(--accent); background: var(--accent-soft); }
+.gate-toggle svg { width: 15px; height: 15px; transition: transform .2s; }
+.gate-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.gate-more { margin-top: 4px; animation: fade .2s ease; }
+.gate-more[hidden] { display: none; }
+.gate-steps { font-size: 13px; color: var(--dim); padding-left: 19px; margin: 0; }
+.gate-steps li { margin: 6px 0; line-height: 1.6; }
+.gate-steps code { background: var(--code-bg); padding: 1.5px 5px; border-radius: 5px; font-family: var(--mono); font-size: .88em; }
+
+.gate-foot {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  font-size: 11.5px; color: var(--faint); margin-top: 14px; line-height: 1.6;
+  text-align: left;
 }
-.gate-lang { text-align: center; margin-top: 18px; font-size: 13px; }
+.gate-foot #g-note { flex: 1; min-width: 200px; }
+.gate-lang { white-space: nowrap; }
 .gate-lang a { color: var(--accent); font-weight: 560; }
+
+@media (max-width: 860px) {
+  .gate h1 { font-size: 22px; }
+  .gate-logo { width: 40px; height: 40px; font-size: 20px; }
+}
 
 /* 休息提醒 */
 .break-hero { font-size: 58px; text-align: center; margin: 6px 0 8px; }
@@ -669,7 +683,6 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
   .lesson h1 { font-size: 26px; }
   .lesson h2 { font-size: 19.5px; margin-top: 32px; }
   .home-hero h1 { font-size: 29px; }
-  .gate h1 { font-size: 27px; }
   .brand .title { font-size: 14.5px; }
   .brand .title small { display: none; }
   .sync-text { display: none; }

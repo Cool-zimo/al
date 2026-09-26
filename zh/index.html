@@ -14,34 +14,32 @@
 <!-- ===================== 登录门 ===================== -->
 <div class="gate" id="gate">
   <div class="gate-box">
-    <div class="gate-logo">🦉</div>
-    <h1>AnyLearn</h1>
-    <p class="slogan">通学万义</p>
-    <p class="tagline" id="g-tagline"></p>
-
-    <div class="gate-feats">
-      <span class="gate-feat">代码现场运行</span>
-      <span class="gate-feat">艾宾浩斯复习</span>
-      <span class="gate-feat">跨设备同步</span>
-      <span class="gate-feat">节奏守护</span>
+    <div class="gate-head">
+      <div class="gate-logo">🦉</div>
+      <div class="gate-names">
+        <h1>AnyLearn</h1>
+        <p class="slogan">通学万义</p>
+      </div>
     </div>
 
     <div class="gate-card">
-      <h2 id="g-title"></h2>
-      <p id="g-desc"></p>
-
-      <div class="gate-note" id="g-note"></div>
-
-      <h3 style="font-size:13.5px;margin:0 0 8px" id="g-steps-title"></h3>
-      <ol class="gate-steps" id="g-steps"></ol>
-
       <input type="text" id="g-token" autocomplete="off" spellcheck="false" autocapitalize="off">
       <div class="gate-err" id="g-err"></div>
       <button class="primary-btn" id="g-submit"></button>
+
+      <button class="gate-toggle" id="g-toggle" aria-expanded="false">
+        <span id="g-toggle-text"></span>
+        <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="gate-more" id="g-more" hidden>
+        <ol class="gate-steps" id="g-steps"></ol>
+      </div>
     </div>
 
-    <p class="gate-foot" id="g-foot"></p>
-    <p class="gate-lang"><a href="../en/">English →</a></p>
+    <p class="gate-foot">
+      <span id="g-note"></span>
+      <span class="gate-lang"><a href="../en/">English →</a></span>
+    </p>
   </div>
 </div>
 

@@ -5,26 +5,20 @@ window.I18N = {
   brandSub: 'Learn Anything',
 
   gate: {
-    tagline: 'Programming tutorials that actually run in your browser · notes · spaced repetition',
-    feats: ['Live code runner', 'Ebbinghaus review', 'Cross-device sync', 'Pace guardian'],
-    cardTitle: 'Sign in with GitHub',
-    cardDesc: 'Your notes, progress and review schedule live in your own private repo — no third-party server involved.',
-    stepTitle: 'Get a token in 3 steps',
+    toggleText: 'How do I get a token?',
     steps: [
       'Open <a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener">GitHub → Personal access tokens</a>',
-      'Choose <b>Fine-grained token</b>, grant exactly one permission: <code>Contents: Read and write</code>',
-      'Set an expiry (90 days is fine), copy the token — it is shown only once'
+      'Choose <b>Fine-grained token</b>, grant only <code>Contents: Read and write</code>',
+      'Set a 90-day expiry, copy the token (shown once)'
     ],
-    inputPlaceholder: 'github_pat_... or ghp_...',
-    submit: 'Sign in and start learning',
+    inputPlaceholder: 'Paste your GitHub token (ghp_ or github_pat_)',
+    submit: 'Sign in',
     submitting: 'Verifying…',
-    note: '🔒 The token stays in your own browser. This site is a static page with no backend — it has nowhere to send your data.',
-    foot: 'No GitHub account yet? <a href="https://github.com/signup" target="_blank" rel="noopener">Create one for free</a> — takes a minute.',
-    errEmpty: 'Please paste your token first',
-    err401: 'Token is invalid or expired. Generate a new one.',
-    errNetwork: 'Cannot reach GitHub. Check your connection and retry.',
-    errOther: 'Sign-in failed: ',
-    switchLang: '中文 →'
+    note: '🔒 The token stays in your browser. No backend, nowhere to send it.',
+    errEmpty: 'Paste your token first',
+    err401: 'Token is invalid or expired — generate a new one',
+    errNetwork: 'Cannot reach GitHub — check your connection',
+    errOther: 'Sign-in failed: '
   },
 
   topbar: { home: 'Back to library', settings: 'Settings', sync: 'Sync' },

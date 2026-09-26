@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>AnyLearn · Learn Anything</title>
-<meta name="description" content="AnyLearn — programming tutorials that actually run in your browser, with notes and Ebbinghaus-spaced review">
+<title>AnyLearn · 通学万义</title>
+<meta name="description" content="AnyLearn 通学万义 —— 浏览器内真跑代码的编程教程，会记笔记、按艾宾浩斯曲线安排复习">
 <meta name="theme-color" content="#0a0c11">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>🦉</text></svg>">
 <link rel="stylesheet" href="../css/style.css">
@@ -14,34 +14,32 @@
 <!-- ===================== 登录门 ===================== -->
 <div class="gate" id="gate">
   <div class="gate-box">
-    <div class="gate-logo">🦉</div>
-    <h1>AnyLearn</h1>
-    <p class="slogan">Learn Anything</p>
-    <p class="tagline" id="g-tagline"></p>
-
-    <div class="gate-feats">
-      <span class="gate-feat">Live code runner</span>
-      <span class="gate-feat">Ebbinghaus review</span>
-      <span class="gate-feat">Cross-device sync</span>
-      <span class="gate-feat">Pace guardian</span>
+    <div class="gate-head">
+      <div class="gate-logo">🦉</div>
+      <div class="gate-names">
+        <h1>AnyLearn</h1>
+        <p class="slogan">通学万义</p>
+      </div>
     </div>
 
     <div class="gate-card">
-      <h2 id="g-title"></h2>
-      <p id="g-desc"></p>
-
-      <div class="gate-note" id="g-note"></div>
-
-      <h3 style="font-size:13.5px;margin:0 0 8px" id="g-steps-title"></h3>
-      <ol class="gate-steps" id="g-steps"></ol>
-
       <input type="text" id="g-token" autocomplete="off" spellcheck="false" autocapitalize="off">
       <div class="gate-err" id="g-err"></div>
       <button class="primary-btn" id="g-submit"></button>
+
+      <button class="gate-toggle" id="g-toggle" aria-expanded="false">
+        <span id="g-toggle-text"></span>
+        <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="gate-more" id="g-more" hidden>
+        <ol class="gate-steps" id="g-steps"></ol>
+      </div>
     </div>
 
-    <p class="gate-foot" id="g-foot"></p>
-    <p class="gate-lang"><a href="../zh/">中文 →</a></p>
+    <p class="gate-foot">
+      <span id="g-note"></span>
+      <span class="gate-lang"><a href="../zh/">中文 →</a></span>
+    </p>
   </div>
 </div>
 
@@ -54,11 +52,11 @@
     </button>
     <div class="brand" id="btn-home">
       <span class="logo">🦉</span>
-      <span class="title">AnyLearn<small>Learn Anything</small></span>
+      <span class="title">AnyLearn<small>通学万义</small></span>
     </div>
     <div class="topbar-right">
       <div class="sync-pill" id="sync-pill" data-state="off">
-        <span class="dot"></span><span class="sync-text">Offline</span>
+        <span class="dot"></span><span class="sync-text">未连接</span>
       </div>
       <button class="user-chip" id="btn-settings">
         <img class="avatar" id="avatar" alt="" hidden>
@@ -75,29 +73,29 @@
       </div>
       <span class="progress-label" id="progress-label"></span>
     </div>
-    <nav class="toc" id="toc"><div class="loading">Loading…</div></nav>
+    <nav class="toc" id="toc"><div class="loading">加载目录…</div></nav>
   </aside>
   <div class="scrim" id="scrim"></div>
 
   <main class="main" id="main">
-    <article class="lesson" id="lesson"><div class="loading">Loading…</div></article>
+    <article class="lesson" id="lesson"><div class="loading">加载中…</div></article>
     <nav class="lesson-nav" id="lesson-nav"></nav>
   </main>
 
   <section class="notes" id="notes">
     <div class="notes-head">
-      <span class="notes-title">📝 Notes</span>
+      <span class="notes-title">📝 本节笔记</span>
       <div class="notes-actions">
-        <button class="mini-btn active" id="btn-note-preview">Preview</button>
-        <button class="mini-btn" id="btn-note-edit">Edit</button>
-        <button class="mini-btn danger" id="btn-note-clear">Clear</button>
+        <button class="mini-btn active" id="btn-note-preview">预览</button>
+        <button class="mini-btn" id="btn-note-edit">编辑</button>
+        <button class="mini-btn danger" id="btn-note-clear">清空</button>
       </div>
     </div>
     <textarea class="note-input" id="note-input" hidden></textarea>
     <div class="note-preview markdown" id="note-preview"></div>
     <div class="notes-foot">
       <span id="note-status"></span>
-      <button class="mini-btn" id="btn-note-sync">Sync now</button>
+      <button class="mini-btn" id="btn-note-sync">立即同步</button>
     </div>
   </section>
 
