@@ -48,7 +48,8 @@ window.I18N = {
     placeholder: '读完写下你的理解、踩过的坑、想改写的代码…\n\n支持 Markdown。自动保存到你的私有仓库，换设备也能接着看。',
     saved: '未同步', syncing: '同步中…', cleared: '已清空，待同步',
     confirmClear: '清空这一节的笔记？此操作会同步到你的私有仓库。',
-    emptyPreview: '_（还没有笔记）_'
+    emptyPreview: '_（还没有笔记）_',
+    noLesson: '_（选一节课，就能为它单独记笔记）_'
   },
 
   quiz: { choice: '选择题', fill: '填空题', code: '程序题', project: '小项目', submit: '提交', run: '▶ 运行并检查', running: '检查中…', hint: '提示', reset: '还原初始代码', done: '我完成了', finished: '已完成 ✅', passed: '已通过', retry: '再试一次', right: '对了。', wrong: '再看看。', pickFirst: '先选一个答案', remain: (n) => `还有 ${n} 项没勾，先自己验收一遍`, noHint: '再读一遍上面的示例代码，注意函数要用 return 把结果返回出去。', refAnswer: '参考答案：' },

@@ -3,7 +3,8 @@
  * 保存策略：输入即写 localStorage（绝不丢），1.2 秒防抖后推到私有仓库。
  */
 const Notes = (() => {
-  let currentId = null;
+  let currentId = null;    // 当前绑定的课（bookId/lessonId）
+  let seq = 0;             // 每次 load 自增，用于让旧的输入事件失效
   let sync = null;
   let saveTimer = null;
   let mode = 'preview';    // edit | preview —— 默认预览，避免一进页面就弹出键盘
@@ -22,9 +23,12 @@ const Notes = (() => {
     if (input && !input._bound) {
       input._bound = true;
       input.addEventListener('input', () => {
-        const id = currentId;
+        const id = currentId, mySeq = seq;
         if (!id) return;
         const text = input.value;
+        // 用 seq 判定：切换章节后尚未落地的旧输入直接丢弃，
+        // 否则在快速切章时，上一节的字会被写进新一节的笔记里
+        if (mySeq !== seq) return;
         Store.update(Store.K.NOTES, {}, n => {
           n[id] = { text, updatedAt: new Date().toISOString() };
           return n;
@@ -75,9 +79,31 @@ const Notes = (() => {
 
   function setStatus(s) { const el = $status(); if (el) el.textContent = s; }
 
-  function load(lessonId) {
+  /** 清空面板（切章瞬间调用，避免旧笔记短暂残留；也用于首页/复习页） */
+  function reset(placeholderText) {
+    seq++;
+    currentId = null;
+    clearTimeout(saveTimer);
+    const input = $input(), prev = $prev();
+    if (input) input.value = '';
+    if (prev) prev.innerHTML = MD.render(placeholderText || N().emptyPreview);
+    if (input) input.hidden = true;
+    if (prev) prev.hidden = false;
+    const bp = document.getElementById('btn-note-preview');
+    const be = document.getElementById('btn-note-edit');
+    if (bp) bp.classList.add('active');
+    if (be) be.classList.remove('active');
+    mode = 'preview';
+    setStatus('');
+  }
+
+  function load(lessonId, title) {
+    if (!lessonId) { reset(); return; }
+    seq++;                 // 让上一节课尚未落地的输入事件失效
     currentId = lessonId;
-    if (!lessonId) return;
+    // 标题直接写出是哪一课的笔记 —— "一课一份笔记"这件事要看得见
+    const tt = document.querySelector('.notes-title');
+    if (tt) tt.textContent = '📝 ' + (title || N().title.replace('📝 ', ''));
     const notes = Store.get(Store.K.NOTES, {}) || {};
     const item = notes[lessonId];
     const text = typeof item === 'string' ? item : (item?.text || '');
@@ -123,5 +149,5 @@ const Notes = (() => {
 
   function toast(m) { window.__toast && window.__toast(m); }
 
-  return { attach, load, exportAll, get currentId() { return currentId; } };
+  return { attach, load, reset, exportAll, get currentId() { return currentId; } };
 })();

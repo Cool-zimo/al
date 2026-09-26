@@ -48,7 +48,8 @@ window.I18N = {
     placeholder: 'Write down what you understood, the traps you hit, the code you want to rewrite…\n\nMarkdown supported. Auto-saved to your private repo, readable on any device.',
     saved: 'Not synced', syncing: 'Syncing…', cleared: 'Cleared, pending sync',
     confirmClear: 'Clear the notes for this lesson? This syncs to your private repo.',
-    emptyPreview: '_（No notes yet）_'
+    emptyPreview: '_（No notes yet）_',
+    noLesson: '_（Pick a lesson — each one gets its own note）_'
   },
 
   quiz: {

@@ -5,7 +5,8 @@
  */
 const MD = (() => {
 
-  /** 把 Markdown 里的围栏块抽出来：普通代码进 blocks，题目进 quizzes */
+  /** 把 Markdown 里的围栏块抽出来：普通代码进 blocks，题目进 quizzes
+   *  （保留给外部工具用；主渲染走 renderLesson 的分段逻辑，不使用占位符） */
   function extract(md) {
     const blocks = [];
     const quizzes = [];
@@ -15,11 +16,11 @@ const MD = (() => {
       if (L === 'quiz') {
         const i = quizzes.length;
         quizzes.push(body);
-        return `\u0000QUIZ${i}\u0000`;
+        return `%%ALQUIZ:${i}%%`;
       }
       const i = blocks.length;
       blocks.push({ lang: L, code: body });
-      return `\u0000BLOCK${i}\u0000`;
+      return `%%ALBLOCK:${i}%%`;
     });
     return { md: out, blocks, quizzes };
   }
@@ -100,24 +101,47 @@ const MD = (() => {
   }
 
   /**
-   * 渲染一节课：抽块 -> 渲染正文 -> 占位符换成真实 UI 的挂载点
+   * 渲染一节课。
+   *
+   * 采用「分段渲染」而不是占位符替换：
+   * 早期版本用 \u0000BLOCK0\u0000 之类的控制字符做占位，但 DOMPurify 清洗时
+   * 会吞掉控制字符，占位符就退化成纯文本 "BLOCK0" 显示在页面上。
+   * 现在改成按围栏把原文切成若干段，文本段各自走 render()（marked + sanitize），
+   * 代码块/题目由我们自己拼出可信 HTML —— 挂载点永不经过清洗，不可能泄漏。
+   *
    * @returns {{html:string, blocks:Array, quizzes:Array}}
    */
   function renderLesson(src) {
-    const { md, blocks, quizzes } = extract(src);
+    // 按围栏切段，保留分隔符以便判断类型
+    const segs = [];
+    const re = /```(\w+)?\n([\s\S]*?)```/g;
+    let last = 0, m;
 
-    // 让占位符独占一行，避免被塞进段落中间
-    const spaced = md
-      .replace(/^\u0000BLOCK(\d+)\u0000$/gm, '\n\u0000BLOCK$1\u0000\n')
-      .replace(/^\u0000QUIZ(\d+)\u0000$/gm, '\n\u0000QUIZ$1\u0000\n');
+    while ((m = re.exec(src)) !== null) {
+      if (m.index > last) segs.push({ type: 'text', text: src.slice(last, m.index) });
+      const lang = (m[1] || 'text').toLowerCase();
+      const body = m[2].replace(/\n$/, '');
+      segs.push({ type: lang === 'quiz' ? 'quiz' : 'block', lang, code: body });
+      last = m.index + m[0].length;
+    }
+    if (last < src.length) segs.push({ type: 'text', text: src.slice(last) });
 
-    let html = render(spaced);
-
-    html = html.replace(/<p>\u0000BLOCK(\d+)\u0000<\/p>|\u0000BLOCK(\d+)\u0000/g,
-      (m, a, b) => `<div data-codeblock="${a ?? b}"></div>`);
-
-    html = html.replace(/<p>\u0000QUIZ(\d+)\u0000<\/p>|\u0000QUIZ(\d+)\u0000/g,
-      (m, a, b) => `<div data-quiz="${a ?? b}"></div>`);
+    const blocks = [];
+    const quizzes = [];
+    const html = segs.map(seg => {
+      if (seg.type === 'text') {
+        // 纯空段（围栏之间只剩换行）跳过，避免渲染出空 <p>
+        return seg.text.trim() ? render(seg.text) : '';
+      }
+      if (seg.type === 'quiz') {
+        const i = quizzes.length;
+        quizzes.push(seg.code);
+        return `<div data-quiz="${i}"></div>`;
+      }
+      const i = blocks.length;
+      blocks.push({ lang: seg.lang, code: seg.code });
+      return `<div data-codeblock="${i}"></div>`;
+    }).join('\n');
 
     return { html, blocks, quizzes };
   }

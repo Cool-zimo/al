@@ -51,6 +51,7 @@
   async function renderHome() {
     book = null; current = null;
     closeSidebar();
+    Notes.reset(T().notes.noLesson || '');
     $('toc').innerHTML = `<div class="toc-chapter">${T().toc.all}</div>` +
       `<button class="toc-item" data-go-review><span class="n">🔁</span><span class="t">${T().toc.review}</span></button>`;
     $('toc').querySelector('[data-go-review]').onclick = () => { location.hash = '#/review'; };
@@ -166,6 +167,8 @@
 
     const art = $('lesson');
     art.innerHTML = `<div class="loading">${T().loading || '加载中…'}</div>`;
+    // 先清空笔记面板：切章瞬间就不能再显示上一节的笔记
+    Notes.reset();
 
     let md;
     try {
@@ -178,7 +181,7 @@
     paint(art, md, keyOf(bookId, lessonId));
     art.appendChild(buildDoneBar(item));
     renderNav(item);
-    Notes.load(keyOf(bookId, lessonId));
+    Notes.load(keyOf(bookId, lessonId), item.title);
     document.title = `${item.title} · ${book.title}`;
     window.scrollTo({ top: 0 });
   }
@@ -222,6 +225,8 @@
 
     const art = $('lesson');
     art.innerHTML = `<div class="loading">…</div>`;
+    Notes.reset();
+
     let md;
     try {
       md = await fetchText(`${CONTENT}/books/${bookId}/lessons/${testId}.md`);
@@ -232,7 +237,7 @@
 
     const ctxKey = keyOf(bookId, testId);
     const total = paint(art, md, ctxKey);
-    Notes.load(ctxKey);
+    Notes.load(ctxKey, current.title || T().toc.chapterTest);
     document.title = `${T().toc.chapterTest} · ${book.title}`;
 
     if (window.__checkAll) document.removeEventListener('quiz:done', window.__checkAll);
@@ -253,6 +258,7 @@
   async function renderReview() {
     isTestMode = false; current = null;
     renderTOC();
+    Notes.reset(T().notes.noLesson || '');
     const art = $('lesson');
     const due = Review.dueList();
     const up = Review.upcoming(7);
