@@ -29,5 +29,36 @@
       }
     ],
     "test": "test-01"
+  },
+  {
+    "title": "第 2 章 · with、路径与数据格式",
+    "items": [
+      {
+        "id": "06",
+        "title": "with 语句：再也不用 close",
+        "summary": "离开块自动关闭，出错也保证"
+      },
+      {
+        "id": "07",
+        "title": "路径：相对与绝对",
+        "summary": "当前工作目录、分隔符、os.path.join"
+      },
+      {
+        "id": "08",
+        "title": "os 模块",
+        "summary": "创建、删除、遍历文件与文件夹"
+      },
+      {
+        "id": "09",
+        "title": "CSV 文件",
+        "summary": "表格数据的读写，newline='' 必加"
+      },
+      {
+        "id": "10",
+        "title": "JSON 文件",
+        "summary": "嵌套结构，ensure_ascii=False"
+      }
+    ],
+    "test": "test-02"
   }
 ]

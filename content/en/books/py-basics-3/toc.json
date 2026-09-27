@@ -29,5 +29,36 @@
       }
     ],
     "test": "test-01"
+  },
+  {
+    "title": "Chapter 2 · with, Paths and Data Formats",
+    "items": [
+      {
+        "id": "06",
+        "title": "with: never write close() again",
+        "summary": "Closes on exit, guaranteed even on error"
+      },
+      {
+        "id": "07",
+        "title": "Paths: relative and absolute",
+        "summary": "Working directory, separators, os.path.join"
+      },
+      {
+        "id": "08",
+        "title": "The os module",
+        "summary": "Create, delete, walk files and folders"
+      },
+      {
+        "id": "09",
+        "title": "CSV files",
+        "summary": "Reading and writing tables; newline='' required"
+      },
+      {
+        "id": "10",
+        "title": "JSON files",
+        "summary": "Nested structures; ensure_ascii=False"
+      }
+    ],
+    "test": "test-02"
   }
 ]
