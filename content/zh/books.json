@@ -164,5 +164,33 @@
   "ready": true,
   "desc": "算法的主战场：二叉树与堆、图的遍历、十大排序，以及从暴力到优化的 DP 推导过程。",
   "note": "完整 6 章 30 课"
+ },
+ {
+  "id": "stdlib-1",
+  "title": "Python 标准库 1",
+  "subtitle": "数据交换与持久化",
+  "desc": "系统讲标准库的第一本：json 打头，配 csv、configparser、pickle、base64、hashlib，再用 decimal / dataclasses / enum 解决精度与建模，最后做一个能跑的数据管道工具。",
+  "stage": "标准库",
+  "level": "进阶",
+  "ready": true,
+  "note": "完整 6 章 30 课"
+ },
+ {
+  "id": "stdlib-2",
+  "title": "Python 标准库 2",
+  "subtitle": "时间、文件与系统",
+  "desc": "datetime 怎么算时间差与时区、pathlib 怎么优雅地处理路径、os / shutil / glob 怎么批量操作文件，最后做一个文件整理与备份工具。",
+  "stage": "标准库",
+  "level": "进阶",
+  "ready": false
+ },
+ {
+  "id": "stdlib-3",
+  "title": "Python 标准库 3",
+  "subtitle": "文本、工具与工程化",
+  "desc": "re 正则、collections / itertools / functools 这些效率工具、logging、argparse、subprocess、unittest，最后做一个带日志和测试的命令行工具。",
+  "stage": "标准库",
+  "level": "实战",
+  "ready": false
  }
 ]

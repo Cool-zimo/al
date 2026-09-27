@@ -1,0 +1,188 @@
+[
+ {
+  "title": "Chapter 1 · JSON: The Lingua Franca",
+  "items": [
+   {
+    "id": "01",
+    "title": "Why Data Formats Matter",
+    "summary": "This lesson answers a simple question: how…"
+   },
+   {
+    "id": "02",
+    "title": "`dumps` and `loads`: Four Functions, Two Pairs",
+    "summary": "This lesson thoroughly covers the four mos…"
+   },
+   {
+    "id": "03",
+    "title": "The Type Mapping Table: What Converts and What Crashes",
+    "summary": "This lesson explains the type conversion r…"
+   },
+   {
+    "id": "04",
+    "title": "Reading and Writing Files: `dump`, `load`, and Three Key Parameters",
+    "summary": "This lesson covers how to actually store J…"
+   },
+   {
+    "id": "05",
+    "title": "Chinese Characters and Encoding: Why Files Become Garbled",
+    "summary": "This lesson explains exactly why \"reading …"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Advanced JSON",
+  "items": [
+   {
+    "id": "06",
+    "title": "Accessing Nested Structures: Safe Retrieval from Multi-Level Dicts and Lists",
+    "summary": "This lesson answers: \"After reading JSON, …"
+   },
+   {
+    "id": "07",
+    "title": "Custom Object Serialization: `default` and `object_hook`",
+    "summary": "This lesson answers: \"How do I store my cl…"
+   },
+   {
+    "id": "08",
+    "title": "`JSONDecodeError`: Common Bad JSON and Locating Errors",
+    "summary": "This lesson is dedicated to the question: …"
+   },
+   {
+    "id": "09",
+    "title": "When JSON Is Not Enough",
+    "summary": "This lesson gives you a \"boundary checklis…"
+   },
+   {
+    "id": "10",
+    "title": "Hands-On: A Configuration Read/Write Module",
+    "summary": "This lesson ties together everything from …"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · CSV: Tabular Data",
+  "items": [
+   {
+    "id": "11",
+    "title": "The `csv` Module and Why You Cannot Just `split(',')`",
+    "summary": "This lesson tells you: CSV looks simple, b…"
+   },
+   {
+    "id": "12",
+    "title": "`reader` / `writer`: Reading and Writing in List Form",
+    "summary": "This lesson dives into `csv.reader` and `c…"
+   },
+   {
+    "id": "13",
+    "title": "`DictReader` / `DictWriter`: Reading and Writing by Column Name",
+    "summary": "The previous lesson used index-based colum…"
+   },
+   {
+    "id": "14",
+    "title": "CSV Encoding and Dialect Pitfalls",
+    "summary": "This lesson tackles \"why it is all garbled…"
+   },
+   {
+    "id": "15",
+    "title": "Hands-On: A CSV ↔ JSON Conversion Utility",
+    "summary": "This lesson ties together everything from …"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Configuration and Persistence",
+  "items": [
+   {
+    "id": "16",
+    "title": "configparser: How to Read INI Configuration Files",
+    "summary": "This lesson solves \"how to read configurat…"
+   },
+   {
+    "id": "17",
+    "title": "pickle: Serialising Arbitrary Python Objects to Bytes",
+    "summary": "This lesson solves \"how to store things th…"
+   },
+   {
+    "id": "18",
+    "title": "pickle Security Warning: Never Unpickle Untrusted Data",
+    "summary": "This lesson covers exactly one thing, but …"
+   },
+   {
+    "id": "19",
+    "title": "base64: Slipping Binary Data into Text-Only Contexts",
+    "summary": "This lesson solves \"how to embed images, s…"
+   },
+   {
+    "id": "20",
+    "title": "hashlib: Verifying Data Integrity — and Why Passwords Must Never Be Stored in Plain Text",
+    "summary": "This lesson tackles two closely related pr…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Data Types and Precision",
+  "items": [
+   {
+    "id": "21",
+    "title": "decimal: Why £0.1 + £0.2 Does Not Equal £0.3",
+    "summary": "This lesson settles, once and for all, the…"
+   },
+   {
+    "id": "22",
+    "title": "fractions: Exact Computation with Fractions, Avoiding Float Error",
+    "summary": "When a business deals in \"ratios,\" \"recipe…"
+   },
+   {
+    "id": "23",
+    "title": "dataclasses: Cutting Your Boilerplate by 80%",
+    "summary": "A class that just holds data needs an `__i…"
+   },
+   {
+    "id": "24",
+    "title": "enum: Killing Magic Strings with Enumerations",
+    "summary": "Is your code full of `\"pending\"`, `\"paid\"`…"
+   },
+   {
+    "id": "25",
+    "title": "In Practice: An Order Data Validator",
+    "summary": "This is the capstone project of chapter 5.…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Capstone Project",
+  "items": [
+   {
+    "id": "26",
+    "title": "Lesson 26 · The Data Pipeline Toolkit: Project Design",
+    "summary": "Putting every tool from the first 25 lesso…"
+   },
+   {
+    "id": "27",
+    "title": "Lesson 27 · The Data Pipeline: Reading Multiple Formats",
+    "summary": "The load layer's goal — no matter what for…"
+   },
+   {
+    "id": "28",
+    "title": "Lesson 28 · The Data Pipeline: Cleaning and Validation",
+    "summary": "The core principle of validation — **colle…"
+   },
+   {
+    "id": "29",
+    "title": "Lesson 29 · The Data Pipeline: Output and Logging",
+    "summary": "The dump layer writes the cleaned data out…"
+   },
+   {
+    "id": "30",
+    "title": "Lesson 30 · The Grand Finale: Assembling the CLI Tool + Book Recap",
+    "summary": "Connecting all four layers into a runnable…"
+   }
+  ],
+  "test": "test-06"
+ }
+]

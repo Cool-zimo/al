@@ -164,5 +164,33 @@
   "ready": true,
   "desc": "算法的主战场：二叉树与堆、图的遍历、十大排序，以及从暴力到优化的 DP 推导过程。",
   "note": "完整 6 章 30 课"
+ },
+ {
+  "id": "stdlib-1",
+  "title": "Python Standard Library 1",
+  "subtitle": "Data Exchange and Persistence",
+  "desc": "The first systematic tour of the standard library: json first, then csv, configparser, pickle, base64 and hashlib, then decimal / dataclasses / enum for precision and modelling — finishing with a working data pipeline tool.",
+  "stage": "Library",
+  "level": "Intermediate",
+  "ready": true,
+  "note": "完整 6 章 30 课"
+ },
+ {
+  "id": "stdlib-2",
+  "title": "Python Standard Library 2",
+  "subtitle": "Time, Files and the System",
+  "desc": "datetime for intervals and timezones, pathlib for elegant paths, os / shutil / glob for batch file work — finishing with a file organiser and backup tool.",
+  "stage": "Library",
+  "level": "Intermediate",
+  "ready": false
+ },
+ {
+  "id": "stdlib-3",
+  "title": "Python Standard Library 3",
+  "subtitle": "Text, Tools and Engineering",
+  "desc": "re for regular expressions, collections / itertools / functools as force multipliers, then logging, argparse, subprocess and unittest — finishing with a logged, tested CLI tool.",
+  "stage": "Library",
+  "level": "Applied",
+  "ready": false
  }
 ]
