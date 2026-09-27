@@ -1,0 +1,33 @@
+[
+  {
+    "title": "第 1 章 · 文件：让数据活过关机",
+    "items": [
+      {
+        "id": "01",
+        "title": "为什么需要文件",
+        "summary": "变量在内存、文件在硬盘——持久化的意义"
+      },
+      {
+        "id": "02",
+        "title": "open() 与三种模式",
+        "summary": "'r' 读、'w' 写（危险）、'a' 追加"
+      },
+      {
+        "id": "03",
+        "title": "读文件的三种方式",
+        "summary": "read / readline / readlines / for line in f"
+      },
+      {
+        "id": "04",
+        "title": "写文件与换行",
+        "summary": "write() 不自动换行，只能写字符串"
+      },
+      {
+        "id": "05",
+        "title": "实战：能记事的日记本",
+        "summary": "带时间戳、能追加、能查看"
+      }
+    ],
+    "test": "test-01"
+  }
+]

@@ -1,0 +1,33 @@
+[
+  {
+    "title": "Chapter 1 · Files: Making Data Survive",
+    "items": [
+      {
+        "id": "01",
+        "title": "Why files exist",
+        "summary": "Variables in memory, files on disk"
+      },
+      {
+        "id": "02",
+        "title": "open() and the three modes",
+        "summary": "'r' read, 'w' write (dangerous), 'a' append"
+      },
+      {
+        "id": "03",
+        "title": "Three ways to read",
+        "summary": "read / readline / readlines / for line in f"
+      },
+      {
+        "id": "04",
+        "title": "Writing and newlines",
+        "summary": "write() adds no newline; strings only"
+      },
+      {
+        "id": "05",
+        "title": "Practice: a diary that remembers",
+        "summary": "Timestamped, appendable, readable"
+      }
+    ],
+    "test": "test-01"
+  }
+]
