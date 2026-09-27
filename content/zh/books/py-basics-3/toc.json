@@ -60,5 +60,36 @@
       }
     ],
     "test": "test-02"
+  },
+  {
+    "title": "第 3 章 · 出错是常态",
+    "items": [
+      {
+        "id": "11",
+        "title": "什么是异常",
+        "summary": "报错的三个部分，从最后一行读起"
+      },
+      {
+        "id": "12",
+        "title": "try / except",
+        "summary": "接住错误，别用裸 except"
+      },
+      {
+        "id": "13",
+        "title": "else 与 finally",
+        "summary": "没出错时 / 无论如何"
+      },
+      {
+        "id": "14",
+        "title": "主动抛出 raise",
+        "summary": "参数校验与自定义异常"
+      },
+      {
+        "id": "15",
+        "title": "实战：打不垮的程序",
+        "summary": "三层防护的完整实践"
+      }
+    ],
+    "test": "test-03"
   }
 ]

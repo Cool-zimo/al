@@ -60,5 +60,36 @@
       }
     ],
     "test": "test-02"
+  },
+  {
+    "title": "Chapter 3 · Errors Are Normal",
+    "items": [
+      {
+        "id": "11",
+        "title": "What an exception is",
+        "summary": "Three parts; read the last line"
+      },
+      {
+        "id": "12",
+        "title": "try / except",
+        "summary": "Catch errors; never a bare except"
+      },
+      {
+        "id": "13",
+        "title": "else and finally",
+        "summary": "On success / always"
+      },
+      {
+        "id": "14",
+        "title": "Raising on purpose",
+        "summary": "Validation and custom exceptions"
+      },
+      {
+        "id": "15",
+        "title": "Practice: a program you can't break",
+        "summary": "All three levels together"
+      }
+    ],
+    "test": "test-03"
   }
 ]
