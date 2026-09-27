@@ -1,0 +1,188 @@
+[
+  {
+    "title": "第 1 章 · 认识 Series 与 DataFrame",
+    "items": [
+      {
+        "id": "01",
+        "title": "为什么需要 pandas",
+        "summary": "NumPy 搞不定的表格，pandas 天生擅长"
+      },
+      {
+        "id": "02",
+        "title": "Series：带标签的一列",
+        "summary": "索引、dtype、与 ndarray 的关系"
+      },
+      {
+        "id": "03",
+        "title": "DataFrame：一张表",
+        "summary": "从字典、列表、NumPy 数组创建"
+      },
+      {
+        "id": "04",
+        "title": "看一眼数据",
+        "summary": "head、info、describe、shape"
+      },
+      {
+        "id": "05",
+        "title": "读 CSV 到 DataFrame",
+        "summary": "read_csv 常用参数与常见坑"
+      }
+    ],
+    "test": "test-01"
+  },
+  {
+    "title": "第 2 章 · 选取与筛选",
+    "items": [
+      {
+        "id": "06",
+        "title": "取列与取行",
+        "summary": "单列、多列、df[] 的规矩"
+      },
+      {
+        "id": "07",
+        "title": "loc 与 iloc",
+        "summary": "按名字取 vs 按位置取，最大的混淆点"
+      },
+      {
+        "id": "08",
+        "title": "条件筛选",
+        "summary": "布尔索引、多条件、isin"
+      },
+      {
+        "id": "09",
+        "title": "改值与加列",
+        "summary": "赋值、新增列、apply"
+      },
+      {
+        "id": "10",
+        "title": "排序与去重",
+        "summary": "sort_values、drop_duplicates、nlargest"
+      }
+    ],
+    "test": "test-02"
+  },
+  {
+    "title": "第 3 章 · 清洗与缺失值",
+    "items": [
+      {
+        "id": "11",
+        "title": "认识 NaN 与 None",
+        "summary": "isna、notna、缺失从哪来"
+      },
+      {
+        "id": "12",
+        "title": "删除还是填补",
+        "summary": "dropna 与 fillna 的取舍"
+      },
+      {
+        "id": "13",
+        "title": "类型转换",
+        "summary": "astype 与 to_numeric 的坑"
+      },
+      {
+        "id": "14",
+        "title": "重复值与异常值",
+        "summary": "duplicated、分位数、clip"
+      },
+      {
+        "id": "15",
+        "title": "字符串列处理",
+        "summary": ".str 访问器，清洗脏文本"
+      }
+    ],
+    "test": "test-03"
+  },
+  {
+    "title": "第 4 章 · 分组与聚合",
+    "items": [
+      {
+        "id": "16",
+        "title": "groupby 的基本套路",
+        "summary": "拆分-应用-合并，一次讲清"
+      },
+      {
+        "id": "17",
+        "title": "聚合函数",
+        "summary": "agg、多指标、命名聚合"
+      },
+      {
+        "id": "18",
+        "title": "按多列分组",
+        "summary": "层次索引与 as_index"
+      },
+      {
+        "id": "19",
+        "title": "transform 与 apply",
+        "summary": "什么时候不该用 agg"
+      },
+      {
+        "id": "20",
+        "title": "透视表",
+        "summary": "pivot_table 与交叉表"
+      }
+    ],
+    "test": "test-04"
+  },
+  {
+    "title": "第 5 章 · 连接与重塑",
+    "items": [
+      {
+        "id": "21",
+        "title": "concat：上下拼",
+        "summary": "纵向堆叠与索引重置"
+      },
+      {
+        "id": "22",
+        "title": "merge：左右拼",
+        "summary": "四种连接方式与键"
+      },
+      {
+        "id": "23",
+        "title": "连接时的坑",
+        "summary": "重复键、列名冲突、指示器"
+      },
+      {
+        "id": "24",
+        "title": "长宽表转换",
+        "summary": "melt 与 pivot"
+      },
+      {
+        "id": "25",
+        "title": "多层索引入门",
+        "summary": "MultiIndex 的取与压平"
+      }
+    ],
+    "test": "test-05"
+  },
+  {
+    "title": "第 6 章 · 时间序列与实战",
+    "items": [
+      {
+        "id": "26",
+        "title": "日期时间类型",
+        "summary": "to_datetime 与 dt 访问器"
+      },
+      {
+        "id": "27",
+        "title": "时间索引与重采样",
+        "summary": "resample 按月/周汇总"
+      },
+      {
+        "id": "28",
+        "title": "滚动窗口",
+        "summary": "rolling 与移动平均"
+      },
+      {
+        "id": "29",
+        "title": "综合实战：销售分析",
+        "summary": "读文件到出报告的完整流程"
+      },
+      {
+        "id": "30",
+        "title": "进阶方向与边界",
+        "summary": "pandas 不擅长什么，下一步学什么"
+      }
+    ],
+    "test": "test-06"
+  }
+]

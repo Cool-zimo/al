@@ -1,0 +1,188 @@
+[
+  {
+    "title": "Chapter 1 · Complexity & algorithmic thinking",
+    "items": [
+      {
+        "id": "01",
+        "title": "What complexity means",
+        "summary": "Why working isn't enough — it has to be fast"
+      },
+      {
+        "id": "02",
+        "title": "Big-O notation",
+        "summary": "Reading the growth trend, ignoring constant detail"
+      },
+      {
+        "id": "03",
+        "title": "Common complexities compared",
+        "summary": "O(1), O(log n), O(n), O(n²) side by side"
+      },
+      {
+        "id": "04",
+        "title": "Space complexity",
+        "summary": "Trading memory for time, and when it isn't worth it"
+      },
+      {
+        "id": "05",
+        "title": "Measure it yourself",
+        "summary": "Verify your analysis with timeit"
+      }
+    ],
+    "test": "test-01"
+  },
+  {
+    "title": "Chapter 2 · Arrays & two pointers",
+    "items": [
+      {
+        "id": "06",
+        "title": "Traversal and indices",
+        "summary": "The most basic operation, and the easiest to botch"
+      },
+      {
+        "id": "07",
+        "title": "In place versus a new array",
+        "summary": "When to save memory"
+      },
+      {
+        "id": "08",
+        "title": "Opposing pointers",
+        "summary": "In from both ends, one pass"
+      },
+      {
+        "id": "09",
+        "title": "Fast and slow pointers",
+        "summary": "One runs ahead, one lags"
+      },
+      {
+        "id": "10",
+        "title": "Removing elements and dedup in place",
+        "summary": "A classic that tests index control"
+      }
+    ],
+    "test": "test-02"
+  },
+  {
+    "title": "Chapter 3 · Sliding window",
+    "items": [
+      {
+        "id": "11",
+        "title": "What a sliding window is",
+        "summary": "The trick that turns O(n²) into O(n)"
+      },
+      {
+        "id": "12",
+        "title": "Fixed-size windows",
+        "summary": "The pattern when the width is known"
+      },
+      {
+        "id": "13",
+        "title": "Variable-size windows",
+        "summary": "Longest substring without repeats — the classic"
+      },
+      {
+        "id": "14",
+        "title": "Window sums",
+        "summary": "The shortest subarray that satisfies a condition"
+      },
+      {
+        "id": "15",
+        "title": "Prefix sums",
+        "summary": "The static version of a window; range sums made easy"
+      }
+    ],
+    "test": "test-03"
+  },
+  {
+    "title": "Chapter 4 · String fundamentals",
+    "items": [
+      {
+        "id": "16",
+        "title": "Strings are immutable",
+        "summary": "Why you can't write s[0] = 'a'"
+      },
+      {
+        "id": "17",
+        "title": "Counting characters with a hash map",
+        "summary": "Turn nested loops into a single pass"
+      },
+      {
+        "id": "18",
+        "title": "Reversing and palindromes",
+        "summary": "Two pointers applied to text"
+      },
+      {
+        "id": "19",
+        "title": "Splitting and joining",
+        "summary": "split, join and their traps"
+      },
+      {
+        "id": "20",
+        "title": "Detecting anagrams",
+        "summary": "Two approaches: sorting and counting"
+      }
+    ],
+    "test": "test-04"
+  },
+  {
+    "title": "Chapter 5 · String matching",
+    "items": [
+      {
+        "id": "21",
+        "title": "Naive matching",
+        "summary": "The intuitive version, and why it's slow"
+      },
+      {
+        "id": "22",
+        "title": "The core idea of KMP",
+        "summary": "Never backtrack the text; jump using next"
+      },
+      {
+        "id": "23",
+        "title": "Building the next array",
+        "summary": "The hardest step, taken slowly"
+      },
+      {
+        "id": "24",
+        "title": "KMP in full",
+        "summary": "Assembling the last two lessons"
+      },
+      {
+        "id": "25",
+        "title": "String to integer",
+        "summary": "Edge cases matter more than the algorithm"
+      }
+    ],
+    "test": "test-05"
+  },
+  {
+    "title": "Chapter 6 · Practice",
+    "items": [
+      {
+        "id": "26",
+        "title": "Two sum",
+        "summary": "A hash map takes O(n²) down to O(n)"
+      },
+      {
+        "id": "27",
+        "title": "Maximum subarray sum",
+        "summary": "Kadane's algorithm and the thinking behind it"
+      },
+      {
+        "id": "28",
+        "title": "Merging intervals",
+        "summary": "Sort, then one pass"
+      },
+      {
+        "id": "29",
+        "title": "Spiral matrix",
+        "summary": "Precision control over boundaries"
+      },
+      {
+        "id": "30",
+        "title": "From brute force to optimal",
+        "summary": "A general path for attacking a new problem"
+      }
+    ],
+    "test": "test-06"
+  }
+]

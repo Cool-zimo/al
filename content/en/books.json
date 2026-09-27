@@ -133,7 +133,8 @@
     "stage": "Algorithms",
     "level": "Intermediate",
     "ready": false,
-    "desc": "Starts with how to measure speed: time and space complexity. Then arrays and strings — the two most-tested foundations. Every exercise is really executed and graded in the page."
+    "desc": "Starts with how to measure speed: time and space complexity. Then arrays and strings — the two most-tested foundations. Every exercise is really executed and graded in the page.",
+    "note": "Chapter 1 complete: Complexity & algorithmic thinking (5 lessons + test)"
   },
   {
     "id": "algo-2",

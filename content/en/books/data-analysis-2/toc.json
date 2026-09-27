@@ -1,0 +1,188 @@
+[
+  {
+    "title": "Chapter 1 · Meet Series and DataFrame",
+    "items": [
+      {
+        "id": "01",
+        "title": "Why pandas",
+        "summary": "What NumPy can't do with tables, pandas does natively"
+      },
+      {
+        "id": "02",
+        "title": "Series: a labelled column",
+        "summary": "Index, dtype, and how it relates to ndarray"
+      },
+      {
+        "id": "03",
+        "title": "DataFrame: a table",
+        "summary": "From dicts, lists and NumPy arrays"
+      },
+      {
+        "id": "04",
+        "title": "Look at the data",
+        "summary": "head, info, describe, shape"
+      },
+      {
+        "id": "05",
+        "title": "Reading CSV into a DataFrame",
+        "summary": "read_csv arguments and common traps"
+      }
+    ],
+    "test": "test-01"
+  },
+  {
+    "title": "Chapter 2 · Selecting and filtering",
+    "items": [
+      {
+        "id": "06",
+        "title": "Columns and rows",
+        "summary": "One column, many columns, the rules of df[]"
+      },
+      {
+        "id": "07",
+        "title": "loc versus iloc",
+        "summary": "By name versus by position — the biggest mix-up"
+      },
+      {
+        "id": "08",
+        "title": "Filtering by condition",
+        "summary": "Boolean indexing, multiple conditions, isin"
+      },
+      {
+        "id": "09",
+        "title": "Changing values and adding columns",
+        "summary": "Assignment, new columns, apply"
+      },
+      {
+        "id": "10",
+        "title": "Sorting and de-duplicating",
+        "summary": "sort_values, drop_duplicates, nlargest"
+      }
+    ],
+    "test": "test-02"
+  },
+  {
+    "title": "Chapter 3 · Cleaning and missing data",
+    "items": [
+      {
+        "id": "11",
+        "title": "NaN and None",
+        "summary": "isna, notna, where gaps come from"
+      },
+      {
+        "id": "12",
+        "title": "Drop or fill",
+        "summary": "Choosing between dropna and fillna"
+      },
+      {
+        "id": "13",
+        "title": "Type conversion",
+        "summary": "astype and the to_numeric traps"
+      },
+      {
+        "id": "14",
+        "title": "Duplicates and outliers",
+        "summary": "duplicated, quantiles, clip"
+      },
+      {
+        "id": "15",
+        "title": "Working with text columns",
+        "summary": "The .str accessor for dirty text"
+      }
+    ],
+    "test": "test-03"
+  },
+  {
+    "title": "Chapter 4 · Grouping and aggregation",
+    "items": [
+      {
+        "id": "16",
+        "title": "The groupby pattern",
+        "summary": "Split-apply-combine, explained once"
+      },
+      {
+        "id": "17",
+        "title": "Aggregation functions",
+        "summary": "agg, multiple metrics, named aggregation"
+      },
+      {
+        "id": "18",
+        "title": "Grouping by several columns",
+        "summary": "Hierarchical index and as_index"
+      },
+      {
+        "id": "19",
+        "title": "transform and apply",
+        "summary": "When agg is the wrong tool"
+      },
+      {
+        "id": "20",
+        "title": "Pivot tables",
+        "summary": "pivot_table and crosstab"
+      }
+    ],
+    "test": "test-04"
+  },
+  {
+    "title": "Chapter 5 · Joining and reshaping",
+    "items": [
+      {
+        "id": "21",
+        "title": "concat: stacking vertically",
+        "summary": "Row-wise stacking and resetting the index"
+      },
+      {
+        "id": "22",
+        "title": "merge: joining sideways",
+        "summary": "The four join types and keys"
+      },
+      {
+        "id": "23",
+        "title": "Join traps",
+        "summary": "Duplicate keys, column clashes, indicators"
+      },
+      {
+        "id": "24",
+        "title": "Long versus wide",
+        "summary": "melt and pivot"
+      },
+      {
+        "id": "25",
+        "title": "MultiIndex basics",
+        "summary": "Selecting from and flattening a MultiIndex"
+      }
+    ],
+    "test": "test-05"
+  },
+  {
+    "title": "Chapter 6 · Time series and practice",
+    "items": [
+      {
+        "id": "26",
+        "title": "Datetime types",
+        "summary": "to_datetime and the dt accessor"
+      },
+      {
+        "id": "27",
+        "title": "Time index and resampling",
+        "summary": "resample by month or week"
+      },
+      {
+        "id": "28",
+        "title": "Rolling windows",
+        "summary": "rolling and moving averages"
+      },
+      {
+        "id": "29",
+        "title": "Practice: sales analysis",
+        "summary": "The full path from file to report"
+      },
+      {
+        "id": "30",
+        "title": "Where to go next",
+        "summary": "What pandas isn't for, and what to learn after"
+      }
+    ],
+    "test": "test-06"
+  }
+]
