@@ -1,0 +1,188 @@
+[
+ {
+  "title": "Chapter 1 · Linked List Basics",
+  "items": [
+   {
+    "id": "01",
+    "title": "Why Linked Lists Exist: The Weakness of Arrays and the Strength of Linked Lists",
+    "summary": "In the previous chapters we squeezed every…"
+   },
+   {
+    "id": "02",
+    "title": "ListNode and Hand-Built Linked Lists: Defining Nodes, Linking Them, Traversing and Printing",
+    "summary": "In this lesson we build a linked list from…"
+   },
+   {
+    "id": "03",
+    "title": "Insertion and Deletion: Head Insert, Middle Insert, Deleting a Node (Why You Need a Predecessor)",
+    "summary": "Insertion and deletion are where linked li…"
+   },
+   {
+    "id": "04",
+    "title": "The Dummy Head Node: How It Eliminates the \"Delete the Head\" Special Case",
+    "summary": "The dummy node is the first linked-list te…"
+   },
+   {
+    "id": "05",
+    "title": "Reversing a Linked List: The Iterative Version (Three Pointers), Frame by Frame",
+    "summary": "Reversing a linked list is the #1 intervie…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Advanced Linked Lists",
+  "items": [
+   {
+    "id": "06",
+    "title": "Fast and Slow Pointers: Finding the Middle and Beyond",
+    "summary": "Two pointers, one start line, two differen…"
+   },
+   {
+    "id": "07",
+    "title": "Cycle Detection: Why Floyd's Algorithm Always Meets",
+    "summary": "A linked list gives you no \"end of the roa…"
+   },
+   {
+    "id": "08",
+    "title": "Merging Two Sorted Lists",
+    "summary": "Two already-sorted lists, one sorted resul…"
+   },
+   {
+    "id": "09",
+    "title": "Removing the N-th Node From the End",
+    "summary": "Unlike an array, a linked list has no back…"
+   },
+   {
+    "id": "10",
+    "title": "Case Study: The Design of an LRU Cache",
+    "summary": "An LRU cache is an interview litmus test: …"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Stacks",
+  "items": [
+   {
+    "id": "11",
+    "title": "What a Stack Is: Last In, First Out, and Why Python's List Already Is One",
+    "summary": "The stack is the simplest data structure i…"
+   },
+   {
+    "id": "12",
+    "title": "Matching Parentheses: The Textbook Use of a Stack",
+    "summary": "Given a string of brackets, decide whether…"
+   },
+   {
+    "id": "13",
+    "title": "Monotonic Stack: Next Greater Element",
+    "summary": "The question is: for every element, \"who i…"
+   },
+   {
+    "id": "14",
+    "title": "Recursion and the Stack: Call Stack, Stack Frames, and RecursionError",
+    "summary": "Recursion is not magic. Behind it is just …"
+   },
+   {
+    "id": "15",
+    "title": "Applied: Expression Evaluation and a Calculator",
+    "summary": "Given the infix expression `\"3 + 5 * (2 - …"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Queues",
+  "items": [
+   {
+    "id": "16",
+    "title": "Queues and Deques: The Art of FIFO",
+    "summary": "A queue is \"waiting in line\" — first come,…"
+   },
+   {
+    "id": "17",
+    "title": "Circular Queues: Implementing a Queue with a Fixed Array",
+    "summary": "An interviewer favorite: given a fixed-siz…"
+   },
+   {
+    "id": "18",
+    "title": "BFS and Queues: The Skeleton of Level-Order Traversal",
+    "summary": "BFS (Breadth-First Search) is the classic …"
+   },
+   {
+    "id": "19",
+    "title": "Monotonic Queues: Sliding Window Maximum",
+    "summary": "Given an array and a window size k, slide …"
+   },
+   {
+    "id": "20",
+    "title": "Practice: Unweighted Shortest Path with BFS",
+    "summary": "BFS's most powerful application is finding…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Hash Tables",
+  "items": [
+   {
+    "id": "21",
+    "title": "What Is Hashing: From \"Array Index\" to \"Key,\" the Cost of O(1)",
+    "summary": "A hash table is humanity's obsession with …"
+   },
+   {
+    "id": "22",
+    "title": "Collisions and Resolution: Separate Chaining, Open Addressing, Load Factor, and Resizing",
+    "summary": "Collisions are the destiny of hash tables …"
+   },
+   {
+    "id": "23",
+    "title": "Python's dict and set: Both Backed by Hash Tables",
+    "summary": "Python's `dict` and `set` are hash tables'…"
+   },
+   {
+    "id": "24",
+    "title": "Hash Table Patterns: Two Sum, Counting, Prefix Sum + Hash",
+    "summary": "A hash table is one of the skeleton keys o…"
+   },
+   {
+    "id": "25",
+    "title": "Practice: Grouping Anagrams",
+    "summary": "Grouping anagrams is a classic combination…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Recursion",
+  "items": [
+   {
+    "id": "26",
+    "title": "Recursion's Three Elements: Base Case, Recursive Relation, and Return Value",
+    "summary": "Recursion is not just \"a function that cal…"
+   },
+   {
+    "id": "27",
+    "title": "How Recursion Runs: the Call Stack, the Recursion Tree, and Print Debugging",
+    "summary": "The hardest part of recursion is not \"writ…"
+   },
+   {
+    "id": "28",
+    "title": "Turning Recursion into Iteration: When You Must Convert, and How",
+    "summary": "Recursion looks elegant when you write it …"
+   },
+   {
+    "id": "29",
+    "title": "Divide and Conquer: Writing Merge Sort Recursively",
+    "summary": "Divide and Conquer (D&C) is recursion's mo…"
+   },
+   {
+    "id": "30",
+    "title": "Backtracking: Permutations and Combinations",
+    "summary": "Backtracking is recursion's most powerful …"
+   }
+  ],
+  "test": "test-06"
+ }
+]
