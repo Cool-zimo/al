@@ -1,0 +1,188 @@
+[
+ {
+  "title": "Chapter 1 · Plan Before You Code",
+  "items": [
+   {
+    "id": "01",
+    "title": "What We Are Building: A Requirements List for a Ledger",
+    "summary": "In the first two books you learned to \"mak…"
+   },
+   {
+    "id": "02",
+    "title": "Designing the Data Model: What Fields Does a Record Have?",
+    "summary": "The previous lesson set out \"what we are b…"
+   },
+   {
+    "id": "03",
+    "title": "Slicing the Modules: A Three-Layer Architecture",
+    "summary": "Requirements? Done. Data model? Done. Now …"
+   },
+   {
+    "id": "04",
+    "title": "A Prototype Sketch: Draw the Interface Before You Code",
+    "summary": "The code is now layered. One last thing be…"
+   },
+   {
+    "id": "05",
+    "title": "Technology Choices: Why SQLite?",
+    "summary": "This lesson locks in the entire technology…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · The Data Layer",
+  "items": [
+   {
+    "id": "06",
+    "title": "SQLite and Connections: The sqlite3 Standard Library",
+    "summary": "This lesson begins the data layer. SQLite …"
+   },
+   {
+    "id": "07",
+    "title": "Creating Tables: CREATE TABLE",
+    "summary": "Connections are covered. This lesson turns…"
+   },
+   {
+    "id": "08",
+    "title": "CRUD: INSERT / SELECT / UPDATE / DELETE",
+    "summary": "The table exists. This lesson covers all f…"
+   },
+   {
+    "id": "09",
+    "title": "Parameterised Queries: Why SQL Must Not Be Concatenated",
+    "summary": "Every SQL statement in the previous lesson…"
+   },
+   {
+    "id": "10",
+    "title": "Transactions and Connection Management",
+    "summary": "This lesson closes out the data layer: wha…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · The Interface Skeleton",
+  "items": [
+   {
+    "id": "11",
+    "title": "The Main Window and a Three-Layer Layout",
+    "summary": "The data layer is done. From this lesson o…"
+   },
+   {
+    "id": "12",
+    "title": "The Treeview Table: Column Definitions and Filling Data",
+    "summary": "This lesson replaces the placeholder Frame…"
+   },
+   {
+    "id": "13",
+    "title": "The Entry Form: Label + Entry + Combobox + Button",
+    "summary": "The table is working. This lesson builds t…"
+   },
+   {
+    "id": "14",
+    "title": "Input Validation: The Amount Must Be a Number, the Category Cannot Be Empty",
+    "summary": "The form accepts input now, but users will…"
+   },
+   {
+    "id": "15",
+    "title": "Empty States and Feedback: What to Show When There Is No Data",
+    "summary": "A detail often overlooked: the first time …"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Wiring It Together",
+  "items": [
+   {
+    "id": "16",
+    "title": "Wiring Up the Data Layer: Loading Records into a Treeview",
+    "summary": "The last three lessons gave you the interf…"
+   },
+   {
+    "id": "17",
+    "title": "Adding a Record: From Form to Database and Back to the Table",
+    "summary": "This lesson closes the first complete loop…"
+   },
+   {
+    "id": "18",
+    "title": "Deleting and Editing: Select a Row, Confirm, Act, Refresh",
+    "summary": "Entry is done. This lesson adds the two re…"
+   },
+   {
+    "id": "19",
+    "title": "Decoupling with the Observer Pattern: Notifying the Interface When Data Changes",
+    "summary": "The last three lessons made us call `refre…"
+   },
+   {
+    "id": "20",
+    "title": "Refresh Strategies: Full Refresh Versus Incremental Update",
+    "summary": "Lesson 19 made the display refresh wheneve…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Charts and Statistics",
+  "items": [
+   {
+    "id": "21",
+    "title": "Summarising by Category with SQL GROUP BY",
+    "summary": "Statistics start here. Requirement F3 is \"…"
+   },
+   {
+    "id": "22",
+    "title": "Embedding matplotlib in tkinter with FigureCanvasTkAgg",
+    "summary": "The aggregation is done. This lesson turns…"
+   },
+   {
+    "id": "23",
+    "title": "Pie Charts and Bar Charts: Category Share and Monthly Trends",
+    "summary": "Last lesson embedded a chart in the window…"
+   },
+   {
+    "id": "24",
+    "title": "Chinese Fonts: Fixing the Square Boxes in Chart Text",
+    "summary": "You label a chart with a Chinese title and…"
+   },
+   {
+    "id": "25",
+    "title": "Keeping Charts in Sync: Auto-Refresh When the Data Changes",
+    "summary": "You edit a record, switch to the statistic…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Packaging and Delivery",
+  "items": [
+   {
+    "id": "26",
+    "title": "Exception Handling and Fallbacks: Never Let the Program Crash on the User",
+    "summary": "The disk is full, a colleague deleted `led…"
+   },
+   {
+    "id": "27",
+    "title": "Configuration and Preferences: Remembering Window Size and the Last-Opened File",
+    "summary": "You close the ledger and reopen it: the wi…"
+   },
+   {
+    "id": "28",
+    "title": "Packaging: Turning the Ledger Into a Double-Clickable Executable",
+    "summary": "The code is finished and your mum wants to…"
+   },
+   {
+    "id": "29",
+    "title": "Slimming Down: Cutting a 60MB Executable to 30MB",
+    "summary": "A tkinter program that just says \"Hello Wo…"
+   },
+   {
+    "id": "30",
+    "title": "Release and Wrap-Up: Shipping the Ledger and Moving On to Qt",
+    "summary": "The code is done, the build works, and the…"
+   }
+  ],
+  "test": "test-06"
+ }
+]

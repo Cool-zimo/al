@@ -1,68 +1,68 @@
 # 第 6 章 · 打包交付 · 大测验
 
-> 8 道题。这一章解决的是"程序怎么变成能交付的产物、怎么稳定运行"的问题。
+> 8 道题。这一章解决的是"把写好的程序变成一个用户能双击运行的产物，并且崩了不吓人、打包别太胖、发布别漏东西"的问题。
 > **全对才算通过这一章。**
 
 ## 第一部分 · 选择题
 
 ```quiz
 type: choice
-q: 关于 PyInstaller 的 --onefile 与 --onedir，以下说法正确的是？
+q: 给桌面程序装全局异常钩子，以下哪个写法是正确的？
 options:
-- --onefile 启动更快，因为无需解压
-- --onefile 启动时需要先把运行时解压到临时目录，启动通常比 --onedir 慢，但分发只需一个文件
-- --onedir 会把程序压缩成单个文件
-- 两者在体积上有巨大差异，--onefile 能省一半空间
+- try: ... except: pass，把一切异常都吞掉
+- 用 sys.excepthook 设置处理函数，先打印完整堆栈、再弹友好提示框
+- 只在 main 函数外层包一个 try，其他地方都不处理
+- 把 traceback 原样弹给用户看，方便用户自己排查
 answer: 1
-explain: --onefile 每次启动都要把整个运行时解压到临时目录（如 %TEMP%/_MEIxxxxxx），所以启动慢；换来的是单个文件便于分发。--onedir 不解压、加载快，但分发要打包成文件夹。两者磁盘占用其实接近，onefile 只是多了一层压缩。
+explain: sys.excepthook 是最后一道防线：先 print 完整堆栈给开发者排查线索，再弹一个不含堆栈的友好 messagebox 给用户。裸 except 吞 bug、只在外层包 try 无针对性提示、把堆栈甩给用户既不友好也没意义。
 ```
 
 ```quiz
 type: choice
-q: 给 tkinter 程序打包时，为什么调试阶段不建议加 --windowed？
+q: 桌面程序的配置文件应该放在哪里？以下说法正确的是？
 options:
-- --windowed 会让程序变慢
-- --windowed 会隐藏控制台，导致 print 输出和未捕获异常的 traceback 全部不可见，难以排查
-- --windowed 会增大体积
-- --windowed 只能用于 macOS
+- 为了方便直接放在程序安装目录下
+- Windows 放 %APPDATA%，macOS 放 ~/Library/Application Support，Linux 放 ~/.config
+- 账本数据库文件和 config.ini 必须放在同一个目录
+- 配置文件必须用 pickle，因为读写最快
 answer: 1
-explain: --windowed（或 --noconsole）告诉操作系统这是 GUI 子系统程序、不分配控制台。代价是所有 print 和异常 traceback 都无处可去。调试阶段应保留控制台，让错误信息暴露出来；确认无误后再加 --windowed 交付。
+explain: 三个平台各有约定的用户配置目录，硬编码或用安装目录都是错的。账本属于用户数据应放文档目录而非配置目录；配置文件用文本格式（ini/json）而非 pickle，跨版本稳定。
 ```
 
 ```quiz
 type: choice
-q: 一个 tkinter hello world 约 10MB，加入 matplotlib 后打包体积飙到 60MB 以上。关于体积优化，以下做法正确的是？
+q: 关于 PyInstaller 的 --onefile 和 --onedir，以下说法正确的是？
 options:
-- 用 --onefile 能大幅减小体积
-- 用 --exclude-module matplotlib 可以把体积压到 30MB 左右，但前提是代码确实用不到被排除的模块
-- 排除越多越好，反正用不到的都删掉
-- UPX 压缩是必选项，能安全地把体积减半
+- --onefile 启动更快，因为它不需要解压
+- --onefile 启动时需要先把运行时解压到临时目录，因此通常比 --onedir 慢
+- --onedir 会把程序压缩成单个文件方便分发
+- 两者磁盘占用差异巨大，--onefile 能省一半空间
 answer: 1
-explain: --exclude-module 能排除确定用不到的大块依赖，实测能把含 matplotlib 的 60MB 项目压到 30MB 左右。但排除的前提是代码确实不依赖它，否则运行时会 ModuleNotFoundError。--onefile 不减体积，排除要谨慎，UPX 不稳定且 PyInstaller 已默认不用。
+explain: --onefile 每次启动都要把整个运行时解压到 %TEMP%/_MEIxxxxxx，这是启动慢的根源；--onedir 无需解压秒开。两者磁盘占用其实差不多，onefile 只是多了一层压缩壳。
 ```
 
 ```quiz
 type: choice
-q: 程序里用 open("data/config.json") 读取资源文件，打包后报 FileNotFoundError。正确的解决方式是？
+q: 用 PyInstaller 打包 tkinter 程序时，关于体积优化，以下哪个说法最符合实际？
 options:
-- 把文件改成绝对路径 C:\data\config.json
-- 用 sys._MEIPASS 定位资源路径（打包后为临时解压目录），并通过 --add-data 显式附带资源
-- 在代码里 try/except 忽略这个错误
-- 把资源文件重命名为 .py 然后 import
+- 打包体积大头是开发者自己写的业务代码
+- 一个 tkinter hello world 约 10MB，加 matplotlib 会到 60MB 以上，体积大头是依赖库
+- --onefile 能显著减小磁盘占用，通常比 onedir 小一半
+- 排除模块越多越好，反正用不到的就删掉
 answer: 1
-explain: 打包后程序运行在临时解压目录 _MEIxxxxxx，源码里的相对路径全部失效。用 sys._MEIPASS 获取真实运行时的资源根目录，并用 --add-data 把资源文件显式打包进去，才能正确访问。
+explain: 实测：tkinter hello world 约 10MB，加 matplotlib 后 60MB+。体积大头是 Python 运行时和依赖库（numpy、matplotlib 字体库等），业务代码压缩后不到 100KB。排除模块要谨慎，排除过头会导致运行时 ModuleNotFoundError。
 ```
 
 ```quiz
 type: choice
-q: 关于发布清单，以下哪项是"必须"的？
+q: 关于发布时资源文件的处理，以下做法正确的是？
 options:
-- 一个 README.md（功能说明、运行方式、打包命令）+ 一个 LICENSE（许可证）+ 明确的版本号
-- 只需要把 exe 文件发给用户就行
-- README 是可选的，专业项目才需要
-- 许可证只要代码够好就不需要
-answer: 0
-explain: 一个可交付的项目至少要有 README（让用户知道这是什么、怎么用、怎么从源码跑起来）、LICENSE（声明使用权限）、明确的版本号。没有许可证的代码在法律上是"保留所有权利"，别人不敢使用或贡献。
+- 直接用相对路径 open("data/xxx.json")，打包后依然能找到
+- 用 sys._MEIPASS 定位资源路径，并在打包时通过 --add-data 显式附带
+- 把 data 目录写进 .gitignore，让 PyInstaller 自动忽略它
+- 把数据库文件打进安装包，方便用户直接使用预置数据
+answer: 1
+explain: 打包后程序运行在临时解压目录 _MEIxxxxxx，源码里的相对路径全部失效。必须用 sys._MEIPASS 定位资源并用 --add-data 附带。数据库文件不应打进安装包（含测试数据、每次应新建），应加入 .gitignore。
 ```
 
 ---
@@ -71,110 +71,143 @@ explain: 一个可交付的项目至少要有 README（让用户知道这是什�
 
 ```quiz
 type: local
-q: 给记账本加全局异常处理 + 首次建库逻辑：用 logging 把未捕获异常写入 exe 同目录的 ledger_error.log；用 try/except 包裹主循环；程序启动时检测数据库文件是否存在，不存在则调用 init_db() 并弹一个欢迎提示。然后用 --onefile --windowed 打包并验证：故意制造一个异常，确认日志文件被写入。注意：PyInstaller 打包需本机环境，网页里跑不了，请点"在 VS Code 里打开"运行。
+q: 给你的记账本录入表单加完整的异常处理：1) 写 validate() 校验分类非空、金额能转 float 且 > 0、日期符合 YYYY-MM-DD（用 datetime.strptime）、备注不超过 200 字，校验失败弹 showwarning；2) on_save() 里用 try/except 捕获 ValueError（金额格式）和 OSError（磁盘满/权限），分别给不同提示；3) 装一个 sys.excepthook 全局钩子，把未捕获异常 print 到控制台并弹 showerror（钩子里判断 tk._default_root 是否存在，避免弹窗时也崩）。窗口程序在网页里跑不了，请点"在 VS Code 里打开"运行。
 starter: |
+  import sys, traceback
   import tkinter as tk
   import tkinter.ttk as ttk
-  import logging
-  import sys
-  from pathlib import Path
-  import sqlite3
-  from tkinter import messagebox
+  import tkinter.messagebox as mb
+  from datetime import datetime
 
-  LOG_PATH = Path(sys.executable).parent / "ledger_error.log"
-  logging.basicConfig(filename=str(LOG_PATH), level=logging.ERROR,
-      format="%(asctime)s %(levelname)s %(message)s")
+  def global_exc_handler(exc_type, exc_value, exc_tb):
+      text = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
+      print("未捕获异常:\n", text)
+      try:
+          if tk._default_root is not None:
+              mb.showerror("程序出错了", f"发生了一个意外错误：\n{exc_value}")
+      except Exception:
+          pass
 
-  DB_PATH = Path("ledger.db")
+  sys.excepthook = global_exc_handler
 
-  def init_db():
-      conn = sqlite3.connect(DB_PATH)
-      conn.execute("""CREATE TABLE IF NOT EXISTS records (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          amount REAL NOT NULL, category TEXT NOT NULL, note TEXT DEFAULT '')""")
-      conn.commit(); conn.close()
+  class EntryForm(ttk.Frame):
+      def __init__(self, master):
+          super().__init__(master)
+          self.category = tk.StringVar(value="餐饮")
+          self.amount = tk.StringVar()
+          self.date = tk.StringVar(value="2026-09-27")
+          self.note = tk.StringVar()
+          for label, var in [("分类", self.category), ("金额", self.amount),
+                             ("日期", self.date), ("备注", self.note)]:
+              ttk.Label(self, text=label).pack()
+              ttk.Entry(self, textvariable=var).pack()
+          ttk.Button(self, text="保存", command=self.on_save).pack(pady=6)
+          ttk.Button(self, text="故意触发异常",
+                     command=lambda: 1/0).pack()
 
-  def ensure_db():
-      if not DB_PATH.exists():
-          init_db()
-          messagebox.showinfo("欢迎", "首次启动，已为您创建账本数据库")
-      else:
-          init_db()  # 确保表结构存在
+      def validate(self):
+          # TODO: 分类非空 / 金额 float>0 / 日期格式 / 备注长度
+          return True
+
+      def on_save(self):
+          if not self.validate():
+              return
+          try:
+              amt = float(self.amount.get())
+              if amt <= 0:
+                  raise ValueError("金额必须大于 0")
+          except ValueError as e:
+              mb.showwarning("输入有误", f"金额格式不对：{e}")
+              return
+          try:
+              datetime.strptime(self.date.get(), "%Y-%m-%d")
+          except ValueError:
+              mb.showwarning("输入有误", "日期必须是 YYYY-MM-DD 格式")
+              return
+          # TODO: 模拟数据库写入，捕获 OSError
+          mb.showinfo("成功", "已保存一条记录")
 
   root = tk.Tk()
-  root.title("记账本")
-  root.geometry("400x200")
-
-  def boom():
-      return 1 / 0  # 故意触发异常
-
-  ttk.Button(root, text="触发异常测试日志", command=boom).pack(expand=True)
-
-  ensure_db()
-  try:
-      root.mainloop()
-  except Exception:
-      logging.exception("未捕获异常")
-      raise
+  root.title("异常处理测试")
+  EntryForm(root).pack()
+  root.mainloop()
 checklist:
-- logging 配置为输出到 exe 同目录下的 ledger_error.log
-- 主循环用 try/except 包裹，未捕获异常被记录完整 traceback
-- ensure_db 检测数据库是否存在，不存在则 init_db 并弹欢迎提示
-- 打包使用 --onefile --windowed
-- 触发异常后日志文件确有内容
-- 首次启动能自动建库并提示用户
+- validate 检查了四项：分类、金额、日期、备注
+- 日期用 datetime.strptime 校验格式，格式错给提示
+- 金额非数字或 <=0 给出不同提示
+- on_save 用 try/except 捕获 ValueError 和 OSError
+- 装了 sys.excepthook，能弹窗并打印堆栈
+- 钩子里判断了 tk._default_root，避免二次崩溃
+- 点击"故意触发异常"按钮能触发全局钩子
 ```
 
 ```quiz
 type: local
-q: 完成发布材料四件套：为你的记账本项目（或任意一个 tkinter 项目）写 README.md（功能、运行、打包、许可证）、LICENSE（MIT）、_version.py（版本号单一来源）、.gitignore（含 *.db、build/、dist/、__pycache__/）。用 bash 脚本验证：在一个干净临时目录里解压/运行你的打包产物，完成一次完整录入流程，确认首次运行自动建库。注意：涉及文件写入与 PyInstaller，网页里跑不了，请点"在 VS Code 里打开"运行。
+q: 实现配置系统的三个函数：config_dir()（三平台返回正确配置目录）、save_config()、load_config()（带 fallback 默认值）。在退出时通过 WM_DELETE_WINDOW 保存窗口 geometry 和上次选中的标签页。运行后打印读到的配置，然后手动修改 config.ini 再运行一次验证能读到修改。窗口程序在网页里跑不了，请点"在 VS Code 里打开"运行。
 starter: |
-  # _version.py
-  VERSION = "1.0.0"
+  import os, platform
+  import tkinter as tk
+  import tkinter.ttk as ttk
+  import configparser
+  from pathlib import Path
 
-  # README.md 骨架（请补全）
-  # =====================================
-  # # 记账本
-  # 一个 Python + tkinter 桌面记账软件。
-  #
-  # ## 功能
-  # - ...
-  #
-  # ## 下载与运行
-  # 从 Releases 下载 Ledger-1.0.0.zip ...
-  #
-  # ## 从源码运行
-  # pip install -r requirements.txt
-  # python main.py
-  #
-  # ## 打包
-  # pyinstaller --onefile --windowed --icon=ledger.ico --name Ledger main.py
-  #
-  # ## 许可证
-  # MIT
+  def config_dir():
+      app = "Ledger"
+      sysname = platform.system()
+      if sysname == "Windows":
+          base = os.environ.get("APPDATA")
+      elif sysname == "Darwin":
+          base = os.path.expanduser("~/Library/Application Support")
+      else:
+          base = os.environ.get("XDG_CONFIG_HOME") or os.path.expanduser("~/.config")
+      p = Path(base) / app
+      p.mkdir(parents=True, exist_ok=True)
+      return p
 
-  # .gitignore 骨架
-  # *.db
-  # build/
-  # dist/
-  # __pycache__/
-  # *.spec
+  def save_config(path, geometry, last_file, last_tab):
+      cp = configparser.ConfigParser()
+      cp["Window"] = {"geometry": geometry}
+      cp["Recent"] = {"last_file": last_file, "last_tab": str(last_tab)}
+      with open(path, "w", encoding="utf-8") as f:
+          cp.write(f)
 
-  # 验证脚本 verify.sh
-  #!/usr/bin/env bash
-  set -e
-  TMP=$(mktemp -d)
-  echo "临时目录: $TMP"
-  # TODO: 解压产物到临时目录并运行，完成一次录入
-  echo "验证完成，产物可正常启动"
+  def load_config(path):
+      cp = configparser.ConfigParser()
+      cp.read(path, encoding="utf-8")
+      return {
+          "geometry": cp.get("Window", "geometry", fallback="1000x650+100+100"),
+          "last_file": cp.get("Recent", "last_file", fallback=""),
+          "last_tab": cp.getint("Recent", "last_tab", fallback=0),
+      }
+
+  root = tk.Tk()
+  root.title("配置系统测试")
+  root.geometry("600x400")
+  nb = ttk.Notebook(root)
+  for name in ["录入", "统计", "设置"]:
+      nb.add(ttk.Frame(nb), text=name)
+  nb.pack(fill="both", expand=True)
+
+  cfg = load_config(config_dir() / "config.ini")
+  print("读取到的配置:", cfg)
+  print("配置目录:", config_dir())
+
+  def on_close():
+      save_config(config_dir() / "config.ini",
+                  root.geometry(), "", nb.index(nb.select()))
+      print("已保存配置，geometry =", root.geometry(),
+            "last_tab =", nb.index(nb.select()))
+      root.destroy()
+
+  root.protocol("WM_DELETE_WINDOW", on_close)
+  root.mainloop()
 checklist:
-- README.md 内容完整（功能、下载运行、源码运行、打包命令、许可证声明）
-- LICENSE 文件存在且为 MIT（含年份与版权声明）
-- _version.py 存在，界面关于区可读取并显示版本号
-- .gitignore 包含 *.db、build/、dist/、__pycache__/、*.spec
-- 验证脚本能在干净临时目录里运行产物
-- 验证过程中确认首次运行自动建库
-- 完成一次完整录入流程，数据能持久化
+- config_dir 三平台分支正确（Windows APPDATA / macOS ~/Library / Linux ~/.config）
+- save_config 写入 [Window] 和 [Recent] section 及键值
+- load_config 用 fallback，文件不存在也不崩
+- WM_DELETE_WINDOW 正确保存 geometry 和 last_tab
+- 重开后配置能恢复（窗口大小或标签页位置）
+- 手动修改 config.ini 后重新运行能读到新值
 ```
 
 ---
@@ -183,43 +216,63 @@ checklist:
 
 ```quiz
 type: project
-q: 完成记账本的"正式发布"全流程：1) 补齐 README / LICENSE / _version.py / .gitignore；2) 用 logging 实现全局异常兜底；3) 用 sys._MEIPASS 处理所有资源文件（图标、默认数据），并配 --add-data；4) 用第 28、29 课学过的命令做 --onefile --windowed --icon 打包，产物命名含版本号；5) 用对照实验测量至少三种排除配置下的体积并打印对比表；6) 把最终产物打包成带版本号的 zip，写一段发布说明（功能、版本、已知问题、更新日志）。注意：PyInstaller 打包需本机环境，网页里跑不了，请点"在 VS Code 里打开"运行。
+q: 完成一次"发布就绪"检查：对你的记账本项目（或任意 tkinter 项目）补齐发布材料 + 做一次完整打包验证。要求：1) 写 README.md（含功能介绍、下载运行方式、从源码运行命令、PyInstaller 打包命令、许可证声明）；2) 添加 _version.py 作为版本号单一来源，在界面关于区显示"记账本 v1.0.0"；3) 添加 LICENSE 文件（MIT）；4) 添加 .gitignore（含 *.db、build/、dist/、__pycache__/、*.spec、config.ini）；5) 用 logging 配置日志输出到 exe 同目录的 ledger_error.log（用 sys.executable 定位）；6) 写一段 bash 或 Python 脚本执行"清理开发产物 → 读取版本号 → --onefile --windowed 打包 → 复制到干净目录验证启动"的完整流程。窗口程序在网页里跑不了，请点"在 VS Code 里打开"运行。
 starter: |
-  #!/usr/bin/env bash
-  # release.sh —— 一键发布脚本骨架
-  set -e
+  # 目录结构建议：
+  #   ./main.py         主程序入口
+  #   ./_version.py     版本号单一来源
+  #   ./README.md       项目说明
+  #   ./LICENSE         MIT 许可证
+  #   ./.gitignore      忽略规则
+  #
+  # _version.py:
+  #   VERSION = "1.0.0"
+  #
+  # main.py 骨架（含日志 + 关于区）:
+  import tkinter as tk
+  import tkinter.ttk as ttk
+  import logging
+  import sys
+  from pathlib import Path
+  from _version import VERSION
 
-  VERSION=$(python -c "import _version; print(_version.VERSION)")
-  NAME="Ledger-$VERSION"
+  log_path = Path(sys.executable).parent / "ledger_error.log"
+  logging.basicConfig(
+      filename=str(log_path),
+      level=logging.ERROR,
+      format="%(asctime)s %(levelname)s %(message)s",
+  )
 
-  echo "== 清理构建产物 =="
-  rm -rf build dist __pycache__ *.db
+  def main():
+      root = tk.Tk()
+      root.title("记账本")
+      root.geometry("400x200")
+      ttk.Label(root, text=f"记账本 v{VERSION}", font=("", 16)).pack(expand=True)
+      root.mainloop()
 
-  echo "== 打包（无排除，基准）=="
-  pyinstaller --onefile --windowed --icon=ledger.ico --name "$NAME-full" main.py
+  if __name__ == "__main__":
+      try:
+          main()
+      except Exception:
+          logging.exception("未捕获的异常")
+          raise
 
-  echo "== 打包（排除 matplotlib）=="
-  pyinstaller --onefile --windowed --icon=ledger.ico --name "$NAME-nompl" \
-      --exclude-module matplotlib main.py
-
-  echo "== 测量体积对比 =="
-  # TODO: 递归统计各 dist/$NAME-* 目录体积并打印对比表
-
-  echo "== 打包成 zip =="
-  # TODO: zip -r $NAME.zip dist/$NAME-* README.md LICENSE
-
-  echo "== 写发布说明 =="
-  # TODO: 生成 RELEASE_NOTES.md
-
-  echo "发布完成: $NAME.zip"
+  # 发布脚本 build_release.sh 骨架:
+  #   #!/usr/bin/env bash
+  #   set -e
+  #   rm -rf build dist __pycache__ *.db
+  #   VERSION=$(python -c "import _version; print(_version.VERSION)")
+  #   pyinstaller --onefile --windowed --name "Ledger-$VERSION" main.py
+  #   mkdir -p /tmp/ledger_test
+  #   cp "dist/Ledger-$VERSION" /tmp/ledger_test/
+  #   echo "请在干净目录验证启动: /tmp/ledger_test/Ledger-$VERSION"
+  #   zip -r "Ledger-$VERSION.zip" "dist/Ledger-$VERSION" README.md LICENSE
 checklist:
-- 发布材料齐全：README / LICENSE / _version.py / .gitignore
-- 全局异常兜底用 logging 写入日志文件
-- 资源文件用 sys._MEIPASS 定位并配 --add-data 附带
-- 打包命令使用 --onefile --windowed --icon，产物命名含版本号
-- 至少三种排除配置的体积对照实验，结果以表格形式呈现
-- 排除 matplotlib 后体积有显著下降（符合 60MB→30MB 量级）
-- 最终产物是带版本号的 zip，含 README 与 LICENSE
-- 发布说明文字清晰：功能、版本、已知问题、更新日志
-- 在一个干净目录验证产物能正常启动并完成录入
-```
+- README.md 内容完整（功能、下载运行、源码运行、打包命令、许可证声明）
+- _version.py 存在且界面关于区正确显示版本号
+- LICENSE 文件存在且为合法 MIT 许可证文本
+- .gitignore 包含 *.db、build/、dist/、__pycache__/、*.spec、config.ini
+- logging 配置输出到 exe 同目录下的 ledger_error.log
+- 发布脚本能清理开发产物、读取版本号、打包、复制验证
+- 打包命令含 --onefile --windowed 且产物命名带版本号
+- 最终产物是带版本号的 zip，内含 README 和 LICENSE
