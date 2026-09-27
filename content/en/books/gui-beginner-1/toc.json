@@ -1,0 +1,188 @@
+[
+ {
+  "title": "Chapter 1 · Your First Window",
+  "items": [
+   {
+    "id": "01",
+    "title": "From the Command Line to a Window",
+    "summary": "Every program you have written so far take…"
+   },
+   {
+    "id": "02",
+    "title": "Where tkinter Lives and How to Import It",
+    "summary": "In the previous lesson you saw `import tki…"
+   },
+   {
+    "id": "03",
+    "title": "Window Properties",
+    "summary": "A bare gray window is ugly. This lesson is…"
+   },
+   {
+    "id": "04",
+    "title": "Your First Widgets: Label and Button",
+    "summary": "A window needs something inside it. This l…"
+   },
+   {
+    "id": "05",
+    "title": "Project: A Window That Says Hello",
+    "summary": "So far the material has been零散 (scattered)…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Layout: Where Widgets Go",
+  "items": [
+   {
+    "id": "06",
+    "title": "Overview of the Three Geometry Managers",
+    "summary": "A widget that has been created is \"floatin…"
+   },
+   {
+    "id": "07",
+    "title": "pack: Top, Bottom, Left, Right",
+    "summary": "pack is the simplest geometry manager, and…"
+   },
+   {
+    "id": "08",
+    "title": "grid: Rows and Columns, rowspan/colspan, and sticky",
+    "summary": "grid is tkinter's most commonly used and m…"
+   },
+   {
+    "id": "09",
+    "title": "grid Weight: Why Widgets Refuse to Move When the Window Grows",
+    "summary": "This is the single most frustrating proble…"
+   },
+   {
+    "id": "10",
+    "title": "place: Absolute and Relative Positioning",
+    "summary": "place is tkinter's most \"primitive\" layout…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Common Widgets",
+  "items": [
+   {
+    "id": "11",
+    "title": "Entry: The Single-Line Input Box — `get`, `delete`, `insert`",
+    "summary": "Entry is the workhorse of every login scre…"
+   },
+   {
+    "id": "12",
+    "title": "Text: The Multiline Widget — `insert`, `get`, `delete`",
+    "summary": "Entry handles one line. The moment you nee…"
+   },
+   {
+    "id": "13",
+    "title": "Checkbutton and Radiobutton",
+    "summary": "Pick one of several options, or any number…"
+   },
+   {
+    "id": "14",
+    "title": "Listbox and Scrollbar",
+    "summary": "Once your options outgrow a handful of Rad…"
+   },
+   {
+    "id": "15",
+    "title": "Combobox, Spinbox, Scale: The ttk Widgets",
+    "summary": "The default tkinter widgets look like Wind…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Events: Making It Move",
+  "items": [
+   {
+    "id": "16",
+    "title": "The `command` Callback: What Happens When You Click",
+    "summary": "A button that does nothing is just a label…"
+   },
+   {
+    "id": "17",
+    "title": "`lambda` and Passing Arguments",
+    "summary": "`command` only takes callables with zero a…"
+   },
+   {
+    "id": "18",
+    "title": "`bind` and Event Sequences",
+    "summary": "`command` covers clicks on a handful of wi…"
+   },
+   {
+    "id": "19",
+    "title": "Keyboard and Mouse: Focus, Shortcuts, and Drag",
+    "summary": "This lesson fills in the parts of input ha…"
+   },
+   {
+    "id": "20",
+    "title": "Variable Tracing With `trace`: Update as You Type",
+    "summary": "Buttons make things happen after a click. …"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Dialogs and Menus",
+  "items": [
+   {
+    "id": "21",
+    "title": "Pop-Up Dialogs: `messagebox`",
+    "summary": "A GUI program needs to talk to the user so…"
+   },
+   {
+    "id": "22",
+    "title": "Opening and Saving Files: `filedialog`",
+    "summary": "A text editor that can't open a file isn't…"
+   },
+   {
+    "id": "23",
+    "title": "Asking for One Value: `simpledialog`",
+    "summary": "Sometimes you don't need a whole form — yo…"
+   },
+   {
+    "id": "24",
+    "title": "Menus: Main, Dropdown, and Right-Click",
+    "summary": "Every real desktop program has a menu bar …"
+   },
+   {
+    "id": "25",
+    "title": "Extra Windows with `Toplevel` (and Modal vs Non-Modal)",
+    "summary": "One window is rarely enough. A settings pa…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Project: A Tool You Can Actually Use",
+  "items": [
+   {
+    "id": "26",
+    "title": "Planning a Real Program: The Text Statistics Tool",
+    "summary": "Lessons 1-25 taught you the pieces. Now yo…"
+   },
+   {
+    "id": "27",
+    "title": "Laying Out the Interface with `Frame` and `grid`",
+    "summary": "Lesson 26 gave you a sketch of the text-st…"
+   },
+   {
+    "id": "28",
+    "title": "Separating Logic From the Interface",
+    "summary": "The counting code belongs in plain functio…"
+   },
+   {
+    "id": "29",
+    "title": "Wiring Up File Reading",
+    "summary": "The layout exists, the logic is separate, …"
+   },
+   {
+    "id": "30",
+    "title": "Finishing Touches and What to Learn Next",
+    "summary": "The program works on the happy path. Lesso…"
+   }
+  ],
+  "test": "test-06"
+ }
+]

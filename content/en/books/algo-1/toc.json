@@ -1,188 +1,188 @@
 [
-  {
-    "title": "Chapter 1 · Complexity & algorithmic thinking",
-    "items": [
-      {
-        "id": "01",
-        "title": "What complexity means",
-        "summary": "Why working isn't enough — it has to be fast"
-      },
-      {
-        "id": "02",
-        "title": "Big-O notation",
-        "summary": "Reading the growth trend, ignoring constant detail"
-      },
-      {
-        "id": "03",
-        "title": "Common complexities compared",
-        "summary": "O(1), O(log n), O(n), O(n²) side by side"
-      },
-      {
-        "id": "04",
-        "title": "Space complexity",
-        "summary": "Trading memory for time, and when it isn't worth it"
-      },
-      {
-        "id": "05",
-        "title": "Measure it yourself",
-        "summary": "Verify your analysis with timeit"
-      }
-    ],
-    "test": "test-01"
-  },
-  {
-    "title": "Chapter 2 · Arrays & two pointers",
-    "items": [
-      {
-        "id": "06",
-        "title": "Traversal and indices",
-        "summary": "The most basic operation, and the easiest to botch"
-      },
-      {
-        "id": "07",
-        "title": "In place versus a new array",
-        "summary": "When to save memory"
-      },
-      {
-        "id": "08",
-        "title": "Opposing pointers",
-        "summary": "In from both ends, one pass"
-      },
-      {
-        "id": "09",
-        "title": "Fast and slow pointers",
-        "summary": "One runs ahead, one lags"
-      },
-      {
-        "id": "10",
-        "title": "Removing elements and dedup in place",
-        "summary": "A classic that tests index control"
-      }
-    ],
-    "test": "test-02"
-  },
-  {
-    "title": "Chapter 3 · Sliding window",
-    "items": [
-      {
-        "id": "11",
-        "title": "What a sliding window is",
-        "summary": "The trick that turns O(n²) into O(n)"
-      },
-      {
-        "id": "12",
-        "title": "Fixed-size windows",
-        "summary": "The pattern when the width is known"
-      },
-      {
-        "id": "13",
-        "title": "Variable-size windows",
-        "summary": "Longest substring without repeats — the classic"
-      },
-      {
-        "id": "14",
-        "title": "Window sums",
-        "summary": "The shortest subarray that satisfies a condition"
-      },
-      {
-        "id": "15",
-        "title": "Prefix sums",
-        "summary": "The static version of a window; range sums made easy"
-      }
-    ],
-    "test": "test-03"
-  },
-  {
-    "title": "Chapter 4 · String fundamentals",
-    "items": [
-      {
-        "id": "16",
-        "title": "Strings are immutable",
-        "summary": "Why you can't write s[0] = 'a'"
-      },
-      {
-        "id": "17",
-        "title": "Counting characters with a hash map",
-        "summary": "Turn nested loops into a single pass"
-      },
-      {
-        "id": "18",
-        "title": "Reversing and palindromes",
-        "summary": "Two pointers applied to text"
-      },
-      {
-        "id": "19",
-        "title": "Splitting and joining",
-        "summary": "split, join and their traps"
-      },
-      {
-        "id": "20",
-        "title": "Detecting anagrams",
-        "summary": "Two approaches: sorting and counting"
-      }
-    ],
-    "test": "test-04"
-  },
-  {
-    "title": "Chapter 5 · String matching",
-    "items": [
-      {
-        "id": "21",
-        "title": "Naive matching",
-        "summary": "The intuitive version, and why it's slow"
-      },
-      {
-        "id": "22",
-        "title": "The core idea of KMP",
-        "summary": "Never backtrack the text; jump using next"
-      },
-      {
-        "id": "23",
-        "title": "Building the next array",
-        "summary": "The hardest step, taken slowly"
-      },
-      {
-        "id": "24",
-        "title": "KMP in full",
-        "summary": "Assembling the last two lessons"
-      },
-      {
-        "id": "25",
-        "title": "String to integer",
-        "summary": "Edge cases matter more than the algorithm"
-      }
-    ],
-    "test": "test-05"
-  },
-  {
-    "title": "Chapter 6 · Practice",
-    "items": [
-      {
-        "id": "26",
-        "title": "Two sum",
-        "summary": "A hash map takes O(n²) down to O(n)"
-      },
-      {
-        "id": "27",
-        "title": "Maximum subarray sum",
-        "summary": "Kadane's algorithm and the thinking behind it"
-      },
-      {
-        "id": "28",
-        "title": "Merging intervals",
-        "summary": "Sort, then one pass"
-      },
-      {
-        "id": "29",
-        "title": "Spiral matrix",
-        "summary": "Precision control over boundaries"
-      },
-      {
-        "id": "30",
-        "title": "From brute force to optimal",
-        "summary": "A general path for attacking a new problem"
-      }
-    ],
-    "test": "test-06"
-  }
+ {
+  "title": "Chapter 1 · Complexity & algorithmic thinking",
+  "items": [
+   {
+    "id": "01",
+    "title": "What algorithmic complexity means",
+    "summary": "Two solutions to the same problem both giv…"
+   },
+   {
+    "id": "02",
+    "title": "Big-O notation",
+    "summary": "Last lesson we said the nested loop \"grows…"
+   },
+   {
+    "id": "03",
+    "title": "Comparing the common complexities",
+    "summary": "Line the usual complexities up and see how…"
+   },
+   {
+    "id": "04",
+    "title": "Space complexity",
+    "summary": "Last lesson compared time. This one compar…"
+   },
+   {
+    "id": "05",
+    "title": "Measuring complexity yourself",
+    "summary": "You analysed it as O(n²) — how do you chec…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Arrays and two pointers",
+  "items": [
+   {
+    "id": "06",
+    "title": "Two Pointers: Why Brute Force O(n²) Collapses to O(n)",
+    "summary": "Two nested loops scan every pair. That is …"
+   },
+   {
+    "id": "07",
+    "title": "Collision Pointers: Reversing Arrays and Testing Palindromes",
+    "summary": "Once two pointers can search, they can als…"
+   },
+   {
+    "id": "08",
+    "title": "Two Pointers, Different Speed: Removing and Deduplicating In-Place",
+    "summary": "Collision pointers are \"two ends closing i…"
+   },
+   {
+    "id": "09",
+    "title": "The Sliding Window, First Steps: Smallest Subarray with a Given Sum",
+    "summary": "Slow/fast pointers are \"one fast, one slow…"
+   },
+   {
+    "id": "10",
+    "title": "Hands On: Taking Apart the Three-Sum Thought Process",
+    "summary": "Three-sum is an interview favorite and the…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Prefix sums & difference arrays",
+  "items": [
+   {
+    "id": "11",
+    "title": "Why Preprocessing Matters: Range Sums from O(n) to O(1)",
+    "summary": "In the previous chapters we learned how tw…"
+   },
+   {
+    "id": "12",
+    "title": "One-Dimensional Prefix Sums: Construction, Query, and the Leading Zero",
+    "summary": "Last lesson we learned that prefix sums ca…"
+   },
+   {
+    "id": "13",
+    "title": "2D Prefix Sums: Submatrix Sums and the Inclusion-Exclusion Principle",
+    "summary": "1D prefix sums handle interval sums. This …"
+   },
+   {
+    "id": "14",
+    "title": "Difference Arrays: Range Addition from O(n) to O(1), Plus Restoration",
+    "summary": "Prefix sums answer \"what is the sum of a r…"
+   },
+   {
+    "id": "15",
+    "title": "Real-World Practice: People-Flow Statistics (Multiple Range Overlays, One Restoration)",
+    "summary": "This lesson applies the difference array t…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Binary search",
+  "items": [
+   {
+    "id": "16",
+    "title": "Why Binary Search Works: Monotonicity, and \"Why It Has Ten Thousand Bugs\"",
+    "summary": "In Chapter 1 we saw how fast binary search…"
+   },
+   {
+    "id": "17",
+    "title": "Standard Binary Search: Closed-Interval Style, Computing Mid, and Infinite Loops",
+    "summary": "In the previous lesson we understood the p…"
+   },
+   {
+    "id": "18",
+    "title": "Boundary Binary Search: Finding the First and Last Match",
+    "summary": "Standard binary search only answers \"is it…"
+   },
+   {
+    "id": "19",
+    "title": "Binary Search on the Answer: Turning \"Find the Optimum\" into \"Test a Candidate\"",
+    "summary": "The first two lessons searched over **posi…"
+   },
+   {
+    "id": "20",
+    "title": "In Practice: Searching in Rotated / Nearly Sorted Arrays",
+    "summary": "Standard binary search requires a fully so…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · String fundamentals",
+  "items": [
+   {
+    "id": "21",
+    "title": "String Immutability: Why Concatenation in a Loop Is O(n²)",
+    "summary": "The first four chapters were all about arr…"
+   },
+   {
+    "id": "22",
+    "title": "Counting and Hashing: Character Frequency and Anagrams",
+    "summary": "The single most common operation on string…"
+   },
+   {
+    "id": "23",
+    "title": "Two Pointers on Strings: Reverse, Reverse Words, and Compress",
+    "summary": "The two-pointer patterns you learned for a…"
+   },
+   {
+    "id": "24",
+    "title": "Three Ways to Check a Palindrome: Center Expansion, Two Pointers, and Reverse-and-Compare",
+    "summary": "Palindromes are a frequent interview topic…"
+   },
+   {
+    "id": "25",
+    "title": "Longest Palindromic Substring: From Brute Force to Center Expansion",
+    "summary": "In the previous lesson we saw that center …"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Sliding window",
+  "items": [
+   {
+    "id": "26",
+    "title": "What Is a Window: When to Use Sliding Window",
+    "summary": "Brute force enumerates all subarrays in O(…"
+   },
+   {
+    "id": "27",
+    "title": "Fixed Windows: Maximum Sum of Size k and Moving Averages",
+    "summary": "Fixed windows are the gateway to all windo…"
+   },
+   {
+    "id": "28",
+    "title": "Variable Windows: Longest Substring Without Repeating Characters",
+    "summary": "Fixed windows never change length; variabl…"
+   },
+   {
+    "id": "29",
+    "title": "Window + Counter: Minimum Window Substring",
+    "summary": "Fixed windows maintain a \"sum\"; variable w…"
+   },
+   {
+    "id": "30",
+    "title": "Putting It All Together: Two Pointers, Prefix Sums, and Sliding Windows",
+    "summary": "Earlier lessons covered two pointers, pref…"
+   }
+  ],
+  "test": "test-06"
+ }
 ]
