@@ -91,5 +91,36 @@
       }
     ],
     "test": "test-03"
+  },
+  {
+    "title": "Chapter 4 · Making Choices",
+    "items": [
+      {
+        "id": "16",
+        "title": "If… then…: The Shape of if",
+        "summary": "Run code only when the condition holds; indentation decides who owns it"
+      },
+      {
+        "id": "17",
+        "title": "Otherwise: else",
+        "summary": "One of two, and exactly one always runs"
+      },
+      {
+        "id": "18",
+        "title": "More Than Two Options: elif",
+        "summary": "Pick one of many, and the ordering trap"
+      },
+      {
+        "id": "19",
+        "title": "Combining Conditions",
+        "summary": "and / or / not — gluing tests together"
+      },
+      {
+        "id": "20",
+        "title": "Project: Grade Classifier",
+        "summary": "Combine the chapter into a working program"
+      }
+    ],
+    "test": "test-04"
   }
 ]
