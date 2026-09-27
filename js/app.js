@@ -22,7 +22,52 @@
   let sync = null, api = null;
   let isTestMode = false;
 
+  /** 阅读位置：正在展示哪一课（决定滚动位置存到哪个 key） */
+  let readingKey = null;
+  /** 刚渲染完、还没恢复滚动位置 —— 这段时间内忽略 scroll 事件，防止把 0 写进去 */
+  let restoringScroll = false;
+
   const keyOf = (b, l) => `${b}/${l}`;
+
+  /* ================= 阅读位置记忆 =================
+   * 记两个粒度：
+   *   LAST_POS —— 上次读到哪一课（进书时直接跳过去）
+   *   READ_POS —— 课内滚到哪了（打开这课时滚回原处）
+   * 一课做完就清掉 READ_POS，下次进来从头开始。
+   */
+  function saveReadPos(y) {
+    if (!readingKey) return;
+    Store.update(Store.K.READ_POS, {}, m => {
+      m[readingKey] = { y: Math.max(0, Math.round(y)), at: Date.now() };
+      return m;
+    });
+  }
+
+  function clearReadPos(k) {
+    Store.update(Store.K.READ_POS, {}, m => { delete m[k]; return m; });
+  }
+
+  /** 滚动时记位置。用 rAF 节流，别让滚动变卡 */
+  let scrollTick = false;
+  function initScrollMemory() {
+    window.addEventListener('scroll', () => {
+      if (restoringScroll || !readingKey || isTestMode) return;
+      if (scrollTick) return;
+      scrollTick = true;
+      requestAnimationFrame(() => {
+        scrollTick = false;
+        if (!readingKey) return;
+        saveReadPos(window.scrollY);
+      });
+    }, { passive: true });
+
+    // 关页/切后台时补一次：rAF 可能还没跑完就走了
+    const flush = () => { if (readingKey && !isTestMode) saveReadPos(window.scrollY); };
+    window.addEventListener('pagehide', flush);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') flush();
+    });
+  }
 
   /* ================= 工具 ================= */
   function toast(msg, ms = 2600) {
@@ -91,7 +136,7 @@
 
   /* ================= 书单首页 ================= */
   async function renderHome() {
-    book = null; current = null;
+    book = null; current = null; readingKey = null;
     closeSidebar();
     resetLab();
     setNotesVisible(false);
@@ -226,6 +271,7 @@
     current = item;
     Store.set(Store.K.LAST_POS, { bookId, lessonId });
     renderTOC();
+    readingKey = keyOf(bookId, lessonId);
 
     const art = $('lesson');
     art.innerHTML = `<div class="loading">${T().loading || '加载中…'}</div>`;
@@ -247,7 +293,47 @@
     renderNav(item);
     Notes.load(keyOf(bookId, lessonId), item.title);
     document.title = `${item.title} · ${book.title}`;
-    window.scrollTo({ top: 0 });
+    restoreScroll(readingKey);
+  }
+
+  /**
+   * 恢复上次的滚动位置。
+   * 内容要先渲染完才能滚（高度不对就滚不到位），所以等到下一帧 + 图片/字体加载后再校准一次。
+   */
+  function restoreScroll(k) {
+    const saved = (Store.get(Store.K.READ_POS, {}) || {})[k];
+    const y = saved && Number.isFinite(saved.y) ? saved.y : 0;
+    restoringScroll = true;
+    window.scrollTo({ top: y, behavior: 'auto' });
+    // 字体/代码块挂载后高度会变，补两次校准，之后才允许写入
+    let tries = 0;
+    const settle = () => {
+      if (k !== readingKey) { restoringScroll = false; return; }
+      window.scrollTo({ top: y, behavior: 'auto' });
+      if (++tries >= 2) setTimeout(() => { restoringScroll = false; }, 120);
+      else requestAnimationFrame(settle);
+    };
+    requestAnimationFrame(settle);
+    if (y > 0) showResumeTip(y);
+  }
+
+  /** 从中间位置打开时给一句提示，避免"我是不是点错了"的困惑 */
+  function showResumeTip(y) {
+    const old = $('resume-tip');
+    if (old) old.remove();
+    const tip = document.createElement('div');
+    tip.id = 'resume-tip';
+    tip.className = 'resume-tip';
+    const zh = window.I18N.lang === 'zh';
+    tip.innerHTML = `<span>${zh ? '已回到上次读到的位置' : 'Back to where you left off'}</span>` +
+      `<button type="button" class="resume-top">${zh ? '回到顶部' : 'Top'}</button>`;
+    tip.querySelector('.resume-top').onclick = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      tip.remove();
+    };
+    document.body.appendChild(tip);
+    setTimeout(() => { tip.classList.add('fade'); }, 2600);
+    setTimeout(() => tip.remove(), 3200);
   }
 
   function paint(art, md, ctxKey) {
@@ -355,7 +441,7 @@
    * 与章末大测验的区别：题目少（一般 1~2 题），但**必须通过**才算学完这一课。
    */
   async function renderLessonQuiz(bookId, lessonId) {
-    isTestMode = true;
+    isTestMode = true; readingKey = null;
     const item = flat.find(x => String(x.id) === String(lessonId));
     if (!item) { location.hash = '#/'; return; }
     current = item;
@@ -428,7 +514,7 @@
 
   /* ================= 章末大测验 ================= */
   async function renderTest(bookId, testId) {
-    isTestMode = true;
+    isTestMode = true; readingKey = null;
     const ch = TOC.find(c => c.test === testId);
     current = { id: testId, title: (ch ? ch.title.replace(/^第\s*\d+\s*章\s*·\s*/, '') : '') };
     renderTOC();
@@ -504,6 +590,10 @@
   /** 一课完成后调用：记额度 + 用完了就提醒 */
   function onLessonCompleted(k, level, bookTitle) {
     const isNew = Quota.consume(k, level);
+    // 这一课结束了：丢掉它的阅读位置记录，下次进来从头开始
+    clearReadPos(k);
+    // 如果人还在这课页面上，直接送回顶部 —— 相当于翻到下一课的起点
+    if (readingKey === k) window.scrollTo({ top: 0, behavior: 'smooth' });
     renderTOC();
     if (isNew && Quota.exhausted(level)) {
       setTimeout(() => showQuotaPanel(level, bookTitle), 700);
@@ -512,7 +602,7 @@
 
   /* ================= 复习 ================= */
   async function renderReview() {
-    isTestMode = false; current = null;
+    isTestMode = false; current = null; readingKey = null;
     renderTOC();
     setNotesVisible(false);
     Notes.reset(T().notes.noLesson || '');
@@ -779,6 +869,9 @@
     $('modal').onclick = e => { if (e.target.id === 'modal') $('modal').hidden = true; };
 
     window.addEventListener('hashchange', route);
+
+    // 阅读位置记忆（课内滚动）
+    initScrollMemory();
   }
 
   /* ================= 设置 ================= */

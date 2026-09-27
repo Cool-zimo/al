@@ -1078,3 +1078,29 @@ body.no-notes .main { margin-right: 0; max-width: 1040px; }
 .quota-bar.full .quota-track i { background: linear-gradient(135deg, var(--amber), var(--red)); }
 .quota-note { font-size: 12px; color: var(--dim); margin-top: 7px; line-height: 1.5; }
 .quota-meta { font-size: 11px; color: var(--faint); margin-top: 3px; }
+
+/* ================= 阅读位置记忆 ================= */
+/* 从中间位置打开时的一句轻提示，几秒后自己淡出 */
+.resume-tip {
+  position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%);
+  z-index: 60; display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px 9px 15px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--card, #fff);
+  box-shadow: 0 6px 22px rgba(20, 24, 40, .14);
+  font-size: 13px; color: var(--text);
+  animation: resume-in .22s ease-out;
+  transition: opacity .5s ease, transform .5s ease;
+}
+.resume-tip.fade { opacity: 0; transform: translateX(-50%) translateY(8px); }
+.resume-tip .resume-top {
+  border: 0; border-radius: 999px; padding: 4px 12px; cursor: pointer;
+  background: var(--accent); color: #fff; font-size: 12.5px; font-weight: 600;
+}
+.resume-tip .resume-top:hover { filter: brightness(1.08); }
+@keyframes resume-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@media (max-width: 640px) {
+  .resume-tip { bottom: 16px; font-size: 12.5px; }
+}
