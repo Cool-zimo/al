@@ -122,5 +122,36 @@
       }
     ],
     "test": "test-04"
+  },
+  {
+    "title": "Chapter 5 · Classes and Objects",
+    "items": [
+      {
+        "id": "21",
+        "title": "Why classes exist",
+        "summary": "Bundling data with operations"
+      },
+      {
+        "id": "22",
+        "title": "Defining classes and creating objects",
+        "summary": "class / __init__ / self / attributes / methods"
+      },
+      {
+        "id": "23",
+        "title": "Class vs instance attributes",
+        "summary": "Shared vs per-object; the mutable trap"
+      },
+      {
+        "id": "24",
+        "title": "Methods and attribute control",
+        "summary": "__str__ / __repr__ / @property"
+      },
+      {
+        "id": "25",
+        "title": "Practice: a student record system",
+        "summary": "Two classes + JSON persistence"
+      }
+    ],
+    "test": "test-05"
   }
 ]

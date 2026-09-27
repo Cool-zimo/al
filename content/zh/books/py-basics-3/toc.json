@@ -122,5 +122,36 @@
       }
     ],
     "test": "test-04"
+  },
+  {
+    "title": "第 5 章 · 类与对象",
+    "items": [
+      {
+        "id": "21",
+        "title": "为什么需要类",
+        "summary": "把数据和操作打包在一起"
+      },
+      {
+        "id": "22",
+        "title": "定义类与创建对象",
+        "summary": "class / __init__ / self / 属性 / 方法"
+      },
+      {
+        "id": "23",
+        "title": "类属性 vs 实例属性",
+        "summary": "共享 vs 各自一份；可变对象陷阱"
+      },
+      {
+        "id": "24",
+        "title": "方法与属性控制",
+        "summary": "__str__ / __repr__ / @property"
+      },
+      {
+        "id": "25",
+        "title": "实战：学生管理系统",
+        "summary": "两个类 + JSON 持久化"
+      }
+    ],
+    "test": "test-05"
   }
 ]
