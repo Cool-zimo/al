@@ -50,7 +50,7 @@ const MD = (() => {
       // 引用块里嵌代码围栏：> ```python ... > ```
       // 之前 ^> 分支把每行都包成 <p>，围栏被当成纯文本显示出来。
       // 这里先一步吃掉整个 "引用 + 围栏" 段，原样渲染成一个真正的代码块。
-      const fenceInQuote = line.match(/^>\s*```(\w*)\s*$/);
+      const fenceInQuote = line.match(/^(?:>|&gt;)\s*```(\w*)\s*$/);
       if (fenceInQuote) {
         flushList();
         if (!inQuote) { out.push('<blockquote>'); inQuote = true; }
@@ -59,8 +59,8 @@ const MD = (() => {
         li++;
         while (li < lines.length) {
           const cur = lines[li];
-          if (/^>\s*```\s*$/.test(cur.trimEnd())) break;   // 围栏结束
-          if (/^>\s?/.test(cur)) body.push(cur.replace(/^>\s?/, ''));
+          if (/^(?:>|&gt;)\s*```\s*$/.test(cur.trimEnd())) break;   // 围栏结束
+          if (/^(?:>|&gt;)\s?/.test(cur)) body.push(cur.replace(/^(?:>|&gt;)\s?/, ''));
           else break;                                        // 引用断了
           li++;
         }
@@ -78,10 +78,11 @@ const MD = (() => {
         out.push(`<h${lv}>${m[2]}</h${lv}>`);
       } else if (/^(-{3,}|\*{3,})$/.test(line.trim())) {
         flushList(); flushQuote(); out.push('<hr>');
-      } else if ((m = line.match(/^>\s?(.*)$/))) {
+      } else if ((m = line.match(/^(?:>|&gt;)\s?(.*)$/))) {
         flushList();
         if (!inQuote) { out.push('<blockquote>'); inQuote = true; }
-        out.push(`<p>${m[1]}</p>`);
+        const qtxt = m[1].replace(/^&gt;\s?/, '');
+        if (qtxt.trim()) out.push(`<p>${qtxt}</p>`);
       } else if ((m = line.match(/^[-*+]\s+(.*)$/))) {
         flushQuote();
         if (list !== 'ul') { flushList(); out.push('<ul>'); list = 'ul'; }
@@ -135,12 +136,18 @@ const MD = (() => {
    * @returns {{html:string, blocks:Array, quizzes:Array}}
    */
   function renderLesson(src) {
-    // 按围栏切段，保留分隔符以便判断类型
+    // 按围栏切段，保留分隔符以便判断类型。
+    // 注意：引用块（> 开头）里的围栏不能被切走 —— 否则代码内容会带着 "> " 前缀
+    // 变成一个非法代码块。这类围栏留给 render()/fallbackRender 在 blockquote 内处理。
     const segs = [];
     const re = /```(\w+)?\n([\s\S]*?)```/g;
     let last = 0, m;
 
     while ((m = re.exec(src)) !== null) {
+      // 围栏起点所在行以 ">" 开头 → 属于引用块，跳过（不切）
+      const lineStart = src.lastIndexOf('\n', m.index) + 1;
+      if (/^\s*>/.test(src.slice(lineStart, m.index + 3))) continue;
+
       if (m.index > last) segs.push({ type: 'text', text: src.slice(last, m.index) });
       const lang = (m[1] || 'text').toLowerCase();
       const body = m[2].replace(/\n$/, '');

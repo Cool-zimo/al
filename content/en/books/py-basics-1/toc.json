@@ -60,5 +60,36 @@
       }
     ],
     "test": "test-02"
+  },
+  {
+    "title": "Chapter 3 · Listening to the User",
+    "items": [
+      {
+        "id": "11",
+        "title": "Asking the User a Question",
+        "summary": "input(): from hard-coded to interactive"
+      },
+      {
+        "id": "12",
+        "title": "input() Always Gives You a String",
+        "summary": "Why 18+18 is 1818, and how to convert"
+      },
+      {
+        "id": "13",
+        "title": "Nicer Output",
+        "summary": "f-strings: goodbye + and str()"
+      },
+      {
+        "id": "14",
+        "title": "Users Never Type What You Expect",
+        "summary": "strip, lower, in — cleaning dirty input"
+      },
+      {
+        "id": "15",
+        "title": "Project: A Personal Info Card",
+        "summary": "Combine the chapter into a usable program"
+      }
+    ],
+    "test": "test-03"
   }
 ]
