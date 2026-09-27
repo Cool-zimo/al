@@ -117,9 +117,12 @@ const Runner = (() => {
    * @param {string} code 用户代码
    * @param {string[]} tests 断言语句数组，如 ["assert add(1,2)==3"]
    * @param {string} nsKey 命名空间钥匙（同一课内共享）
+   * @param {string|string[]} [stdin] 判分时喂给 input() 的内容（每行一次）。
+   *        不传则 input() 返回空字符串——这对"只用预置变量"的题是安全的，
+   *        但想真正考 input() 的题必须靠这个字段把输入喂进去。
    * @returns {Promise<{ok:boolean, stdout:string, error:string|null, failed:number}>}
    */
-  async function execWithTests(code, tests, nsKey = '__quiz__') {
+  async function execWithTests(code, tests, nsKey = '__quiz__', stdin = null) {
     const result = { ok: false, stdout: '', error: null, failed: 0 };
     try {
       await ensure();
@@ -132,6 +135,17 @@ const Runner = (() => {
       ns = pyodide.runPython('{}');
       nsOwner = nsKey;
     }
+    // 题目声明了 stdin 就按行排队喂给 input()，用完补空串（不会卡住）
+    stdinQueue = [];
+    if (stdin != null) {
+      const arr = Array.isArray(stdin) ? stdin : String(stdin).split('\n');
+      stdinQueue = arr.map(v => String(v));
+    }
+    pyodide.setStdin({
+      stdin: () => (stdinQueue.length ? stdinQueue.shift() + '\n' : '\n'),
+      autoEOF: true
+    });
+
     let buf = '';
     pyodide.setStdout({ batched: s => { buf += s + '\n'; } });
     pyodide.setStderr({ batched: s => { buf += s + '\n'; } });

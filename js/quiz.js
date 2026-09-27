@@ -334,7 +334,8 @@ const Quiz = (() => {
       out.textContent = Q().running;
 
       const nsKey = 'quiz:' + id;
-      const r = await Runner.execWithTests(ta.value, tests, nsKey);
+      // 题目若声明了 stdin（多行块），就喂给 input()；没声明则维持空串行为
+      const r = await Runner.execWithTests(ta.value, tests, nsKey, q.stdin || null);
 
       if (r.ok) {
         out.className = 'quiz-out show ok';

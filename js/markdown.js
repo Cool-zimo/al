@@ -43,8 +43,31 @@ const MD = (() => {
     const flushList = () => { if (list) { out.push(`</${list}>`); list = null; } };
     const flushQuote = () => { if (inQuote) { out.push('</blockquote>'); inQuote = false; } };
 
-    for (const raw of lines) {
+    for (let li = 0; li < lines.length; li++) {
+      const raw = lines[li];
       const line = raw.trimEnd();
+
+      // 引用块里嵌代码围栏：> ```python ... > ```
+      // 之前 ^> 分支把每行都包成 <p>，围栏被当成纯文本显示出来。
+      // 这里先一步吃掉整个 "引用 + 围栏" 段，原样渲染成一个真正的代码块。
+      const fenceInQuote = line.match(/^>\s*```(\w*)\s*$/);
+      if (fenceInQuote) {
+        flushList();
+        if (!inQuote) { out.push('<blockquote>'); inQuote = true; }
+        const lang = fenceInQuote[1] || '';
+        const body = [];
+        li++;
+        while (li < lines.length) {
+          const cur = lines[li];
+          if (/^>\s*```\s*$/.test(cur.trimEnd())) break;   // 围栏结束
+          if (/^>\s?/.test(cur)) body.push(cur.replace(/^>\s?/, ''));
+          else break;                                        // 引用断了
+          li++;
+        }
+        const code = body.join('\n').replace(/\u0000INL(\d+)\u0000/g, (m, i) => '`' + inlines[+i] + '`');
+        out.push(`<pre><code${lang ? ` class="lang-${lang}"` : ''}>${code}</code></pre>`);
+        continue;
+      }
 
       if (/^\s*$/.test(line)) { flushList(); flushQuote(); continue; }
 
