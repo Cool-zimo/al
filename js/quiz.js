@@ -161,11 +161,17 @@ const Quiz = (() => {
 
       const pass = r.results.filter(x => x.ok).length;
       const ok = r.ok;
+      const zh = window.I18N.lang === 'zh';
       const lines = r.results.map(x => {
         const flag = x.ok ? '✅' : '❌';
+        // 区间用例（随机函数）：args 是空串，got 里已经写了"调用了 N 次"的摘要
+        if (x.isRange) {
+          if (x.ok) return `${flag} ${x.got}`;
+          return `${flag} ${x.got || (x.error || (zh ? '报错' : 'error'))}`;
+        }
         let s = `${flag} ${funcName}(${x.args.slice(1, -1)})`;
         if (x.ok) s += ` → ${x.got}`;
-        else s += `  期望 ${x.expect}，实际 ${x.got === null ? (x.error || '报错') : x.got}`;
+        else s += `  ${zh ? '期望' : 'expected'} ${fmtExpect(x.expectRaw ?? x.expect)}，${zh ? '实际' : 'got'} ${x.got === null ? (x.error || (zh ? '报错' : 'error')) : x.got}`;
         return s;
       });
       out.className = 'quiz-out show ' + (ok ? 'ok' : 'err');
@@ -204,17 +210,60 @@ const Quiz = (() => {
   }
 
   /** 解析用例：每行 "参数 -> 期望值"，值用 Python 字面量写法（支持列表） */
+  /**
+   * 解析用例表。每行形如「参数 -> 期望」。
+   *
+   * 两种额外语法，用来判**带随机性的函数**（掷骰子、洗牌、抽样……）——
+   * 这类函数每次返回值都不同，没法用精确值比对：
+   *
+   *   1) `*N` 前缀：把这个用例重复调用 N 次
+   *      `*20 -> 1..6`     无参调用 20 次
+   *   2) `a..b` 期望：每次结果都落在 [a, b] 区间内
+   *
+   * 两者合起来就是"掷 20 次骰子，每次都得是 1~6"。
+   * 只判范围还挡不住 `return 3` 这种假随机，所以区间用例还会检查
+   * **结果是否真的出现了多种不同的值**（具体规则见 runner.js）。
+   */
   function parseCases(block) {
     if (Array.isArray(block)) block = block.join('\n');
     return String(block || '').split('\n')
       .map(l => l.trim())
       .filter(l => l && l.includes('->'))
       .map(line => {
-        const [a, e] = line.split('->');
-        const argStr = a.trim();
+        const idx = line.indexOf('->');
+        let argStr = line.slice(0, idx).trim();
+        const expStr = line.slice(idx + 2).trim();
+
+        // `*N` 重复调用标记：可以带参数，如 `*20, 3 -> ...`，也可以单独出现
+        let repeat = 1;
+        const m = /^\*(\d+)\s*(?:,\s*(.*))?$/.exec(argStr);
+        if (m) {
+          repeat = parseInt(m[1], 10) || 1;
+          argStr = (m[2] || '').trim();
+        }
         const args = argStr === '' ? [] : splitArgs(argStr).map(s => literal(s.trim()));
-        return { args, expect: literal(e.trim()) };
+
+        // `a..b` 区间期望
+        const r = /^(-?\d+(?:\.\d+)?)\s*\.\.\s*(-?\d+(?:\.\d+)?)$/.exec(expStr);
+        const expect = r
+          ? { range: [parseFloat(r[1]), parseFloat(r[2])] }
+          : literal(expStr);
+
+        const c = { args, expect };
+        if (repeat > 1) c.repeat = repeat;
+        return c;
       });
+  }
+
+  /** 把用例的期望值渲染成人能读的文字 */
+  function fmtExpect(e) {
+    if (e && typeof e === 'object' && Array.isArray(e.range)) {
+      const [a, b] = e.range;
+      return window.I18N.lang === 'zh'
+        ? `结果落在 ${a} ~ ${b}`
+        : `result in ${a} .. ${b}`;
+    }
+    return typeof e === 'string' ? e : JSON.stringify(e);
   }
 
   /** 把 Python 字面量写法转成 JS 值 */

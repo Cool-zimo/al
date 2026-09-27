@@ -285,12 +285,71 @@ def __short(v):
         r = str(v)
     return r if len(r) <= 60 else r[:57] + "..."
 
+def __in_range(v, lo, hi):
+    try:
+        return float(lo) <= float(v) <= float(hi)
+    except Exception:
+        return False
+
+def __run_range(__args, lo, hi, repeat):
+    """随机函数用例：重复调用 repeat 次，每次都要落在 [lo, hi]。
+
+    光判范围挡不住 `return 3` —— 它每次都在 1~6 里，但根本不是随机。
+    所以还要看结果是否真的出现了多种不同的值：
+      * 整数且区间宽度 <= 10（骰子、硬币这类）：要求每个整数都出现过
+      * 其它（浮点、很宽的区间）：至少出现 5 个不同值
+    """
+    __vals = []
+    for _ in range(repeat):
+        __vals.append(__fn_obj(*__args))
+    __bad = [__v for __v in __vals if not __in_range(__v, lo, hi)]
+    __distinct = set()
+    for __v in __vals:
+        try:
+            __distinct.add(__v)
+        except TypeError:      # 不可哈希（比如返回了列表）
+            __distinct.add(str(__v))
+
+    __is_int = float(lo).is_integer() and float(hi).is_integer()
+    __span = int(hi) - int(lo) + 1 if __is_int else 0
+    if __is_int and 0 < __span <= 10:
+        __need = set(range(int(lo), int(hi) + 1))
+        __enough = __need.issubset({int(__x) for __x in __vals if __in_range(__x, lo, hi)})
+        __why = "覆盖了 %d~%d 每个取值" % (int(lo), int(hi))
+    else:
+        __enough = len(__distinct) >= min(5, repeat)
+        __why = "出现了 %d 种不同结果" % len(__distinct)
+
+    __ok = (not __bad) and __enough
+    if __bad:
+        __msg = "调用 %d 次，有 %d 次结果越界（如 %s）" % (repeat, len(__bad), __short(__bad[0]))
+    elif not __enough:
+        __msg = "调用 %d 次，范围都对，但只有 %d 种不同结果 —— 像是个固定值，不是随机" % (repeat, len(__distinct))
+    else:
+        __msg = "调用 %d 次，全部落在 %s~%s，%s" % (repeat, __short(lo), __short(hi), __why)
+    return {"args": "", "expect": "", "expectRaw": {"range": [lo, hi]},
+            "got": __msg, "ok": bool(__ok), "isRange": True}
+
 __cs = __json.loads(__cases_json)
 __res = []
 for __c in __cs:
     __args = __c.get("args", []) or []
     __exp = __c.get("expect")
-    __row = {"args": __short(__args)[1:-1], "expect": __short(__exp), "got": None, "ok": False}
+    __repeat = int(__c.get("repeat") or 1)
+
+    # 区间期望 = 随机函数用例
+    if isinstance(__exp, dict) and isinstance(__exp.get("range"), list) and len(__exp["range"]) == 2:
+        __lo, __hi = __exp["range"][0], __exp["range"][1]
+        try:
+            __res.append(__run_range(__args, __lo, __hi, __repeat))
+        except Exception as __e:
+            __res.append({"args": "", "expect": "", "got": None,
+                          "error": str(__e), "ok": False, "isRange": True})
+        continue
+
+    # 普通用例：逐个精确比对（repeat > 1 时要求每次都对）
+    __row = {"args": __short(__args)[1:-1], "expect": __short(__exp),
+             "expectRaw": __exp, "got": None, "ok": False}
     try:
         __got = __fn_obj(*__args)
         __row["got"] = __short(__got)
