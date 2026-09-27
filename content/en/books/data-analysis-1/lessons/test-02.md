@@ -80,7 +80,7 @@ starter: |
   # hint: np.where(arr < 0, 0, arr)
   # result should be [3 0 0 0 5]
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "[3 0 0 0 5]" in __out
 hint: print(np.where(arr < 0, 0, arr)). Three arguments: condition, value when true, value when false.

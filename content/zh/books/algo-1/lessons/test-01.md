@@ -83,7 +83,7 @@ starter: |
   
   # 这个列表里 7 出现了两次，应该打印 True
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "True" in __out
 hint: print(has_duplicate([3, 7, 1, 7, 9]))。set 的 in 查询是 O(1)，所以整体只遍历一次，是 O(n)；而两两比较是 O(n²)。

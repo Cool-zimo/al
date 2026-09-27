@@ -80,7 +80,7 @@ starter: |
   # np.genfromtxt('m.csv', delimiter=',')
   # loadtxt 会报错，genfromtxt 把空字段变成 nan
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "nan" in __out
 hint: print(np.genfromtxt('m.csv', delimiter=','))。np.loadtxt 遇到空字段会 ValueError，genfromtxt 则把它变成 nan。
@@ -99,7 +99,7 @@ starter: |
   # 2. 把哨兵值 -1 替换成 nan：arr[arr == -1] = np.nan
   # 3. 打印 np.any(arr == -1)，应该是 False
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "False" in __out
 hint: arr = np.genfromtxt('s.csv', delimiter=',') 然后 arr[arr == -1] = np.nan，最后 print(np.any(arr == -1))。布尔索引赋值是批量替换最直接的写法。

@@ -92,7 +92,7 @@ starter: |
   
   # math.pow(2, 10) is 1024.0
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "1024" in __out
 hint: print(math.pow(2, 10)). You could also use the built-in 2 ** 10, but this demonstrates calling through a module.

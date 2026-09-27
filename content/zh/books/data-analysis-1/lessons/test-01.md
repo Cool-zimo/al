@@ -79,7 +79,7 @@ starter: |
   # 再 reshape 成 3 行 4 列
   # 打印它
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "[[ 0  1  2  3]" in __out
 - assert "[ 8  9 10 11]]" in __out
@@ -98,7 +98,7 @@ starter: |
   # 不需要循环：直接 arr + 100
   # 然后求和（答案应该是 515）
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "515" in __out
 hint: print((arr + 100).sum())。arr + 100 会把 100 加到每个元素上，得到 [101,102,103,104,105]，求和是 515。

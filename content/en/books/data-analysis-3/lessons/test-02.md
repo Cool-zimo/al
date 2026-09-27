@@ -89,7 +89,7 @@ starter: |
   # ax.set_xticks / set_xticklabels
   # ax.legend
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "London" in __out
 hint: x = np.arange(len(stores)), w = 0.35, offset the two groups by x-w/2 and x+w/2. Set xticks to x and xticklabels to stores. Do not skip ax.legend().
@@ -114,7 +114,7 @@ starter: |
   # ax2.plot(..., color='#377eb8')
   # set_ylabel on both axes
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "saved" in __out
 hint: ax1 draws sales in red with y-label "Sales (£10k)"; ax2 = ax1.twinx() draws avg_price in blue with y-label "Avg Price (£)". Colour both axes with tick_params(axis='y', labelcolor=...) as well.

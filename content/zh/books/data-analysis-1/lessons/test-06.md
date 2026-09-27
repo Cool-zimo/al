@@ -81,7 +81,7 @@ starter: |
   # np.convolve(x, k, mode='valid') → [2, 3, 4, 5]
   # 第二个值是 3
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "3" in __out
 hint: print(np.convolve(x, k, mode='valid')[1])。valid 模式长度 n-k+1 = 4，结果是 [2,3,4,5]。

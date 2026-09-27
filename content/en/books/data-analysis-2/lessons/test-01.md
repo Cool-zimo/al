@@ -84,7 +84,7 @@ starter: |
   # df['revenue'] = df['price'] * df['units']
   # the total should be 199*120 + 89*500 = 68380
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "68380" in __out
 hint: df['revenue'] = df['price'] * df['units'], then print(df['revenue'].sum()). Multiplying two Series aligns them by index and computes element by element.
@@ -102,7 +102,7 @@ starter: |
   # s.idxmax() returns the index LABEL of the maximum (not a position)
   # it should be 'Berlin'
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "Berlin" in __out
 hint: print(s.idxmax()). idxmax returns the label; argmax returns the position — in a table you usually want the name.

@@ -96,7 +96,7 @@ starter: |
   # 先 .str.replace 去符号和逗号，再 to_numeric(errors='coerce')
   # 1299 和 89 → 最大值 1299
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "1299" in __out
 hint: cleaned = df['价格'].str.replace('¥','').str.replace(',','')，然后 print(pd.to_numeric(cleaned, errors='coerce').max())。两步走：先清干扰字符，再转换。

@@ -355,6 +355,16 @@ const Quiz = (() => {
     const wrap = document.createElement('div');
     wrap.className = 'quiz-code';
 
+    // starter 里带 TODO 占位时，给它一个醒目标记 ——
+    // 否则学生盯着一整段代码，根本看不出"要改的是最后那行 print"
+    const hasTodo = /TODO/.test(starter);
+    if (hasTodo) {
+      const tip = document.createElement('div');
+      tip.className = 'quiz-todo-tip';
+      tip.innerHTML = '<b>✏️</b> ' + (Q().todoTip || '');
+      body.appendChild(tip);
+    }
+
     const ta = document.createElement('textarea');
     ta.className = 'quiz-ta';
     ta.spellcheck = false;
@@ -392,8 +402,16 @@ const Quiz = (() => {
         finish(id, true, q, foot, null);
         btnRun.textContent = Q().passed;
       } else {
+        // 学生直接点运行、没动 starter 里的 TODO 占位：单独给一句人话，
+        // 而不是甩一个看不懂的 AssertionError
+        const todoLeft = hasTodo && /TODO/.test(ta.value) && /TODO/.test(r.stdout || '');
         out.className = 'quiz-out show err';
-        out.textContent = '❌ ' + (r.error || Q().wrong) + (r.stdout ? '\n\n' + (window.I18N.lang==='zh'?'输出':'Output') + '：\n' + r.stdout : '');
+        if (todoLeft) {
+          out.textContent = '✏️ ' + (Q().todoLeft || '') +
+            (r.stdout ? '\n\n' + (window.I18N.lang === 'zh' ? '输出' : 'Output') + '：\n' + r.stdout : '');
+        } else {
+          out.textContent = '❌ ' + (r.error || Q().wrong) + (r.stdout ? '\n\n' + (window.I18N.lang==='zh'?'输出':'Output') + '：\n' + r.stdout : '');
+        }
         finish(id, false, q, foot, null);
         btnRun.disabled = false;
         btnRun.textContent = Q().retry;

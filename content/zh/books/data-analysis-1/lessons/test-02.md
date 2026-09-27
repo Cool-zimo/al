@@ -80,7 +80,7 @@ starter: |
   # 提示：np.where(arr < 0, 0, arr)
   # 结果应该是 [3 0 0 0 5]
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "[3 0 0 0 5]" in __out
 hint: print(np.where(arr < 0, 0, arr))。三个参数：条件、成立时取的值、不成立时取的值。

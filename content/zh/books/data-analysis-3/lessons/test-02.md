@@ -89,7 +89,7 @@ starter: |
   # ax.set_xticks / set_xticklabels
   # ax.legend
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "北京" in __out
 hint: x = np.arange(len(stores))，w = 0.35，两组用 x-w/2 和 x+w/2 错开。设置 xticks 为 x、xticklabels 为 stores。ax.legend() 不能漏。
@@ -114,7 +114,7 @@ starter: |
   # ax2.plot(..., color='#377eb8')
   # 两个轴分别 set_ylabel
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "saved" in __out
 hint: ax1 画 sales 用红色并设 y 标签"销售额（万元）"；ax2 = ax1.twinx() 画 avg_price 用蓝色并设 y 标签"客单价（元）"。两个轴分别 tick_params(axis='y', labelcolor=...) 染色。

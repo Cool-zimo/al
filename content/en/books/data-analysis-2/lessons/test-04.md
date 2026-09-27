@@ -98,7 +98,7 @@ starter: |
   # df.groupby('city')['revenue'].transform('sum') is as long as the original
   # row 0 is London → London's total = 100 + 150 = 250
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "250" in __out
 hint: df['city_total'] = df.groupby('city')['revenue'].transform('sum'), then print(df.loc[0,'city_total']). transform broadcasts the aggregate back onto every row.

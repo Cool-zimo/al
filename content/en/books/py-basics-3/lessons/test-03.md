@@ -93,7 +93,7 @@ starter: |
   except ValueError:
       print("conversion failed")
   finally:
-      print("edit here")
+      print("TODO: replace this line with your output")
 tests:
 - assert "cleanup done" in __out and "conversion failed" in __out
 hint: After finally: write print("cleanup done"). Code in finally runs whether or not there was an error, and even if there's a return.

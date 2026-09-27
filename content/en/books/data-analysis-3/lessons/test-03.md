@@ -82,7 +82,7 @@ starter: |
   # for ax in axes.flat:
   #     ax.plot([1, 2, 3], [1, 2, 3])
 
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "saved" in __out
 hint: Iterate with `for ax in axes.flat: ax.plot([1,2,3],[1,2,3])`, then fig.tight_layout() and fig.savefig('out.png').

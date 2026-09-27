@@ -96,7 +96,7 @@ starter: |
   # .str.replace to strip symbols and commas, then to_numeric(errors='coerce')
   # 1299 and 89 → the maximum is 1299
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "1299" in __out
 hint: cleaned = df['price'].str.replace('£','').str.replace(',',''), then print(pd.to_numeric(cleaned, errors='coerce').max()). Two steps: clean the interfering characters, then convert.

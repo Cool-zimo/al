@@ -85,7 +85,7 @@ starter: |
   # ax.set_title / set_xlabel / set_ylabel
   # fig.savefig(...)
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "北京门店销售" in __out
 - assert "月份" in __out
@@ -110,7 +110,7 @@ starter: |
   
   # fig.savefig(...)
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "2025 销售" in __out
 hint: 字体：plt.rcParams['font.sans-serif'] = ['WenQuanYi Micro Hei']，unicode_minus：plt.rcParams['axes.unicode_minus'] = False。保存：fig.savefig('out.png', dpi=150, bbox_inches='tight')。

@@ -81,7 +81,7 @@ starter: |
   # np.convolve(x, k, mode='valid') → [2, 3, 4, 5]
   # the second value is 3
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "3" in __out
 hint: print(np.convolve(x, k, mode='valid')[1]). valid's length is n-k+1 = 4; the result is [2,3,4,5].

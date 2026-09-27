@@ -92,7 +92,7 @@ starter: |
   
   # math.pow(2, 10) 应该是 1024.0
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "1024" in __out
 hint: print(math.pow(2, 10))。或者用内置的 2 ** 10，但这里用 math 演示模块调用。

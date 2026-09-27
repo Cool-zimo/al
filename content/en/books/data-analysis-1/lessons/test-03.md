@@ -80,7 +80,7 @@ starter: |
   # boolean indexing: arr[arr > 10]
   # result should be [12 20 15]
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "[12 20 15]" in __out
 hint: print(arr[arr > 10]). arr > 10 builds a boolean array; putting it in brackets keeps only the True positions.

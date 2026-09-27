@@ -69,7 +69,7 @@ window.I18N = {
     noLesson: '_（选一节课，就能为它单独记笔记）_'
   },
 
-  quiz: { choice: '选择题', fill: '填空题', code: '程序题', project: '小项目', submit: '提交', run: '▶ 运行并检查', running: '检查中…', hint: '提示', reset: '还原初始代码', done: '我完成了', finished: '已完成 ✅', passed: '已通过', retry: '再试一次', right: '对了。', wrong: '再看看。', pickFirst: '先选一个答案', remain: (n) => `还有 ${n} 项没勾，先自己验收一遍`, noHint: '再读一遍上面的示例代码，注意函数要用 return 把结果返回出去。', refAnswer: '参考答案：' ,
+  quiz: { choice: '选择题', fill: '填空题', code: '程序题', project: '小项目', submit: '提交', run: '▶ 运行并检查', running: '检查中…', hint: '提示', reset: '还原初始代码', done: '我完成了', finished: '已完成 ✅', passed: '已通过', retry: '再试一次', right: '对了。', wrong: '再看看。', pickFirst: '先选一个答案', todoTip: '初始代码里的 TODO 就是你要动手的地方 —— 把它改成真正的代码再运行。', todoLeft: '你还没改初始代码里的 TODO —— 现在跑的是占位代码，当然过不了。往下看题面，把 TODO 那行换成真正的代码。', remain: (n) => `还有 ${n} 项没勾，先自己验收一遍`, noHint: '再读一遍上面的示例代码，注意函数要用 return 把结果返回出去。', refAnswer: '参考答案：' ,
     verify: '▶ 检查能不能跑通',
     noBug: '代码能跑通，没有报错',
     hasBug: '代码跑不通，先修一下：',

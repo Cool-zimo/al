@@ -127,7 +127,7 @@ starter: |
   name = input()
   # 用 map(int, input().split()) 读入三门成绩
   # 算 total、avg，按规则定 level，用 f-string 打印
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 hint: 三步拆开写：读入（map+split）→ 计算（total、avg、level）→ 输出（f-string）。等级判定用 if-elif-else，先判高的。
 checklist:
 - 用 map(int, input().split()) 正确读入三个整数成绩

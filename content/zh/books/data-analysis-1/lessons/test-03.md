@@ -80,7 +80,7 @@ starter: |
   # 布尔索引：arr[arr > 10]
   # 结果应该是 [12 20 15]
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "[12 20 15]" in __out
 hint: print(arr[arr > 10])。arr > 10 先得到布尔数组，放进方括号就只保留 True 的位置。

@@ -95,7 +95,7 @@ q: 读入一个 0~100 的整数，按规则输出等级：90 及以上输出"优
 starter: |
   # if-elif-else，条件从严到宽
   score = int(input())
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 stdin: |
   88
 tests:

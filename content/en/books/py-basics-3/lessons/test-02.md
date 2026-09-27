@@ -96,7 +96,7 @@ starter: |
   #     json.dump(user, f, ensure_ascii=False, indent=2)
   # then read it back
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "20" in __out
 hint: Write with json.dump(user, f, ensure_ascii=False, indent=2); read with json.load(f) then print(d['age']).

@@ -84,7 +84,7 @@ starter: |
   # df['销售额'] = df['单价'] * df['销量']
   # 总和应该是 199*120 + 89*500 = 68380
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "68380" in __out
 hint: df['销售额'] = df['单价'] * df['销量']，然后 print(df['销售额'].sum())。两个 Series 相乘会按索引对齐后逐元素计算，赋值给新列名就是新增一列。
@@ -102,7 +102,7 @@ starter: |
   # s.idxmax() 返回最大值的索引标签（不是位置）
   # 应该是 '广州'
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "广州" in __out
 hint: print(s.idxmax())。idxmax 返回标签，argmax 返回位置 —— 表格里通常要的是名字，所以 idxmax 更常用。

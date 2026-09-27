@@ -93,7 +93,7 @@ starter: |
   except ValueError:
       print("转换失败")
   finally:
-      print("在这里改")
+      print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "清理完成" in __out and "转换失败" in __out
 hint: finally: 后面写 print("清理完成")。finally 无论是否出错、有无 return 都执行。

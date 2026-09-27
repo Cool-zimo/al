@@ -73,7 +73,7 @@ window.I18N = {
     choice: 'Multiple choice', fill: 'Fill in the blank', code: 'Coding', project: 'Mini project',
     submit: 'Submit', run: '▶ Run & check', running: 'Checking…', hint: 'Hint', reset: 'Reset code',
     done: 'I finished it', finished: 'Done ✅', passed: 'Passed', retry: 'Try again',
-    right: 'Correct. ', wrong: 'Not quite. ', pickFirst: 'Pick an answer first',
+    right: 'Correct. ', wrong: 'Not quite. ', pickFirst: 'Pick an answer first', todoTip: 'The TODO in the starter code is what you need to fill in — replace it with real code before running.', todoLeft: 'You have not replaced the TODO in the starter code yet — you just ran the placeholder, so of course it failed. Read the task again and swap that TODO line for real code.',
     remain: (n) => `${n} item(s) still unchecked — review them yourself first`,
     noHint: 'Re-read the example above. Remember: a function must return its result.',
     refAnswer: 'Answer: '

@@ -79,7 +79,7 @@ starter: |
   # then reshape into 3 rows, 4 columns
   # and print it
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "[[ 0  1  2  3]" in __out
 - assert "[ 8  9 10 11]]" in __out
@@ -98,7 +98,7 @@ starter: |
   # no loop needed: just arr + 100
   # then sum it (the answer should be 515)
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "515" in __out
 hint: print((arr + 100).sum()). arr + 100 adds 100 to each element, giving [101,102,103,104,105], which sums to 515.

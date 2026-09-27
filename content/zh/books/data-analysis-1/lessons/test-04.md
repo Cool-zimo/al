@@ -81,7 +81,7 @@ starter: |
   # np.vstack([a, b]) 会先把每个一维数组变成"一行"再上下堆
   # 结果应该是 [[1 2 3] [4 5 6]]
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "[[1 2 3]" in __out
 - assert "[4 5 6]]" in __out

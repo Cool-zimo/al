@@ -98,7 +98,7 @@ starter: |
   # df.groupby('城市')['销售额'].transform('sum') 结果和原表一样长
   # 第 0 行是北京 → 北京总额 = 100 + 150 = 250
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "250" in __out
 hint: df['城市总额'] = df.groupby('城市')['销售额'].transform('sum')，然后 print(df.loc[0,'城市总额'])。transform 把聚合结果广播回每一行。

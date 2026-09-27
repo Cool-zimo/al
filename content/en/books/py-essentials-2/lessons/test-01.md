@@ -127,7 +127,7 @@ starter: |
   name = input()
   # use map(int, input().split()) to read the three scores
   # compute total, avg, level, then print with an f-string
-  print("change this")
+  print("TODO: replace this line with your output")
 hints: Break it into three steps: read (map + split) -> compute (total, avg, level) -> output (f-string). For the grade use if-elif-else, testing the higher thresholds first.
 checklist:
 - correctly reads three integer scores with map(int, input().split())

@@ -95,7 +95,7 @@ q: Read an integer from 0 to 100, then print the grade by the rules: 90 and abov
 starter: |
   # if-elif-else, strict to loose
   score = int(input())
-  print("change this")
+  print("TODO: replace this line with your output")
 stdin: |
   88
 tests:

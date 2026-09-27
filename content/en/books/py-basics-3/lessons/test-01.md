@@ -94,7 +94,7 @@ starter: |
   # append "new\n" with mode 'a'
   # then read with 'r'
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "new" in __out and "old" in __out
 hint: with open('log.txt','a',encoding='utf-8') as f: f.write("new\n"); then with open('log.txt','r',encoding='utf-8') as f: print(f.read()).

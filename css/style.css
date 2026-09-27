@@ -500,6 +500,16 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
 .quiz-answer { font-size: 13px; color: var(--green); margin-top: 8px; }
 
 .quiz-code { margin: 12px 0 8px; }
+/* starter 里带 TODO 占位时的提示条 */
+.quiz-todo-tip {
+  display: flex; align-items: flex-start; gap: 7px;
+  margin: 10px 0 0; padding: 9px 13px;
+  border: 1px solid color-mix(in srgb, var(--amber) 45%, var(--border));
+  border-left: 3px solid var(--amber);
+  border-radius: var(--r-sm); background: var(--amber-soft);
+  color: var(--amber); font-size: 13px; line-height: 1.6;
+}
+.quiz-todo-tip b { font-size: 14px; }
 .quiz-ta {
   width: 100%; min-height: 140px; resize: vertical; padding: 14px 16px;
   border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--code-bg);

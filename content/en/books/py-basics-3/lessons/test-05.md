@@ -111,7 +111,7 @@ starter: |
   r = Rectangle(3, 5)
   # print(r.area()) → 15
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "15" in __out
 hint: In __init__: self.w = w; self.h = h. In area: return self.w * self.h. Then print(r.area()).

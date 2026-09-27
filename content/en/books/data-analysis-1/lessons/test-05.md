@@ -80,7 +80,7 @@ starter: |
   # np.genfromtxt('m.csv', delimiter=',')
   # loadtxt raises; genfromtxt turns the empty field into nan
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "nan" in __out
 hint: print(np.genfromtxt('m.csv', delimiter=',')). np.loadtxt raises ValueError on an empty field; genfromtxt turns it into nan.
@@ -99,7 +99,7 @@ starter: |
   # 2. replace the sentinel -1 with nan: arr[arr == -1] = np.nan
   # 3. print np.any(arr == -1) — should be False
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "False" in __out
 hint: arr = np.genfromtxt('s.csv', delimiter=','), then arr[arr == -1] = np.nan, then print(np.any(arr == -1)). Boolean-index assignment is the most direct bulk replacement.

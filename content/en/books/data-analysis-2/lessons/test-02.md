@@ -98,7 +98,7 @@ starter: |
   # df.loc[df['score'] >= 90, 'grade'] = 'A'
   # Bob (92) and Cara (95) → 2 A's
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "2" in __out
 hint: df.loc[df['score'] >= 90, 'grade'] = 'A', then print((df['grade'] == 'A').sum()). The shape is fixed: loc[row condition, column] = new value.

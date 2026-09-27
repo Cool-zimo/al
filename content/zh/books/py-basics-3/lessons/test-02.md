@@ -96,7 +96,7 @@ starter: |
   #     json.dump(user, f, ensure_ascii=False, indent=2)
   # 再读回来
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "20" in __out
 hint: 写用 json.dump(user, f, ensure_ascii=False, indent=2)；读用 json.load(f)，然后 print(d['age'])。

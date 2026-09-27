@@ -85,7 +85,7 @@ starter: |
   # ax.set_title / set_xlabel / set_ylabel
   # fig.savefig(...)
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "London Store Sales" in __out
 - assert "Month" in __out
@@ -110,7 +110,7 @@ starter: |
   
   # fig.savefig(...)
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "2025 Sales" in __out
 hint: Font: plt.rcParams['font.sans-serif'] = ['WenQuanYi Micro Hei']; unicode_minus: plt.rcParams['axes.unicode_minus'] = False. Save: fig.savefig('out.png', dpi=150, bbox_inches='tight').

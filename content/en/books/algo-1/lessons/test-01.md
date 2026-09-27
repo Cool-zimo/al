@@ -83,7 +83,7 @@ starter: |
   
   # this list contains 7 twice, so it should print True
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "True" in __out
 hint: print(has_duplicate([3, 7, 1, 7, 9])). A set's `in` test is O(1), so the whole function is a single pass — O(n) — whereas pairwise comparison is O(n²).

@@ -94,7 +94,7 @@ starter: |
   # 用 'a' 模式追加 "new\n"
   # 再用 'r' 读出来
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "new" in __out and "old" in __out
 hint: with open('log.txt','a',encoding='utf-8') as f: f.write("new\n")；然后 with open('log.txt','r',encoding='utf-8') as f: print(f.read())。

@@ -86,7 +86,7 @@ starter: |
   age_text = "18"
   
   # 请转成整数，算出 2025 - 年龄，然后按格式打印
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "2007" in __out
 hint: birth = 2025 - int(age_text)，然后 print(f"你出生于 {birth} 年")。关键在 int() —— 字符串不能做减法。
@@ -102,7 +102,7 @@ starter: |
   age = 18
   
   # 用 f-string 打印
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "小红今年 18 岁了！" in __out
 hint: print(f"{name}今年 {age} 岁了！") —— 注意「今年」后面和「岁」前面的空格要照抄。

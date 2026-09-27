@@ -82,7 +82,7 @@ starter: |
   # for ax in axes.flat:
   #     ax.plot([1, 2, 3], [1, 2, 3])
   
-  print("在这里改")
+  print("TODO：把这行改成你要打印的结果")
 tests:
 - assert "saved" in __out
 hint: 用 for ax in axes.flat: ax.plot([1,2,3],[1,2,3]) 迭代画完，再 fig.tight_layout() 和 fig.savefig('out.png')。

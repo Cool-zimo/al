@@ -81,7 +81,7 @@ starter: |
   # np.vstack([a, b]) promotes each to "one row", then stacks
   # result should be [[1 2 3] [4 5 6]]
   
-  print("edit here")
+  print("TODO: replace this line with your output")
 tests:
 - assert "[[1 2 3]" in __out
 - assert "[4 5 6]]" in __out
