@@ -1,0 +1,157 @@
+[
+ {
+  "title": "Chapter 1 · Get It Running",
+  "items": [
+   {
+    "id": "01",
+    "title": "Setup and Your First Program",
+    "summary": "By the end of this lesson you will have Py…"
+   },
+   {
+    "id": "02",
+    "title": "Variables and Three Kinds of Data",
+    "summary": "By the end of this lesson you will be able…"
+   },
+   {
+    "id": "03",
+    "title": "Making Your Program Talk and Listen",
+    "summary": "By the end of this lesson your program wil…"
+   },
+   {
+    "id": "04",
+    "title": "Arithmetic and String Concatenation",
+    "summary": "By the end of this lesson you will be able…"
+   },
+   {
+    "id": "05",
+    "title": "Comments and Reading Error Messages",
+    "summary": "By the end of this lesson you will be able…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Judging and Repeating",
+  "items": [
+   {
+    "id": "06",
+    "title": "if / elif / else: teaching your program to decide",
+    "summary": "By the end of this lesson you will be able…"
+   },
+   {
+    "id": "07",
+    "title": "and / or / not and the rules of truthiness",
+    "summary": "By the end of this lesson you will be able…"
+   },
+   {
+    "id": "08",
+    "title": "while loops: keep going as long as the condition holds",
+    "summary": "By the end of this lesson you will be able…"
+   },
+   {
+    "id": "09",
+    "title": "for and range: when you know how many times",
+    "summary": "By the end of this lesson you will be able…"
+   },
+   {
+    "id": "10",
+    "title": "break / continue and nested loops",
+    "summary": "By the end of this lesson you will be able…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Containers",
+  "items": [
+   {
+    "id": "11",
+    "title": "Lists: boxes for holding things",
+    "summary": "By the end of this lesson you will be able…"
+   },
+   {
+    "id": "12",
+    "title": "Common list operations",
+    "summary": "By the end of this lesson you will be able…"
+   },
+   {
+    "id": "13",
+    "title": "Tuples and dictionaries: which to use when",
+    "summary": "By the end of this lesson you will be able…"
+   },
+   {
+    "id": "14",
+    "title": "Common dictionary operations",
+    "summary": "By the end of this lesson you will be able…"
+   },
+   {
+    "id": "15",
+    "title": "Sets: deduplication and set operations",
+    "summary": "By the end of this lesson you will be able…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Packaging Your Code",
+  "items": [
+   {
+    "id": "16",
+    "title": "Functions: Packaging Code into Reusable Blocks",
+    "summary": "By the end of this lesson you will be able…"
+   },
+   {
+    "id": "17",
+    "title": "Advanced Parameters: Defaults, Keywords, and `*args`",
+    "summary": "By the end of this lesson you will be able…"
+   },
+   {
+    "id": "18",
+    "title": "Scope: Local and Global Variables",
+    "summary": "By the end of this lesson you will know wh…"
+   },
+   {
+    "id": "19",
+    "title": "String Methods in Depth",
+    "summary": "By the end of this lesson you will be able…"
+   },
+   {
+    "id": "20",
+    "title": "Reading and Writing Files",
+    "summary": "By the end of this lesson you will be able…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Something You Can Show Off",
+  "items": [
+   {
+    "id": "21",
+    "title": "Exceptions: try / except / finally",
+    "summary": "By the end of this lesson you will be able…"
+   },
+   {
+    "id": "22",
+    "title": "Modules and Packages: Standing on the Shoulders of Giants",
+    "summary": "By the end of this lesson you will be able…"
+   },
+   {
+    "id": "23",
+    "title": "List Comprehensions and Built-in Functional Tools",
+    "summary": "By the end of this lesson you will be able…"
+   },
+   {
+    "id": "24",
+    "title": "Project: A Working Contact Book",
+    "summary": "By the end of this lesson you will combine…"
+   },
+   {
+    "id": "25",
+    "title": "Wrapping Up: Where to Go Next",
+    "summary": "This lesson is not an ending — it is a sig…"
+   }
+  ],
+  "test": "test-05"
+ }
+]

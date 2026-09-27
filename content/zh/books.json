@@ -35,7 +35,8 @@
   "desc": "给学过一次、需要快速捡起来的人。只讲主干，去掉所有铺垫。",
   "stage": "基础",
   "level": "复习",
-  "ready": false
+  "ready": true,
+  "note": "完整 5 章 25 课"
  },
  {
   "id": "py-essentials-2",
