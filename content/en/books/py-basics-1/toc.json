@@ -122,5 +122,36 @@
       }
     ],
     "test": "test-04"
+  },
+  {
+    "title": "Chapter 5 · Making the Program Repeat",
+    "items": [
+      {
+        "id": "21",
+        "title": "while: Making the Program Repeat",
+        "summary": "Keep going while the condition holds; the increment is the brake"
+      },
+      {
+        "id": "22",
+        "title": "Run Forever: while True and break",
+        "summary": "When you can't know the count — plus continue to skip a round"
+      },
+      {
+        "id": "23",
+        "title": "for and range: Counting",
+        "summary": "Cleaner when you know the count, and the 'end is excluded' rule"
+      },
+      {
+        "id": "24",
+        "title": "Loops Inside Loops: Nesting",
+        "summary": "The outer steps once; the inner runs a full lap"
+      },
+      {
+        "id": "25",
+        "title": "Project: The Number Guessing Game",
+        "summary": "Stitch the chapter into a game you can keep playing"
+      }
+    ],
+    "test": "test-05"
   }
 ]
