@@ -51,7 +51,7 @@
     "desc": "从 Python 列表到 ndarray 的思维转换：向量化、广播、索引技巧。",
     "stage": "数据",
     "level": "进阶",
-    "ready": false
+    "ready": true
   },
   {
     "id": "data-analysis-2",

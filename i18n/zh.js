@@ -73,7 +73,15 @@ window.I18N = {
     noCodeOk: '没填代码也没关系 —— 项目可以在你自己的编辑器里完成',
     verifyFirst: '先点「检查能不能跑通」，确认没报错再提交',
     projectPlaceholder: '把你的代码贴在这里（可选）。贴了就必须能跑通，没贴也能提交 —— 项目可以在 VSCode 里完成。',
-    projectNote: '小项目不判功能对不对（那太主观了），只要求：代码跑得通 + 你自己对照上面的清单验收。' },
+    projectNote: '小项目不判功能对不对（那太主观了），只要求：代码跑得通 + 你自己对照上面的清单验收。',
+    local: '本机运行题',
+    localWhyTitle: '为什么要在本机跑：',
+    localWhy: 'tkinter / pygame / Qt 这类库需要真实的窗口系统。浏览器沙箱里既没有显示器，也没有 GUI 后端，在线运行必然失败 —— 不是代码写错了，是环境不支持。所以这类题改为：把代码带回 VS Code，在本机跑，自己按清单验收。',
+    localOpen: '在 VS Code 里打开',
+    localOpened: '已复制 ✓',
+    localDownloaded: '.py 已下载',
+    localCheck: '在本机跑通后，按上面的清单自评'
+  },
 
   review: {
     title: '🔁 今日复习',

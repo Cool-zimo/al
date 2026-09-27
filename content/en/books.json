@@ -51,7 +51,7 @@
     "desc": "Switching your brain from Python lists to ndarray: vectorisation, broadcasting, indexing tricks.",
     "stage": "Data",
     "level": "Intermediate",
-    "ready": false
+    "ready": true
   },
   {
     "id": "data-analysis-2",

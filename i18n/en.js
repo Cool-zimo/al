@@ -81,7 +81,14 @@ window.I18N = {
     noCodeOk: 'No code pasted is fine — you can build the project in your own editor',
     verifyFirst: 'Click "Check it runs" first to confirm there are no errors',
     projectPlaceholder: 'Paste your code here (optional). If you paste it, it must run clean; if not, you can still submit — build it in VS Code instead.',
-    projectNote: 'Mini projects are not judged on functionality (too subjective). The bar is: it runs + you ticked the checklist above.'
+    projectNote: 'Mini projects are not judged on functionality (too subjective). The bar is: it runs + you ticked the checklist above.',
+    local: 'Run locally',
+    localWhyTitle: 'Why this must run on your machine: ',
+    localWhy: 'tkinter, pygame and Qt all need a real windowing system. The browser sandbox has neither a display nor a GUI backend, so running them online always fails — not because your code is wrong, but because the environment cannot support it. So these exercises work differently: take the code back to VS Code, run it locally, and self-check against the list above.',
+    localOpen: 'Open in VS Code',
+    localOpened: 'Copied ✓',
+    localDownloaded: '.py downloaded',
+    localCheck: 'Run it locally, then self-check against the list above',
   },
 
   review: {

@@ -1,0 +1,95 @@
+[
+  {
+    "title": "Chapter 1 · From lists to arrays",
+    "items": [
+      {
+        "id": "01",
+        "title": "Why lists aren't enough",
+        "summary": "Three limits of Python lists, and how arrays fix them"
+      },
+      {
+        "id": "02",
+        "title": "Six ways to create an array",
+        "summary": "array, zeros, ones, arange, linspace, random"
+      },
+      {
+        "id": "03",
+        "title": "dtype and shape",
+        "summary": "Data types, dimensions, shape and reshape"
+      },
+      {
+        "id": "04",
+        "title": "Basic array arithmetic",
+        "summary": "With scalars, with arrays, and comparisons"
+      },
+      {
+        "id": "05",
+        "title": "Lists vs arrays",
+        "summary": "Converting, measuring speed, knowing when to use which"
+      }
+    ],
+    "test": "test-01"
+  },
+  {
+    "title": "Chapter 2 · Vectorisation & broadcasting",
+    "items": [
+      {
+        "id": "06",
+        "title": "Thinking in vectors",
+        "summary": "Why you should drop the for loop"
+      },
+      {
+        "id": "07",
+        "title": "Universal functions (ufuncs)",
+        "summary": "sqrt, exp, sin and element-wise work"
+      },
+      {
+        "id": "08",
+        "title": "Broadcasting",
+        "summary": "How arrays of different shapes can compute at all"
+      },
+      {
+        "id": "09",
+        "title": "Broadcasting in practice",
+        "summary": "Standardisation and distance matrices"
+      },
+      {
+        "id": "10",
+        "title": "Reading broadcast errors",
+        "summary": "How to debug a shape mismatch"
+      }
+    ],
+    "test": "test-02"
+  },
+  {
+    "title": "Chapter 3 · Indexing, aggregation & practice",
+    "items": [
+      {
+        "id": "11",
+        "title": "Slicing and views",
+        "summary": "view versus copy — the biggest trap"
+      },
+      {
+        "id": "12",
+        "title": "Boolean and fancy indexing",
+        "summary": "Filter by condition, fetch in batches"
+      },
+      {
+        "id": "13",
+        "title": "Aggregation functions",
+        "summary": "sum, mean, max, argmax and nan-safe variants"
+      },
+      {
+        "id": "14",
+        "title": "What on earth is axis",
+        "summary": "The most confusing idea, explained once"
+      },
+      {
+        "id": "15",
+        "title": "Practice: analysing grades",
+        "summary": "Tie all three chapters into one full workflow"
+      }
+    ],
+    "test": "test-03"
+  }
+]

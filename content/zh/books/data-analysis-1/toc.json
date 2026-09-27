@@ -1,0 +1,95 @@
+[
+  {
+    "title": "第 1 章 · 从列表到数组",
+    "items": [
+      {
+        "id": "01",
+        "title": "为什么列表不够用",
+        "summary": "Python 列表的三个短板，以及数组怎么解决"
+      },
+      {
+        "id": "02",
+        "title": "创建数组的六种方式",
+        "summary": "array、zeros、ones、arange、linspace、随机"
+      },
+      {
+        "id": "03",
+        "title": "dtype 与 shape",
+        "summary": "数据类型、维度、形状与 reshape"
+      },
+      {
+        "id": "04",
+        "title": "数组的基本运算",
+        "summary": "与标量、与数组、以及比较运算"
+      },
+      {
+        "id": "05",
+        "title": "列表与数组的取舍",
+        "summary": "互相转换、性能实测、什么时候该用谁"
+      }
+    ],
+    "test": "test-01"
+  },
+  {
+    "title": "第 2 章 · 向量化与广播",
+    "items": [
+      {
+        "id": "06",
+        "title": "向量化思维",
+        "summary": "为什么应该戒掉 for 循环"
+      },
+      {
+        "id": "07",
+        "title": "通用函数 ufunc",
+        "summary": "sqrt、exp、sin 与逐元素运算"
+      },
+      {
+        "id": "08",
+        "title": "广播机制",
+        "summary": "形状不同的数组凭什么能一起算"
+      },
+      {
+        "id": "09",
+        "title": "广播实战",
+        "summary": "标准化与距离矩阵"
+      },
+      {
+        "id": "10",
+        "title": "广播报错怎么读",
+        "summary": "shape mismatch 的排查方法"
+      }
+    ],
+    "test": "test-02"
+  },
+  {
+    "title": "第 3 章 · 索引、聚合与实战",
+    "items": [
+      {
+        "id": "11",
+        "title": "切片与视图",
+        "summary": "view 和 copy 的区别，最重要的陷阱"
+      },
+      {
+        "id": "12",
+        "title": "布尔索引与花式索引",
+        "summary": "按条件筛选，按位置批量取"
+      },
+      {
+        "id": "13",
+        "title": "聚合函数",
+        "summary": "sum、mean、max、argmax 与 nan 安全版本"
+      },
+      {
+        "id": "14",
+        "title": "axis 到底是谁",
+        "summary": "最容易被绕晕的概念，一次讲清"
+      },
+      {
+        "id": "15",
+        "title": "综合实战：成绩分析",
+        "summary": "把三章内容串成一个完整流程"
+      }
+    ],
+    "test": "test-03"
+  }
+]

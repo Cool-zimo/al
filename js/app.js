@@ -595,6 +595,98 @@
     return wrap;
   }
 
+  /* ================= 复习 ================= */
+  async function renderReview() {
+    isTestMode = false; current = null;
+    renderTOC();
+    setNotesVisible(false);
+    Notes.reset(T().notes.noLesson || '');
+    const art = $('lesson');
+    const due = Review.dueList();
+    const up = Review.upcoming(7);
+    const R = T().review;
+
+    let html = `
+      <div class="home-hero">
+        <h1>${R.title}</h1>
+        <p class="home-sub">${escapeHtml(R.sub)}</p>
+      </div>`;
+
+    if (!due.length) {
+      html += `<div class="empty-state">
+        <div class="empty-icon">🎉</div>
+        <p>${R.empty}</p>
+        <p class="dim">${R.emptyDesc}</p>
+      </div>`;
+    } else {
+      html += `<h2 class="home-stage">${R.dueTitle(due.length)}</h2><div class="review-list">`;
+      for (const d of due) {
+        const [bid, lid] = String(d.key).split('/');
+        const b = BOOKS.find(x => x.id === bid);
+        html += `
+          <div class="review-item">
+            <div class="review-meta">
+              <span class="review-book">${escapeHtml(b ? b.title : bid)}</span>
+              <span class="review-stage">${escapeHtml(Review.stageLabel(d.stage))}</span>
+            </div>
+            <div class="review-title">${escapeHtml(lid)}</div>
+            <a class="review-go" href="#/book/${bid}/${lid}">${R.go}</a>
+          </div>`;
+      }
+      html += `</div>`;
+    }
+
+    if (up.length) {
+      html += `<h2 class="home-stage">${R.upcoming}</h2><div class="review-up">`;
+      for (const u of up) {
+        html += `<div class="up-item"><span>${escapeHtml(u.key)}</span><span class="faint">${Review.humanDue(u.due)}</span></div>`;
+      }
+      html += `</div>`;
+    }
+
+    art.innerHTML = html;
+    $('lesson-nav').innerHTML = '';
+    document.title = `${R.title} · ${T().brand}`;
+  }
+
+  /* ================= 完成标记 ================= */
+  function buildDoneBar(item) {
+    const k = keyOf(book.id, item.id);
+    const progress = Store.get(Store.K.PROGRESS, {}) || {};
+    const done = !!progress[k]?.done;
+    const rv = (Store.get(Store.K.REVIEW, {}) || {})[k];
+    const L = T().lesson;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'lesson-done' + (done ? ' done' : '');
+    const span = document.createElement('span');
+    span.innerHTML = done
+      ? `${L.done} <span class="hint">· ${L.nextReview} ${Review.humanDue(rv?.due)}</span>`
+      : L.undone;
+    wrap.appendChild(span);
+
+    const btn = document.createElement('button');
+    btn.textContent = done ? L.unmark : L.markDone;
+    btn.onclick = () => {
+      const nowDone = !done;
+      Store.update(Store.K.PROGRESS, {}, p => {
+        if (nowDone) p[k] = { done: true, updatedAt: new Date().toISOString() };
+        else delete p[k];
+        return p;
+      });
+      if (nowDone) {
+        Review.learn(k);
+        toast(T().toast.addedReview);
+      } else Review.unlearn(k);
+      if (sync) sync.schedulePush();
+      const old = $('lesson').querySelector('.lesson-done');
+      if (old) old.replaceWith(buildDoneBar(item));
+      renderTOC();
+    };
+    wrap.appendChild(btn);
+    return wrap;
+  }
+
   function renderNav(item) {
     const i = flat.findIndex(x => x.id === item.id);
     const nav = $('lesson-nav');

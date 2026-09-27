@@ -82,7 +82,8 @@ const Quiz = (() => {
     const q0 = Q();
     const badge = ({
       choice: q0.choice, fill: q0.fill, code: q0.code,
-      function: q0.function || q0.code, project: q0.project
+      function: q0.function || q0.code, project: q0.project,
+      local: q0.local || q0.project
     })[q.type] || '练习';
     head.innerHTML = `<span class="quiz-badge">${badge}</span><span class="quiz-q">${escapeHtml(q.q || '')}</span>`;
     box.appendChild(head);
@@ -106,7 +107,7 @@ const Quiz = (() => {
 
     ({
       choice: renderChoice, fill: renderFill, code: renderCode,
-      function: renderFunction, project: renderProject
+      function: renderFunction, project: renderProject, local: renderLocal
     }[q.type] || renderChoice)(q, body, foot, id, ctx);
 
     return box;
@@ -184,7 +185,25 @@ const Quiz = (() => {
     if (saved && saved.ok) { btnRun.textContent = Q().passed; }
   }
 
-  /** 解析用例：每行 "参数 -> 期望值"，参数用逗号分隔，值用 Python 字面量写法 */
+  /**
+   * 按逗号切分参数，但忽略括号内部的逗号。
+   * 为什么必须这样：用例里会写数组参数，比如 [1,2,3] -> [2,4,6]，
+   * 直接按逗号切会得到 ["[1", "2", "3]"] 这种残片。
+   */
+  function splitArgs(s) {
+    const out = [];
+    let depth = 0, cur = '';
+    for (const ch of String(s)) {
+      if (ch === '[' || ch === '(' || ch === '{') depth++;
+      else if (ch === ']' || ch === ')' || ch === '}') depth--;
+      if (ch === ',' && depth === 0) { out.push(cur.trim()); cur = ''; }
+      else cur += ch;
+    }
+    if (cur.trim()) out.push(cur.trim());
+    return out;
+  }
+
+  /** 解析用例：每行 "参数 -> 期望值"，值用 Python 字面量写法（支持列表） */
   function parseCases(block) {
     if (Array.isArray(block)) block = block.join('\n');
     return String(block || '').split('\n')
@@ -193,7 +212,7 @@ const Quiz = (() => {
       .map(line => {
         const [a, e] = line.split('->');
         const argStr = a.trim();
-        const args = argStr === '' ? [] : argStr.split(',').map(s => literal(s.trim()));
+        const args = argStr === '' ? [] : splitArgs(argStr).map(s => literal(s.trim()));
         return { args, expect: literal(e.trim()) };
       });
   }
@@ -209,6 +228,7 @@ const Quiz = (() => {
     if (/^'.*'$/.test(s)) return s.slice(1, -1);
     if (/^[[{]/.test(s)) {
       try { return JSON.parse(s.replace(/'/g, '"')); } catch (e) { /* 落到底下当字符串 */ }
+      try { return JSON.parse(s); } catch (e2) { /* 再试一次原样 */ }
     }
     return s;
   }
@@ -336,6 +356,82 @@ const Quiz = (() => {
 
     const saved = getResult(id);
     if (saved && saved.ok) { btnRun.textContent = Q().passed; btnRun.disabled = false; }
+  }
+
+  /* --- 本地运行题：窗口/图形类，浏览器里跑不了，引导去 VSCode --- */
+  function renderLocal(q, body, foot, id, ctx) {
+    const starter = q.starter || '';
+
+    // 为什么不能在线跑：tkinter / pygame / Qt 都需要真实窗口系统，
+    // 浏览器沙箱里没有显示器也没有 GUI 后端，一运行就失败。
+    const why = document.createElement('div');
+    why.className = 'quiz-local-why';
+    why.innerHTML = '<b>' + (Q().localWhyTitle || '') + '</b> ' + (Q().localWhy || '');
+    body.appendChild(why);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'quiz-code';
+    const ta = document.createElement('textarea');
+    ta.className = 'quiz-ta';
+    ta.spellcheck = false;
+    ta.value = starter;
+    wrap.appendChild(ta);
+    body.appendChild(wrap);
+
+    const btnVS = mkBtn('💻 ' + (Q().localOpen || ''), 'primary');
+    btnVS.onclick = async () => {
+      const fname = (q.filename || 'gui_demo') + '.py';
+      const r = await VSCode.open(ta.value, fname);
+      btnVS.textContent = r && r.copied
+        ? (Q().localOpened || '')
+        : (Q().localDownloaded || '');
+      setTimeout(() => btnVS.textContent = '💻 ' + (Q().localOpen || ''), 2200);
+    };
+    foot.appendChild(btnVS);
+
+    // 验收清单：能不能跑、有没有窗口、对不对，由用户在本地确认
+    const list = [].concat(q.checklist || q.checks || []);
+    if (list.length) {
+      const box = document.createElement('div');
+      box.className = 'quiz-checks';
+      const boxes = [];
+      list.forEach(t => {
+        const row = document.createElement('label');
+        row.className = 'quiz-check';
+        row.innerHTML = `<input type="checkbox"><span>${escapeHtml(t)}</span>`;
+        box.appendChild(row);
+        boxes.push(row.querySelector('input'));
+      });
+      body.appendChild(box);
+
+      const btnDone = mkBtn(Q().done, 'ghost');
+      btnDone.onclick = () => {
+        const done = boxes.filter(b => b.checked).length;
+        if (done < boxes.length) return toast(Q().remain(boxes.length - done));
+        finish(id, true, q, foot, null);
+        btnDone.textContent = Q().finished;
+        btnDone.disabled = true;
+        // 已经通过了就别再阻塞后续
+        const nav = document.querySelector('.exam-nav .qbtn.primary');
+        if (nav) nav.classList.add('pulse');
+      };
+      foot.appendChild(btnDone);
+    } else {
+      // 没有清单时给一个"我跑通了"直接确认
+      const btnDone = mkBtn(Q().done, 'ghost');
+      btnDone.onclick = () => {
+        finish(id, true, q, foot, null);
+        btnDone.textContent = Q().finished;
+        btnDone.disabled = true;
+      };
+      foot.appendChild(btnDone);
+    }
+
+    const saved = getResult(id);
+    if (saved && saved.ok) {
+      const last = foot.lastElementChild;
+      if (last) { last.textContent = Q().finished; last.disabled = true; }
+    }
   }
 
   /* --- 小项目：验收清单自评 + 「能跑通」验证 --- */

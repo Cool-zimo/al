@@ -32,6 +32,25 @@ const Runner = (() => {
     return loading;
   }
 
+  /** 从代码里猜出需要加载哪些包 */
+  function detectPackages(...sources) {
+    const src = sources.filter(Boolean).join('\n');
+    const out = [];
+    if (/^\s*(import\s+numpy|from\s+numpy\b|import\s+numpy\s+as)/m.test(src) || /\bnp\./.test(src)) out.push('numpy');
+    if (/^\s*(import\s+pandas|from\s+pandas\b|import\s+pandas\s+as)/m.test(src) || /\bpd\./.test(src)) out.push('pandas');
+    if (/^\s*(import\s+matplotlib|from\s+matplotlib\b)/m.test(src) || /\bplt\./.test(src)) out.push('matplotlib');
+    return [...new Set(out)];
+  }
+
+  /** 确保包已加载（已加载的会被跳过） */
+  async function ensurePackages(pkgs) {
+    await ensure();
+    if (!pkgs || !pkgs.length) return;
+    const loaded = pyodide.loadedPackages || {};
+    const want = pkgs.filter(p => !loaded[p]);
+    if (want.length) await pyodide.loadPackage(want);
+  }
+
   /** 切换章节：重置命名空间 */
   function resetNamespace(lessonId) {
     if (!pyodide || nsOwner === lessonId) return;
@@ -58,6 +77,7 @@ const Runner = (() => {
   async function run(code, lessonId, out) {
     try {
       await ensure();
+      await ensurePackages(detectPackages(code));
     } catch (e) {
       out.write('err', '运行环境加载失败：' + e.message + '\n（多半是网络问题，刷新页面重试）');
       out.end(0);
@@ -103,6 +123,7 @@ const Runner = (() => {
     const result = { ok: false, stdout: '', error: null, failed: 0 };
     try {
       await ensure();
+      await ensurePackages(detectPackages(code, (tests || []).join('\n')));
     } catch (e) {
       result.error = '运行环境加载失败：' + e.message;
       return result;
@@ -160,6 +181,7 @@ const Runner = (() => {
     const result = { ok: false, results: [], error: null, stdout: '' };
     try {
       await ensure();
+      await ensurePackages(detectPackages(code, JSON.stringify(cases)));
     } catch (e) {
       result.error = '运行环境加载失败：' + e.message;
       return result;
@@ -204,23 +226,61 @@ const Runner = (() => {
 
     const py = `
 import json as __json
+try:
+    import numpy as __np
+except Exception:
+    __np = None
+
+def __eq(a, b):
+    # numpy 数组：== 返回的是数组，不能直接当布尔用，
+    # 必须用 array_equal / allclose
+    if __np is not None:
+        try:
+            if isinstance(a, __np.ndarray) or isinstance(b, __np.ndarray):
+                __x, __y = __np.asarray(a), __np.asarray(b)
+                if __x.shape != __y.shape:
+                    return False
+                try:
+                    return bool(__np.array_equal(__x, __y))
+                except Exception:
+                    return bool(__np.allclose(__x.astype(float), __y.astype(float)))
+        except Exception:
+            pass
+    # 浮点：允许极小误差
+    if isinstance(a, float) or isinstance(b, float):
+        try:
+            return abs(float(a) - float(b)) < 1e-9
+        except Exception:
+            return False
+    # 严格类型：避免 1 == True 这种"值相等但类型不同"的误判
+    # int / float 之间放宽（写 6 和 6.0 都算对）
+    __same = (
+        type(a) is type(b)
+        or (isinstance(a, (int, float)) and isinstance(b, (int, float))
+            and not isinstance(a, bool) and not isinstance(b, bool))
+    )
+    try:
+        return bool(a == b) and __same
+    except Exception:
+        return False
+
+def __short(v):
+    try:
+        r = __repr(v)
+    except Exception:
+        r = str(v)
+    return r if len(r) <= 60 else r[:57] + "..."
+
 __cs = __json.loads(__cases_json)
 __res = []
 for __c in __cs:
     __args = __c.get("args", []) or []
     __exp = __c.get("expect")
-    __row = {"args": __repr(__args), "expect": __repr(__exp), "got": None, "ok": False}
+    __row = {"args": __short(__args)[1:-1], "expect": __short(__exp), "got": None, "ok": False}
     try:
         __got = __fn_obj(*__args)
-        __row["got"] = __repr(__got)
-        # 严格比较：避免 1 == True 这种"值相等但类型不同"的误判
-        # 但 int / float 之间放宽（用户写 6.0 和 6 都算对）
-        __same_kind = (
-            type(__got) is type(__exp)
-            or (isinstance(__got, (int, float)) and isinstance(__exp, (int, float))
-                and not isinstance(__got, bool) and not isinstance(__exp, bool))
-        )
-        __row["ok"] = bool((__got == __exp) and __same_kind)
+        __row["got"] = __short(__got)
+        __row["ok"] = bool(__eq(__got, __exp))
     except Exception as __e:
         __row["got"] = None
         __row["error"] = str(__e)
@@ -250,6 +310,7 @@ __json.dumps(__res, ensure_ascii=False)
     const result = { ok: false, error: null, stdout: '', lines: 0 };
     try {
       await ensure();
+      await ensurePackages(detectPackages(code));
     } catch (e) {
       result.error = '运行环境加载失败：' + e.message;
       return result;
@@ -274,5 +335,5 @@ __json.dumps(__res, ensure_ascii=False)
     return result;
   }
 
-  return { run, execWithTests, execFunction, execCheck, ensure, resetNamespace, get ready() { return !!pyodide; } };
+  return { run, execWithTests, execFunction, execCheck, ensure, ensurePackages, detectPackages, resetNamespace, get ready() { return !!pyodide; } };
 })();
