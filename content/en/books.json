@@ -51,7 +51,8 @@
     "desc": "Switching your brain from Python lists to ndarray: vectorisation, broadcasting, indexing tricks.",
     "stage": "Data",
     "level": "Intermediate",
-    "ready": true
+    "ready": true,
+    "note": "Complete: 6 chapters, 30 lessons"
   },
   {
     "id": "data-analysis-2",

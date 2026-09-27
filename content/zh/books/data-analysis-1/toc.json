@@ -77,7 +77,7 @@
       {
         "id": "13",
         "title": "聚合函数",
-        "summary": "sum、mean、max、argmax 与 nan 安全版本"
+        "summary": "sum、mean、argmax 与 nan 安全版本"
       },
       {
         "id": "14",
@@ -91,5 +91,98 @@
       }
     ],
     "test": "test-03"
+  },
+  {
+    "title": "第 4 章 · 变形、拼接与排序",
+    "items": [
+      {
+        "id": "16",
+        "title": "拼接数组",
+        "summary": "concatenate、vstack、hstack 与维度对齐"
+      },
+      {
+        "id": "17",
+        "title": "分割数组",
+        "summary": "split、array_split、vsplit、hsplit"
+      },
+      {
+        "id": "18",
+        "title": "重复与铺砖",
+        "summary": "repeat 与 tile 的区别和典型用途"
+      },
+      {
+        "id": "19",
+        "title": "排序与排名",
+        "summary": "sort、argsort、多列排序与 Top-N"
+      },
+      {
+        "id": "20",
+        "title": "去重与集合运算",
+        "summary": "unique、in1d、交集并集差集"
+      }
+    ],
+    "test": "test-04"
+  },
+  {
+    "title": "第 5 章 · 文件读写",
+    "items": [
+      {
+        "id": "21",
+        "title": "npy 与 npz",
+        "summary": "save、load、savez，最稳妥的保存方式"
+      },
+      {
+        "id": "22",
+        "title": "文本文件 savetxt / loadtxt",
+        "summary": "CSV 的读写与格式控制"
+      },
+      {
+        "id": "23",
+        "title": "真实 CSV：genfromtxt",
+        "summary": "处理表头、缺失值与混合类型"
+      },
+      {
+        "id": "24",
+        "title": "读文件常见报错",
+        "summary": "编码、分隔符、列数不一致怎么排查"
+      },
+      {
+        "id": "25",
+        "title": "完整流程：从文件到报告",
+        "summary": "读数据、清洗、统计、输出的端到端演练"
+      }
+    ],
+    "test": "test-05"
+  },
+  {
+    "title": "第 6 章 · 综合实战与进阶",
+    "items": [
+      {
+        "id": "26",
+        "title": "实战一：销售数据月度分析",
+        "summary": "分组汇总、环比、Top 商品"
+      },
+      {
+        "id": "27",
+        "title": "实战二：时间序列与移动平均",
+        "summary": "cumsum、卷积与滑动窗口"
+      },
+      {
+        "id": "28",
+        "title": "实战三：图像即数组",
+        "summary": "用切片和广播处理像素"
+      },
+      {
+        "id": "29",
+        "title": "性能：避开常见慢写法",
+        "summary": "实测几种写法的差距，建立直觉"
+      },
+      {
+        "id": "30",
+        "title": "从 NumPy 到 pandas",
+        "summary": "NumPy 的边界在哪，下一步学什么"
+      }
+    ],
+    "test": "test-06"
   }
 ]

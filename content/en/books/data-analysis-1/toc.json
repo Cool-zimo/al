@@ -77,7 +77,7 @@
       {
         "id": "13",
         "title": "Aggregation functions",
-        "summary": "sum, mean, max, argmax and nan-safe variants"
+        "summary": "sum, mean, argmax and nan-safe variants"
       },
       {
         "id": "14",
@@ -91,5 +91,98 @@
       }
     ],
     "test": "test-03"
+  },
+  {
+    "title": "Chapter 4 · Reshaping, joining & sorting",
+    "items": [
+      {
+        "id": "16",
+        "title": "Joining arrays",
+        "summary": "concatenate, vstack, hstack and axis alignment"
+      },
+      {
+        "id": "17",
+        "title": "Splitting arrays",
+        "summary": "split, array_split, vsplit, hsplit"
+      },
+      {
+        "id": "18",
+        "title": "Repeating and tiling",
+        "summary": "repeat versus tile, and when each is right"
+      },
+      {
+        "id": "19",
+        "title": "Sorting and ranking",
+        "summary": "sort, argsort, multi-column sorting, top-N"
+      },
+      {
+        "id": "20",
+        "title": "Unique values and set operations",
+        "summary": "unique, in1d, union, intersection, difference"
+      }
+    ],
+    "test": "test-04"
+  },
+  {
+    "title": "Chapter 5 · Reading and writing files",
+    "items": [
+      {
+        "id": "21",
+        "title": "npy and npz",
+        "summary": "save, load, savez — the safest way to persist"
+      },
+      {
+        "id": "22",
+        "title": "Text files: savetxt / loadtxt",
+        "summary": "CSV writing and reading with format control"
+      },
+      {
+        "id": "23",
+        "title": "Real CSVs: genfromtxt",
+        "summary": "Headers, missing values and mixed types"
+      },
+      {
+        "id": "24",
+        "title": "Common file-reading errors",
+        "summary": "Encoding, delimiters and ragged rows"
+      },
+      {
+        "id": "25",
+        "title": "End to end: from file to report",
+        "summary": "A full read, clean, analyse, output walkthrough"
+      }
+    ],
+    "test": "test-05"
+  },
+  {
+    "title": "Chapter 6 · Practice projects & next steps",
+    "items": [
+      {
+        "id": "26",
+        "title": "Project 1: monthly sales analysis",
+        "summary": "Grouping, period-over-period change, top products"
+      },
+      {
+        "id": "27",
+        "title": "Project 2: time series and moving averages",
+        "summary": "cumsum, convolution and sliding windows"
+      },
+      {
+        "id": "28",
+        "title": "Project 3: an image is an array",
+        "summary": "Processing pixels with slicing and broadcasting"
+      },
+      {
+        "id": "29",
+        "title": "Performance: avoid the slow idioms",
+        "summary": "Measure the alternatives and build intuition"
+      },
+      {
+        "id": "30",
+        "title": "From NumPy to pandas",
+        "summary": "Where NumPy ends and what to learn next"
+      }
+    ],
+    "test": "test-06"
   }
 ]
