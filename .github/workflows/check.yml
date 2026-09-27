@@ -34,6 +34,12 @@ jobs:
           "
 
       - name: 校验目录与课文一一对应
+        # 书是一本一本、一章一章写的，所以这里允许"写了一半"的书：
+        #   - 一篇课文都没有       → SKIP（还没开始）
+        #   - 某一章写了任意一课   → 这一章就必须完整（该章所有课 + 章末测验）
+        #   - 全部写完             → DONE
+        # 这样既保留"目录里列了课、md 忘了提交"的防漏作用，
+        # 又不会让正在写的书一直红叉。
         run: |
           python3 -c "
           import json, sys, os
@@ -45,21 +51,32 @@ jobs:
               books = json.load(open(f'{root}/books.json', encoding='utf-8'))
               for b in books:
                   bid = b['id']
+                  ldir = f'{root}/books/{bid}/lessons'
                   toc_path = f'{root}/books/{bid}/toc.json'
                   if not os.path.exists(toc_path):
                       print(f'SKIP {lang}/{bid}: 还没有目录'); continue
                   toc = json.load(open(toc_path, encoding='utf-8'))
+                  total = sum(len(c['items']) for c in toc)
+                  have = set()
+                  if os.path.isdir(ldir):
+                      have = {f[:-3] for f in os.listdir(ldir) if f.endswith('.md')}
+                  if not have:
+                      print(f'SKIP {lang}/{bid}: 还没开始写'); continue
                   for ch in toc:
-                      for it in ch['items']:
-                          p = f'{root}/books/{bid}/lessons/{it[\"id\"]}.md'
-                          if not os.path.exists(p):
-                              ok = False; print('MISS', p)
-                      if ch.get('test'):
-                          p = f'{root}/books/{bid}/lessons/{ch[\"test\"]}.md'
-                          if not os.path.exists(p):
-                              ok = False; print('MISS', p)
-                  n = sum(len(c['items']) for c in toc)
-                  print(f'OK   {lang}/{bid}: {len(toc)} 章 / {n} 课')
+                      ids = [it['id'] for it in ch['items']]
+                      if not any(i in have for i in ids):
+                          continue            # 这一章还没动笔
+                      missing = [i for i in ids if i not in have]
+                      if ch.get('test') and ch['test'] not in have:
+                          missing.append(ch['test'])
+                      if missing:
+                          ok = False
+                          print(f'FAIL {lang}/{bid} {ch[\"title\"]}: 这一章写了一半，缺 {missing}')
+                      else:
+                          print(f'  OK {lang}/{bid} {ch[\"title\"]}')
+                  need = total + len(toc)
+                  status = 'DONE' if len(have) >= need else 'PROGRESS'
+                  print(f'{status} {lang}/{bid}: {len(have)} 个文件 / 共 {total} 课 + {len(toc)} 个测验')
           sys.exit(0 if ok else 1)
           "
 
