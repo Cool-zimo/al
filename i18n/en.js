@@ -54,7 +54,10 @@ window.I18N = {
     passed: '🎉 All passed — this lesson is complete',
     notPassed: 'Some questions still failing — revisit the examples above',
     noQuiz: 'No quiz has been set for this lesson yet',
-    noQuizHint: 'The exercises inside the lesson are for practising as you read — they do not count as the quiz.'
+    noQuizHint: 'The exercises inside the lesson are for practising as you read — they do not count as the quiz.',
+    inlineTitle: 'Lesson quiz',
+    inlineHint: n => `Answer these ${n} question${n > 1 ? 's' : ''} to complete the lesson.`,
+    inlineGo: n => `Take the quiz (${n} question${n > 1 ? 's' : ''}) →`
   },
 
   notes: {

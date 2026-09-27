@@ -54,7 +54,10 @@ window.I18N = {
     passed: '🎉 全部通过 —— 这一节算学完了',
     notPassed: '还有题没通过，再看看课文里的例子',
     noQuiz: '这一节还没有配测试题',
-    noQuizHint: '课文里的练习题是边读边做的，不算正式测验。'
+    noQuizHint: '课文里的练习题是边读边做的，不算正式测验。',
+    inlineTitle: '本节测验',
+    inlineHint: n => `做完下面 ${n} 题，才算学完这一节。`,
+    inlineGo: n => `去做本节测试（${n} 题）→`
   },
 
   notes: {

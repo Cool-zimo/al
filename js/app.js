@@ -305,7 +305,48 @@
       else art.appendChild(box);
     });
 
+    // md 里常写一节「## 本节测验」+ 一句说明，但测验题本身不内联到正文，
+    // 于是那一节会剩下个空标题 —— 看着像题目没加载出来。
+    // 这里把这一节换成一个入口卡片：写明有几题，点了直接去小测页。
+    replaceExamHeading(art, ctxKey, LESSON_EXAM.length);
+
     return quizzes.length - examIdx.size;
+  }
+
+  /**
+   * 把课文里的「## 本节测验」替换成通往小测页的入口卡片。
+   * 中英文标题都认；标题后面到下一个同级标题之间的说明段也一并吃掉。
+   */
+  function replaceExamHeading(art, ctxKey, n) {
+    if (!n) return;
+    const [bookId, lessonId] = ctxKey.split('/');
+    // 各家写法都认：本节测验 / 本节测试 / Section quiz / Lesson quiz / Quiz
+    const PAT = /^(本节测验|本节测试|本节小测|Section quiz|Lesson quiz|Lesson test|End-of-lesson quiz|Quiz)$/i;
+
+    const h = [...art.querySelectorAll('h2,h3')]
+      .find(el => PAT.test(el.textContent.trim()));
+    if (!h) return;
+
+    // 只吃掉紧跟着的说明段落（<p>），遇到其它元素就停 ——
+    // 否则会把后面的正文、小结、代码块一起误删
+    const extra = [];
+    let cur = h.nextElementSibling;
+    while (cur && cur.tagName === 'P') {
+      extra.push(cur);
+      cur = cur.nextElementSibling;
+    }
+    extra.forEach(el => el.remove());
+
+    const L = T().lq;
+    const card = document.createElement('div');
+    card.className = 'quiz-entry';
+    card.innerHTML =
+      `<div class="qe-text">` +
+        `<strong>${escapeHtml(L.inlineTitle)}</strong>` +
+        `<span>${escapeHtml(L.inlineHint(n))}</span>` +
+      `</div>` +
+      `<a class="qe-go primary" href="#/book/${bookId}/quiz/${lessonId}">${escapeHtml(L.inlineGo(n))}</a>`;
+    h.replaceWith(card);
   }
 
   /* ================= 单课小测（独立页面） ================= */

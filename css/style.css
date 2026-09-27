@@ -262,6 +262,31 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
 .lesson-done.done button { background: var(--green); border-color: var(--green); color: #04241a; }
 .lesson-done .hint { font-size: 12.5px; color: var(--faint); }
 
+/* 「本节测验」入口卡片：测验题不内联到正文，但标题还在，
+   不替换就会剩一个空标题，看着像题目没加载出来。 */
+.quiz-entry {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  margin: 28px 0 8px; padding: 16px 18px; border-radius: var(--r);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--accent) 8%, var(--panel)),
+    color-mix(in srgb, var(--accent-2) 8%, var(--panel)));
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--border));
+}
+.quiz-entry .qe-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.quiz-entry .qe-text strong { font-size: 15px; font-weight: 620; letter-spacing: -.01em; }
+.quiz-entry .qe-text span { font-size: 13px; color: var(--faint); }
+.quiz-entry .qe-go {
+  margin-left: auto; text-decoration: none; white-space: nowrap;
+  padding: 9px 18px; border-radius: 99px; font-size: 13.5px; font-weight: 580;
+  background: var(--grad); color: #fff; box-shadow: 0 3px 12px color-mix(in srgb, var(--accent) 28%, transparent);
+  transition: .15s;
+}
+.quiz-entry .qe-go:hover { transform: translateY(-1px); box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 36%, transparent); }
+@media (max-width: 560px) {
+  .quiz-entry { flex-direction: column; align-items: flex-start; }
+  .quiz-entry .qe-go { margin-left: 0; width: 100%; text-align: center; }
+}
+
 .lesson-nav { display: flex; gap: 12px; margin-top: 50px; padding-top: 26px; border-top: 1px solid var(--border-soft); }
 .lesson-nav a {
   flex: 1; padding: 15px 18px; border: 1px solid var(--border); border-radius: var(--r);
