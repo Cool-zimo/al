@@ -1,0 +1,33 @@
+[
+  {
+    "title": "第 1 章 · 让程序记住一堆东西",
+    "items": [
+      {
+        "id": "01",
+        "title": "一次装很多个：列表",
+        "summary": "为什么需要列表，怎么创建，len()"
+      },
+      {
+        "id": "02",
+        "title": "索引：按位置取出来",
+        "summary": "从 0 数起、负索引、越界"
+      },
+      {
+        "id": "03",
+        "title": "添加与删除",
+        "summary": "append / insert / pop / remove / del"
+      },
+      {
+        "id": "04",
+        "title": "切片：一次取出一整段",
+        "summary": "前闭后开、省略、负索引切片、不改动原列表"
+      },
+      {
+        "id": "05",
+        "title": "遍历与常用操作",
+        "summary": "for / in / sum / max / min，sort 与 sorted 的区别"
+      }
+    ],
+    "test": "test-01"
+  }
+]

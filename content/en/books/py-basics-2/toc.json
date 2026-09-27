@@ -1,0 +1,33 @@
+[
+  {
+    "title": "Chapter 1 · Remembering a Whole Bunch of Things",
+    "items": [
+      {
+        "id": "01",
+        "title": "Holding Many Things at Once: Lists",
+        "summary": "Why you need lists, how to create one, len()"
+      },
+      {
+        "id": "02",
+        "title": "Indexes: Pulling Things Out by Position",
+        "summary": "Counting from 0, negative indexes, out of range"
+      },
+      {
+        "id": "03",
+        "title": "Adding and Removing",
+        "summary": "append / insert / pop / remove / del"
+      },
+      {
+        "id": "04",
+        "title": "Slicing: Taking Out a Whole Range",
+        "summary": "Half-open ranges, omitting ends, negative slices, no side effects"
+      },
+      {
+        "id": "05",
+        "title": "Iteration and Everyday Operations",
+        "summary": "for / in / sum / max / min, and sort vs sorted"
+      }
+    ],
+    "test": "test-01"
+  }
+]
