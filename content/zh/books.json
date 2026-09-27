@@ -182,7 +182,8 @@
   "desc": "datetime 怎么算时间差与时区、pathlib 怎么优雅地处理路径、os / shutil / glob 怎么批量操作文件，最后做一个文件整理与备份工具。",
   "stage": "标准库",
   "level": "进阶",
-  "ready": false
+  "ready": true,
+  "note": "完整 6 章 30 课"
  },
  {
   "id": "stdlib-3",

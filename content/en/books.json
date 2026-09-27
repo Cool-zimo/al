@@ -182,7 +182,8 @@
   "desc": "datetime for intervals and timezones, pathlib for elegant paths, os / shutil / glob for batch file work — finishing with a file organiser and backup tool.",
   "stage": "Library",
   "level": "Intermediate",
-  "ready": false
+  "ready": true,
+  "note": "完整 6 章 30 课"
  },
  {
   "id": "stdlib-3",

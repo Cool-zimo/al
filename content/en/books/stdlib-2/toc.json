@@ -1,0 +1,188 @@
+[
+ {
+  "title": "Chapter 1 · Time Basics",
+  "items": [
+   {
+    "id": "01",
+    "title": "Why Time Is Hard",
+    "summary": "This lesson answers \"why time is one of th…"
+   },
+   {
+    "id": "02",
+    "title": "The Three Siblings: date, time, datetime",
+    "summary": "This lesson answers \"which of `date`, `tim…"
+   },
+   {
+    "id": "03",
+    "title": "timedelta: Time Deltas and Date Arithmetic",
+    "summary": "This lesson answers \"how do I correctly ad…"
+   },
+   {
+    "id": "04",
+    "title": "Formatting: strftime and strptime",
+    "summary": "This lesson answers \"how do I turn a date …"
+   },
+   {
+    "id": "05",
+    "title": "Timestamps",
+    "summary": "This lesson answers \"why should I pass tim…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Advanced Time",
+  "items": [
+   {
+    "id": "06",
+    "title": "Time Zones: naive vs aware",
+    "summary": "This lesson answers \"why can't I mix zoned…"
+   },
+   {
+    "id": "07",
+    "title": "Timing: perf_counter vs time.time",
+    "summary": "This lesson answers \"how do I measure how …"
+   },
+   {
+    "id": "08",
+    "title": "Advanced Date Arithmetic",
+    "summary": "This lesson answers \"what is the last day …"
+   },
+   {
+    "id": "09",
+    "title": "Parsing Dates in the Wild",
+    "summary": "This lesson answers \"users type dates in e…"
+   },
+   {
+    "id": "10",
+    "title": "Capstone: A Countdown and Schedule Tool",
+    "summary": "This lesson ties the first nine lessons to…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Paths and the File System",
+  "items": [
+   {
+    "id": "11",
+    "title": "os.path vs pathlib",
+    "summary": "This lesson answers \"how do I represent fi…"
+   },
+   {
+    "id": "12",
+    "title": "Working with Paths in pathlib",
+    "summary": "This lesson takes the common operations of…"
+   },
+   {
+    "id": "13",
+    "title": "Walking Directories",
+    "summary": "This lesson shows how to dig files out of …"
+   },
+   {
+    "id": "14",
+    "title": "File Metadata",
+    "summary": "This lesson covers how to read a file's si…"
+   },
+   {
+    "id": "15",
+    "title": "Capstone: A Batch-Rename Tool",
+    "summary": "This lesson brings everything you have lea…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · File Operations and the System",
+  "items": [
+   {
+    "id": "16",
+    "title": "Reading and Writing Files the Right Way",
+    "summary": "This lesson answers one question: how do y…"
+   },
+   {
+    "id": "17",
+    "title": "High-Level File Operations with shutil",
+    "summary": "The `os` module handles one file at a time…"
+   },
+   {
+    "id": "18",
+    "title": "Temporary Files and Directories",
+    "summary": "This lesson explains why you should never …"
+   },
+   {
+    "id": "19",
+    "title": "The os Module and System Information",
+    "summary": "This lesson shows how to read environment …"
+   },
+   {
+    "id": "20",
+    "title": "The subprocess Module Basics",
+    "summary": "This lesson shows how to invoke external c…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Archives and Compression",
+  "items": [
+   {
+    "id": "21",
+    "title": "zipfile: Creating and Reading Zip Archives",
+    "summary": "This lesson covers Python's `zipfile` modu…"
+   },
+   {
+    "id": "22",
+    "title": "tarfile: Choosing Between tar.gz, tar.bz2, and tar.xz",
+    "summary": "This lesson covers Python's `tarfile` modu…"
+   },
+   {
+    "id": "23",
+    "title": "To Compress or Not to Compress",
+    "summary": "This lesson covers a counterintuitive fact…"
+   },
+   {
+    "id": "24",
+    "title": "glob and fnmatch: Filename Pattern Matching",
+    "summary": "This lesson presents a pair of modules: `f…"
+   },
+   {
+    "id": "25",
+    "title": "Project: A Backup Tool",
+    "summary": "This lesson brings Chapters 4 and 5 togeth…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Capstone Project",
+  "items": [
+   {
+    "id": "26",
+    "title": "Project Design: A Smart File Organiser",
+    "summary": "The previous five chapters gave you a tool…"
+   },
+   {
+    "id": "27",
+    "title": "Scanning and Classification: Turning a Directory into Data",
+    "summary": "Building on `pathlib` traversal from Chapt…"
+   },
+   {
+    "id": "28",
+    "title": "The Rule Engine: Configurable Classification and Date-Based Archiving",
+    "summary": "Hardcoding classification rules makes a to…"
+   },
+   {
+    "id": "29",
+    "title": "Execution and Undo: Making the Tool Trustworthy",
+    "summary": "Generating a plan is only paper. Moving fi…"
+   },
+   {
+    "id": "30",
+    "title": "The Final Assembly: A Runnable Tool and a Path to Standard Library 3",
+    "summary": "The previous four lessons produced the par…"
+   }
+  ],
+  "test": "test-06"
+ }
+]
