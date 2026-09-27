@@ -91,5 +91,36 @@
       }
     ],
     "test": "test-03"
+  },
+  {
+    "title": "Chapter 4 · Modules and import",
+    "items": [
+      {
+        "id": "16",
+        "title": "Why modules exist",
+        "summary": "A module is one .py file"
+      },
+      {
+        "id": "17",
+        "title": "Four ways to import",
+        "summary": "Never use import *"
+      },
+      {
+        "id": "18",
+        "title": "Writing your own modules",
+        "summary": "if __name__ == '__main__'"
+      },
+      {
+        "id": "19",
+        "title": "Packages: folders of modules",
+        "summary": "__init__.py and dotted imports"
+      },
+      {
+        "id": "20",
+        "title": "Standard library tour and pip",
+        "summary": "Common modules + requirements.txt"
+      }
+    ],
+    "test": "test-04"
   }
 ]

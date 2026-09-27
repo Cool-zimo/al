@@ -91,5 +91,36 @@
       }
     ],
     "test": "test-03"
+  },
+  {
+    "title": "第 4 章 · 模块与 import",
+    "items": [
+      {
+        "id": "16",
+        "title": "为什么需要模块",
+        "summary": "模块 = 一个 .py 文件"
+      },
+      {
+        "id": "17",
+        "title": "import 的四种写法",
+        "summary": "别用 import *"
+      },
+      {
+        "id": "18",
+        "title": "写自己的模块",
+        "summary": "if __name__ == '__main__'"
+      },
+      {
+        "id": "19",
+        "title": "包：模块装进文件夹",
+        "summary": "__init__.py 与点号导入"
+      },
+      {
+        "id": "20",
+        "title": "标准库巡礼与 pip",
+        "summary": "常用标准库 + requirements.txt"
+      }
+    ],
+    "test": "test-04"
   }
 ]
