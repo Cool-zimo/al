@@ -45,7 +45,8 @@
   "desc": "不重复讲概念，全部用题目驱动，把基础阶段的易错点一次性扫光。",
   "stage": "基础",
   "level": "复习",
-  "ready": false
+  "ready": true,
+  "note": "完整 5 章 25 课"
  },
  {
   "id": "data-analysis-1",

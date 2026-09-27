@@ -1,0 +1,157 @@
+[
+ {
+  "title": "Chapter 1 · Syntax Drills",
+  "items": [
+   {
+    "id": "01",
+    "title": "Variables & Types — Reinforced",
+    "summary": "This lesson does not introduce new concept…"
+   },
+   {
+    "id": "02",
+    "title": "Output & Input — Reinforced",
+    "summary": "This lesson does not introduce new concept…"
+   },
+   {
+    "id": "03",
+    "title": "Arithmetic & Strings — Reinforced",
+    "summary": "This lesson does not introduce new concept…"
+   },
+   {
+    "id": "04",
+    "title": "Reading Error Messages — Reinforced",
+    "summary": "This lesson does not introduce new concept…"
+   },
+   {
+    "id": "05",
+    "title": "Basics Review",
+    "summary": "This lesson does not introduce new concept…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Branching and Looping Drills",
+  "items": [
+   {
+    "id": "06",
+    "title": "if / elif / else — Reinforced",
+    "summary": "This lesson does not introduce new concept…"
+   },
+   {
+    "id": "07",
+    "title": "Truthiness Rules — Reinforced",
+    "summary": "This lesson does not introduce new concept…"
+   },
+   {
+    "id": "08",
+    "title": "while — Reinforced",
+    "summary": "This lesson does not introduce new concept…"
+   },
+   {
+    "id": "09",
+    "title": "for and range — Reinforced",
+    "summary": "This lesson does not introduce new concept…"
+   },
+   {
+    "id": "10",
+    "title": "break / continue / Nesting — Reinforced",
+    "summary": "This lesson does not introduce new concept…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Containers Drills",
+  "items": [
+   {
+    "id": "11",
+    "title": "Lists — Reinforced",
+    "summary": "This lesson does not introduce new concept…"
+   },
+   {
+    "id": "12",
+    "title": "List Operations — Reinforced",
+    "summary": "This lesson does not introduce new concept…"
+   },
+   {
+    "id": "13",
+    "title": "Tuples & Dictionaries — Reinforced",
+    "summary": "This lesson does not introduce new concept…"
+   },
+   {
+    "id": "14",
+    "title": "Dictionaries Advanced — Reinforced",
+    "summary": "This lesson does not introduce new concept…"
+   },
+   {
+    "id": "15",
+    "title": "Sets — Reinforced",
+    "summary": "This lesson does not introduce new concept…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Packaging Code Drills",
+  "items": [
+   {
+    "id": "16",
+    "title": "Functions Review",
+    "summary": "This lesson does not re-teach concepts. It…"
+   },
+   {
+    "id": "17",
+    "title": "Advanced Parameters Review",
+    "summary": "This lesson does not re-teach concepts. It…"
+   },
+   {
+    "id": "18",
+    "title": "Scope Review",
+    "summary": "This lesson does not re-teach concepts. It…"
+   },
+   {
+    "id": "19",
+    "title": "String Methods Review",
+    "summary": "This lesson does not re-teach concepts. It…"
+   },
+   {
+    "id": "20",
+    "title": "File I/O Review",
+    "summary": "This lesson does not re-teach concepts. It…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Capstone Projects",
+  "items": [
+   {
+    "id": "21",
+    "title": "Exception Handling Review",
+    "summary": "This lesson does not re-teach concepts. It…"
+   },
+   {
+    "id": "22",
+    "title": "Modules and Imports Review",
+    "summary": "This lesson does not re-teach concepts. It…"
+   },
+   {
+    "id": "23",
+    "title": "Comprehensions and Built-ins Review",
+    "summary": "This lesson does not re-teach concepts. It…"
+   },
+   {
+    "id": "24",
+    "title": "Project I: Contact Book",
+    "summary": "This is the first real project of the *Rev…"
+   },
+   {
+    "id": "25",
+    "title": "Project II and Where to Go Next",
+    "summary": "This is the final lesson of the *Review* b…"
+   }
+  ],
+  "test": "test-05"
+ }
+]
