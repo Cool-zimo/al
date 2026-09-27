@@ -1,0 +1,188 @@
+[
+ {
+  "title": "Chapter 1 · Drawing with Canvas",
+  "items": [
+   {
+    "id": "01",
+    "title": "What Is a Canvas: A Blank Area You Can Draw On",
+    "summary": "So far, every widget we have used was a re…"
+   },
+   {
+    "id": "02",
+    "title": "Drawing Basic Shapes: Rectangles, Ovals, Lines and Polygons",
+    "summary": "In the previous lesson we met the canvas; …"
+   },
+   {
+    "id": "03",
+    "title": "Drawing Text and Images: create_text and PhotoImage",
+    "summary": "A canvas can hold more than geometric shap…"
+   },
+   {
+    "id": "04",
+    "title": "Manipulating Shapes: move, coords, itemconfig and tag",
+    "summary": "A shape does not have to sit there once it…"
+   },
+   {
+    "id": "05",
+    "title": "Project: A Drawing Pad That Draws and Clears",
+    "summary": "The previous lessons covered Canvas drawin…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Animation and Timing",
+  "items": [
+   {
+    "id": "06",
+    "title": "The after() Timer: Why You Must Not Use while True for Animation",
+    "summary": "When you want something to move on screen,…"
+   },
+   {
+    "id": "07",
+    "title": "Making Shapes Move: after Plus move, and a Bouncing Ball",
+    "summary": "In the previous lesson we learned `after`;…"
+   },
+   {
+    "id": "08",
+    "title": "Frame Rate and Delta Time: Why a Fixed Step Runs at Different Speeds",
+    "summary": "In the previous lesson we animated by \"mov…"
+   },
+   {
+    "id": "09",
+    "title": "Keyboard Control: Binding Key Events to Move a Square with the Arrow Keys",
+    "summary": "Games need keyboard control. This lesson c…"
+   },
+   {
+    "id": "10",
+    "title": "Project: A Simple Pong Game",
+    "summary": "This lesson combines animation, keyboard i…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · ttk and Polish",
+  "items": [
+   {
+    "id": "11",
+    "title": "What Is ttk: Why Native Widgets Look Dated and ttk Gives You Themed Widgets",
+    "summary": "Up to now we have used tkinter's \"native w…"
+   },
+   {
+    "id": "12",
+    "title": "ttk Themes and Styles: Style, theme_use and configure",
+    "summary": "In the previous lesson we learned that a t…"
+   },
+   {
+    "id": "13",
+    "title": "The Treeview Table: Columns, Rows, Inserting Data and Selection Events",
+    "summary": "ttk's Treeview is a \"tree-plus-table\" widg…"
+   },
+   {
+    "id": "14",
+    "title": "Notebook Tab Pages: A Multi-Page Interface",
+    "summary": "When one window has too much content, pili…"
+   },
+   {
+    "id": "15",
+    "title": "Progressbar and Progress Feedback: Keeping the Interface Responsive During Long Work",
+    "summary": "When a program does background work (downl…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Getting Started with pygame",
+  "items": [
+   {
+    "id": "16",
+    "title": "Why Games Use pygame: The Limits of tkinter for Game Development",
+    "summary": "You've learned a lot about tkinter — you c…"
+   },
+   {
+    "id": "17",
+    "title": "Installation and Your First Window: pygame.init, display.set_mode, and the Quit Event Loop",
+    "summary": "From this lesson we enter pygame. We'll in…"
+   },
+   {
+    "id": "18",
+    "title": "The Game Loop's Three Jobs: Handle Events, Update State, Redraw",
+    "summary": "Last lesson we built the minimum window. T…"
+   },
+   {
+    "id": "19",
+    "title": "Drawing Shapes and Loading Images: Surface, blit, and the Coordinate System",
+    "summary": "Last lesson used pygame.draw for basic sha…"
+   },
+   {
+    "id": "20",
+    "title": "Frame Rate Control: Clock and tick, and Why You Shouldn't Run at Full CPU",
+    "summary": "The game loops from earlier lessons \"work\"…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · pygame Sprites and Collision",
+  "items": [
+   {
+    "id": "21",
+    "title": "Sprite and Group: Why We Need Sprite Classes",
+    "summary": "Previously we managed a character with a b…"
+   },
+   {
+    "id": "22",
+    "title": "Movement and Boundaries: Velocity Vectors and Boundary Detection",
+    "summary": "Last lesson covered Sprites. This lesson m…"
+   },
+   {
+    "id": "23",
+    "title": "Collision Detection: rect.colliderect and spritecollide",
+    "summary": "The most common need in games: \"Did the ba…"
+   },
+   {
+    "id": "24",
+    "title": "Handling Keyboard Input: Continuous Keys and key.get_pressed",
+    "summary": "tkinter keys are \"press once, fire once\" —…"
+   },
+   {
+    "id": "25",
+    "title": "Project: Catch Game (Paddle + Ball + Score)",
+    "summary": "Let's tie together Lessons 18–24 and build…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Finishing Up and Next Steps",
+  "items": [
+   {
+    "id": "26",
+    "title": "Sound and Text: Making Your Game Speak and Play",
+    "summary": "So far your game has been \"mute\" — just dr…"
+   },
+   {
+    "id": "27",
+    "title": "State Management: Using One Variable to Switch Between Start, Playing, and Game Over",
+    "summary": "Your first game only had one state: \"playi…"
+   },
+   {
+    "id": "28",
+    "title": "Saving and Config: Storing the High Score in a File",
+    "summary": "When you close and reopen the game, your s…"
+   },
+   {
+    "id": "29",
+    "title": "Common Crashes and Debugging: Fixing \"Frozen\" and \"Black Screen\"",
+    "summary": "The previous lessons covered \"how to write…"
+   },
+   {
+    "id": "30",
+    "title": "Final Project: A Complete Mini-Game and What to Learn Next",
+    "summary": "The previous five chapters covered sprites…"
+   }
+  ],
+  "test": "test-06"
+ }
+]

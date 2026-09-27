@@ -93,7 +93,8 @@
   "desc": "菜单、对话框、Canvas 绘图；pygame 的游戏循环与精灵。",
   "stage": "桌面",
   "level": "进阶",
-  "ready": false
+  "ready": true,
+  "note": "完整 6 章 30 课"
  },
  {
   "id": "gui-beginner-3",
