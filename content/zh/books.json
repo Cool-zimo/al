@@ -73,7 +73,8 @@
   "desc": "matplotlib / seaborn 出图，以及一个端到端的真实数据分析项目。",
   "stage": "数据",
   "level": "实战",
-  "ready": false
+  "ready": true,
+  "note": "完整 6 章 30 课"
  },
  {
   "id": "gui-beginner-1",

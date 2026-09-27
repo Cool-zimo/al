@@ -1,0 +1,188 @@
+[
+ {
+  "title": "Chapter 1 · Meet matplotlib",
+  "items": [
+   {
+    "id": "01",
+    "title": "Why We Visualize: Anscombe's Quartet",
+    "summary": "Four tiny datasets with nearly identical s…"
+   },
+   {
+    "id": "02",
+    "title": "Figure and Axes: the Canvas and the Coordinate System",
+    "summary": "Writing `plt.plot(x, y)` is enough to get …"
+   },
+   {
+    "id": "03",
+    "title": "Drawing Your First Line: `plot`, `marker`, `linestyle`, `color`",
+    "summary": "The line chart is the most commonly used v…"
+   },
+   {
+    "id": "04",
+    "title": "Fonts and Garbled Text",
+    "summary": "Chinese characters turning into boxes, min…"
+   },
+   {
+    "id": "05",
+    "title": "Saving and Exporting: the Pitfalls of `savefig`",
+    "summary": "Drawing is not the finish line — producing…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Choosing the Right Chart",
+  "items": [
+   {
+    "id": "06",
+    "title": "Bar Charts `bar` / `barh`: Comparing Categories",
+    "summary": "The bar chart is the default choice for \"w…"
+   },
+   {
+    "id": "07",
+    "title": "Line Charts and Time Series: Trends and Dual Y-Axes",
+    "summary": "A line chart tells a \"story of change\": ho…"
+   },
+   {
+    "id": "08",
+    "title": "Scatter Plots: Two Variables and Mapping a Third Dimension",
+    "summary": "A scatter plot shows \"how two variables mo…"
+   },
+   {
+    "id": "09",
+    "title": "Histograms and Box Plots: Seeing Distributions and Outliers",
+    "summary": "A mean only tells you \"where the centre is…"
+   },
+   {
+    "id": "10",
+    "title": "The Pie-Chart Controversy and Its Alternatives",
+    "summary": "The pie chart is probably the first chart …"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Making Charts Talk",
+  "items": [
+   {
+    "id": "11",
+    "title": "Multi-panel layouts: subplots, shared axes, and tight packing",
+    "summary": "One figure with several panels is the stan…"
+   },
+   {
+    "id": "12",
+    "title": "Titles, axis labels, legends, and grids: make the plot self-explaning",
+    "summary": "If you hand a plot to someone with no back…"
+   },
+   {
+    "id": "13",
+    "title": "Annotations and reference lines: annotate, axhline, axvline",
+    "summary": "The one thing you most want your audience …"
+   },
+   {
+    "id": "14",
+    "title": "Colour and style: colormaps, colour-blind safety, and seaborn themes",
+    "summary": "Colour choices determine how professional …"
+   },
+   {
+    "id": "15",
+    "title": "Plotting directly from pandas: the df.plot() family",
+    "summary": "A DataFrame has its own `.plot()` method, …"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Statistical Plots with seaborn",
+  "items": [
+   {
+    "id": "16",
+    "title": "Why seaborn: statistical plots with far less code",
+    "summary": "matplotlib can draw anything, but a good-l…"
+   },
+   {
+    "id": "17",
+    "title": "Distribution plots: histplot, kdeplot, displot",
+    "summary": "The first thing you do with a dataset is n…"
+   },
+   {
+    "id": "18",
+    "title": "Relational plots: relplot, scatterplot, lineplot, and grouping with hue",
+    "summary": "\"Is there a relationship between these two…"
+   },
+   {
+    "id": "19",
+    "title": "Categorical plots: boxplot, violinplot, barplot, countplot",
+    "summary": "When the horizontal axis is categorical an…"
+   },
+   {
+    "id": "20",
+    "title": "Heatmaps and correlation matrices: heatmap, annot, and masking the upper triangle",
+    "summary": "Once variables pile up, drawing scatter pl…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Data Stories and Pitfalls",
+  "items": [
+   {
+    "id": "21",
+    "title": "From Question to Chart: Pick the Chart After You Know the Question",
+    "summary": "Most bad charts are not caused by bad code…"
+   },
+   {
+    "id": "22",
+    "title": "The Full EDA Flow: Shape, Missing Values, Outliers, Relationships",
+    "summary": "When you receive new data, do not model it…"
+   },
+   {
+    "id": "23",
+    "title": "Charts That Lie: Truncated Axes, Dual Axes, Area Tricks and Hidden Sample Sizes",
+    "summary": "The same data can tell completely differen…"
+   },
+   {
+    "id": "24",
+    "title": "Chart Readability: Information Density, Whitespace, Typography Hierarchy, One Idea Per Chart",
+    "summary": "A chart that runs is not the same as a cha…"
+   },
+   {
+    "id": "25",
+    "title": "Putting It Together: One Deliverable Analysis Page",
+    "summary": "Take the previous 24 lessons and turn them…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · End-to-End Project",
+  "items": [
+   {
+    "id": "26",
+    "title": "Receiving Dirty Data: Read, Overview, Set a Cleaning Strategy",
+    "summary": "Real data never arrives clean. This lesson…"
+   },
+   {
+    "id": "27",
+    "title": "Cleaning and Features: From Dirty Data to Usable Data",
+    "summary": "The previous lesson set the cleaning check…"
+   },
+   {
+    "id": "28",
+    "title": "Grouped Insights: Finding the Conclusions That Actually Matter",
+    "summary": "Once the data is read and cleaned, the rea…"
+   },
+   {
+    "id": "29",
+    "title": "Visual Presentation: Turning Conclusions Into a Set of Charts",
+    "summary": "The previous lesson produced the conclusio…"
+   },
+   {
+    "id": "30",
+    "title": "Writing the Report: Conclusions, Evidence, Limits and \"What Data to Collect Next\"",
+    "summary": "This is the final lesson of the book. By n…"
+   }
+  ],
+  "test": "test-06"
+ }
+]
