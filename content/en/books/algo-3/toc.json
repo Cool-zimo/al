@@ -1,0 +1,188 @@
+[
+ {
+  "title": "Chapter 1 · Binary Tree Basics",
+  "items": [
+   {
+    "id": "01",
+    "title": "What Is a Tree: Why Trees Exist at All",
+    "summary": "Arrays need O(n) to find an element; a sor…"
+   },
+   {
+    "id": "02",
+    "title": "Binary Trees and Traversal: Preorder / Inorder / Postorder",
+    "summary": "Traversal means visiting every node in a t…"
+   },
+   {
+    "id": "03",
+    "title": "Level-Order Traversal BFS: Why a Queue Layers Things Naturally",
+    "summary": "The first three traversals are all \"plunge…"
+   },
+   {
+    "id": "04",
+    "title": "Binary Search Trees (BST): Smaller on the Left, Larger on the Right — Search in O(h)",
+    "summary": "A BST is how \"order\" truly enters a tree s…"
+   },
+   {
+    "id": "05",
+    "title": "Practice: Depth, Node Count, and Balance of a Tree",
+    "summary": "The first three lessons covered traversal;…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Advanced Binary Trees",
+  "items": [
+   {
+    "id": "06",
+    "title": "The Universal Recipe for Tree Recursion: Split the Problem into \"Left Subtree + Root + Right Subtree\"",
+    "summary": "Tree problems look like they come in endle…"
+   },
+   {
+    "id": "07",
+    "title": "Path Problems: Root-to-Leaf Path Sums",
+    "summary": "\"Paths\" are the second major category of t…"
+   },
+   {
+    "id": "08",
+    "title": "Lowest Common Ancestor (LCA)",
+    "summary": "The Lowest Common Ancestor is the classic …"
+   },
+   {
+    "id": "09",
+    "title": "Reconstructing a Binary Tree: From Preorder + Inorder",
+    "summary": "Given a tree's traversal results, can you …"
+   },
+   {
+    "id": "10",
+    "title": "Heaps and Priority Queues: Array Representation of a Complete Binary Tree, and heapq",
+    "summary": "A heap is a special kind of complete binar…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Graph Fundamentals",
+  "items": [
+   {
+    "id": "11",
+    "title": "Graphs: Adjacency Matrix vs Adjacency List",
+    "summary": "Arrays are one-to-one, trees are one-to-ma…"
+   },
+   {
+    "id": "12",
+    "title": "DFS and BFS: Two Traversal Frameworks and Their Differences",
+    "summary": "There are only two ways to traverse a grap…"
+   },
+   {
+    "id": "13",
+    "title": "Topological Sort: Dependencies and Kahn's Algorithm",
+    "summary": "Topological sort solves the problem of \"ho…"
+   },
+   {
+    "id": "14",
+    "title": "Disjoint Set Union: Connectivity and Path Compression",
+    "summary": "Disjoint Set Union (DSU) is the go-to tool…"
+   },
+   {
+    "id": "15",
+    "title": "Shortest Path: The Intuition Behind Dijkstra",
+    "summary": "How do you find the shortest path between …"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Sorting",
+  "items": [
+   {
+    "id": "16",
+    "title": "The Lower Bound: Why Comparison Sorts Are Ω(n log n)",
+    "summary": "It is not that algorithms are not clever e…"
+   },
+   {
+    "id": "17",
+    "title": "The Three Basic Sorts: Bubble, Selection, and Insertion",
+    "summary": "They are all O(n²) and look clumsy, but in…"
+   },
+   {
+    "id": "18",
+    "title": "Merge Sort: Divide and Conquer, with Stability",
+    "summary": "Merge sort is the first truly O(n log n) s…"
+   },
+   {
+    "id": "19",
+    "title": "Quick Sort: The Partitioning Idea",
+    "summary": "Quick sort is the fastest general-purpose …"
+   },
+   {
+    "id": "20",
+    "title": "Heap Sort and Non-Comparison Sorting: Breaking the O(n log n) Barrier",
+    "summary": "The theoretical lower bound for comparison…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Introduction to DP",
+  "items": [
+   {
+    "id": "21",
+    "title": "What Is Dynamic Programming: Overlapping Subproblems & Optimal Substructure",
+    "summary": "Dynamic Programming (DP) is one of the mos…"
+   },
+   {
+    "id": "22",
+    "title": "State & Transition: How to Define the DP Array",
+    "summary": "\"What does dp[i] mean?\"—this is the hardes…"
+   },
+   {
+    "id": "23",
+    "title": "1D Dynamic Programming: House Robber & Longest Increasing Subsequence",
+    "summary": "1D DP is the most common and fundamental f…"
+   },
+   {
+    "id": "24",
+    "title": "2D Dynamic Programming: Longest Common Subsequence (LCS)",
+    "summary": "1D DP only needs one index to describe a s…"
+   },
+   {
+    "id": "25",
+    "title": "Knapsack Problems: 0/1 Knapsack & Unbounded Knapsack",
+    "summary": "The knapsack problem is a classic applicat…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Integrated Practice",
+  "items": [
+   {
+    "id": "26",
+    "title": "How to Choose an Algorithm: Reverse-Engineering from Data Ranges",
+    "summary": "When you get a problem, don't rush to code…"
+   },
+   {
+    "id": "27",
+    "title": "Greedy vs. DP: When Is Greedy Correct?",
+    "summary": "Greedy algorithms are much simpler to writ…"
+   },
+   {
+    "id": "28",
+    "title": "Binary Search on Answer + Feasibility Check",
+    "summary": "Some problems ask for \"what's the optimal …"
+   },
+   {
+    "id": "29",
+    "title": "Prefix Sums + Hash + Sliding Window: Combined Techniques",
+    "summary": "Prefix sums, hash tables, and sliding wind…"
+   },
+   {
+    "id": "30",
+    "title": "Capstone: One Problem from Brute Force → Optimization → Optimal",
+    "summary": "This lesson uses \"Maximum Subarray Sum\" to…"
+   }
+  ],
+  "test": "test-06"
+ }
+]
