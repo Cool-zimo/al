@@ -115,7 +115,8 @@
   "desc": "信号与槽、布局管理、常用控件、样式表 —— Qt 的心智模型。",
   "stage": "桌面",
   "level": "进阶",
-  "ready": false
+  "ready": true,
+  "note": "完整 6 章 30 课"
  },
  {
   "id": "qt-2",
@@ -192,6 +193,7 @@
   "desc": "re 正则、collections / itertools / functools 这些效率工具、logging、argparse、subprocess、unittest，最后做一个带日志和测试的命令行工具。",
   "stage": "标准库",
   "level": "实战",
-  "ready": false
+  "ready": true,
+  "note": "完整 6 章 30 课"
  }
 ]

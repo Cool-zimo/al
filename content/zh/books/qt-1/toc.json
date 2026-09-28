@@ -1,0 +1,188 @@
+[
+ {
+  "title": "第 1 章 · 信号与槽",
+  "items": [
+   {
+    "id": "01",
+    "title": "装环境与第一个窗口",
+    "summary": "tkinter 是 Python 标准库，装好 Python 就能用；PySide6…"
+   },
+   {
+    "id": "02",
+    "title": "为什么选 PySide6",
+    "summary": "学 Qt 要做的第一个决定是选哪个绑定：PySide6 还是 PyQt6。两者的 A…"
+   },
+   {
+    "id": "03",
+    "title": "信号与槽：和 tkinter 的 command 有什么本质区别",
+    "summary": "tkinter 里按钮点了就调一个函数（`command=callback`），这是…"
+   },
+   {
+    "id": "04",
+    "title": "connect 的几种写法",
+    "summary": "第 3 课讲了信号与槽的概念，这一课把 `connect` 的几种常见写法铺开：连内…"
+   },
+   {
+    "id": "05",
+    "title": "实战：一个带计数按钮的窗口",
+    "summary": "前面四课把概念铺完了，这一课把它们串起来：做一个能点一次 +1、能重置的计数窗口。你…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "第 2 章 · 布局管理",
+  "items": [
+   {
+    "id": "06",
+    "title": "为什么不能用 setGeometry 摆控件",
+    "summary": "tkinter 里你可以 `btn.place(x=20, y=30)` 手动定坐标…"
+   },
+   {
+    "id": "07",
+    "title": "QVBoxLayout 与 QHBoxLayout",
+    "summary": "纵向布局（QVBoxLayout）和横向布局（QHBoxLayout）是 Qt 最常…"
+   },
+   {
+    "id": "08",
+    "title": "QGridLayout：行列网格布局",
+    "summary": "计算器界面、登录表单、参数设置页——这些\"格子状\"的界面用 QGridLayout …"
+   },
+   {
+    "id": "09",
+    "title": "QFormLayout 与嵌套布局",
+    "summary": "表单界面（标签 + 输入框成对出现）在 QGridLayout 里也能做，但 Qt …"
+   },
+   {
+    "id": "10",
+    "title": "布局的伸缩：sizePolicy、setStretch 与 minimumSize",
+    "summary": "布局会把多余空间分配给控件，但\"分配给谁、分多少\"由伸缩机制决定。这一课讲三件控制伸…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "第 3 章 · 常用控件",
+  "items": [
+   {
+    "id": "11",
+    "title": "QLabel、QPushButton、QLineEdit",
+    "summary": "这三个是 Qt 最基础的控件：QLabel 显示文字或图片、QPushButton …"
+   },
+   {
+    "id": "12",
+    "title": "QTextEdit 与 QPlainTextEdit：多行文本",
+    "summary": "单行的用 QLineEdit，多行的用 QTextEdit 或 QPlainText…"
+   },
+   {
+    "id": "13",
+    "title": "QComboBox、QCheckBox、QRadioButton",
+    "summary": "下拉框、复选框、单选按钮——这是选择类控件的三个主力。它们的共同点是\"选一个或几个值…"
+   },
+   {
+    "id": "14",
+    "title": "QListWidget 与 QTableWidget",
+    "summary": "列表和表格是 GUI 里最常见的数据展示方式。这一课讲两个\"Item-based\"控…"
+   },
+   {
+    "id": "15",
+    "title": "QSlider、QSpinBox 与 QProgressBar",
+    "summary": "数值输入和进度反馈是 GUI 的标配。QSlider 是拖动条、QSpinBox 是…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "第 4 章 · 对话框与菜单",
+  "items": [
+   {
+    "id": "16",
+    "title": "QMessageBox：四种提示与返回值",
+    "summary": "弹窗是和用户沟通最快的方式。这一课讲 QMessageBox 的四种标准对话框，以及…"
+   },
+   {
+    "id": "17",
+    "title": "QInputDialog / QFileDialog / QColorDialog",
+    "summary": "三个最常用的内置对话框：取一个值、选一个文件、挑一个颜色。都是静态方法一行搞定，但都…"
+   },
+   {
+    "id": "18",
+    "title": "自定义对话框 QDialog",
+    "summary": "内置对话框只能取一个值，真正的交互界面得自己画。这一课讲怎么写一个 QDialog，…"
+   },
+   {
+    "id": "19",
+    "title": "QMenuBar / QToolBar / QStatusBar",
+    "summary": "菜单、工具栏、状态栏是桌面应用的\"门面三件套\"。这一课讲它们各自的写法和互相配合。"
+   },
+   {
+    "id": "20",
+    "title": "QAction：一处定义，多处挂载",
+    "summary": "QAction 是\"动作\"对象：一个逻辑操作，可以同时挂到菜单和工具栏，还能带图标和…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "第 5 章 · 样式与资源",
+  "items": [
+   {
+    "id": "21",
+    "title": "QSS 样式表入门",
+    "summary": "QSS（Qt Style Sheets）是 Qt 的样式语言，语法和 CSS 像到几…"
+   },
+   {
+    "id": "22",
+    "title": "常用 QSS 写法",
+    "summary": "这一课把最常用的几组 QSS 写法一次讲透：按钮的悬停按下、边框圆角、输入框聚焦。记…"
+   },
+   {
+    "id": "23",
+    "title": "资源系统 qrc",
+    "summary": "把图片打包进程序，发布时不用带一堆零散文件。这一课讲 qrc 资源文件和 pyrcc…"
+   },
+   {
+    "id": "24",
+    "title": "图标与字体",
+    "summary": "图标要清晰，字体要好看，还要在 4K 屏上不糊。这一课讲 QIcon 的多分辨率机制…"
+   },
+   {
+    "id": "25",
+    "title": "深色模式与主题切换",
+    "summary": "一个\"切换主题\"按钮，背后是动态替换 QSS。这一课讲怎么组织两套样式表，以及切换时…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "第 6 章 · 多线程与实战",
+  "items": [
+   {
+    "id": "26",
+    "title": "为什么 GUI 里不能干重活",
+    "summary": "GUI 程序最致命的错误不是崩溃，而是\"卡死\"。这一课讲清楚主线程阻塞的原理，以及什…"
+   },
+   {
+    "id": "27",
+    "title": "QThread 与 Worker 模式",
+    "summary": "把重活扔到子线程，让界面永远流畅。这一课讲 QThread 的正确用法，以及那个最容…"
+   },
+   {
+    "id": "28",
+    "title": "QTimer：定时任务的正确姿势",
+    "summary": "用 QTimer 做定时任务，永远不会冻住界面。这一课讲清楚 QTimer 怎么用，…"
+   },
+   {
+    "id": "29",
+    "title": "实战：文件批量重命名工具",
+    "summary": "把第 14、15、17、27 课的知识全串起来——多线程、进度条、文件对话框、表格，…"
+   },
+   {
+    "id": "30",
+    "title": "收官：Qt 项目组织与下一步",
+    "summary": "25 课走完了。这一课讲怎么把 Qt 项目组织好、怎么打包发布，以及《Qt 进阶 2…"
+   }
+  ],
+  "test": "test-06"
+ }
+]
