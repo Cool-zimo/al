@@ -1,0 +1,188 @@
+[
+ {
+  "title": "Chapter 1 · Regular Expressions",
+  "items": [
+   {
+    "id": "01",
+    "title": "Why Regular Expressions Exist",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "02",
+    "title": "Basic Matching: search, match, and findall",
+    "summary": "This lesson answers: \"Which key opens whic…"
+   },
+   {
+    "id": "03",
+    "title": "Character Classes and Quantifiers",
+    "summary": "This lesson answers: \"How do I describe a …"
+   },
+   {
+    "id": "04",
+    "title": "Groups and Capturing",
+    "summary": "This lesson answers: \"I matched it, but I …"
+   },
+   {
+    "id": "05",
+    "title": "Replacement and Splitting: sub and split",
+    "summary": "This lesson covers two things: \"change wha…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Advanced Regex",
+  "items": [
+   {
+    "id": "06",
+    "title": "Compiling Regex: re.compile and Flags",
+    "summary": "This lesson answers: \"How do I handle perf…"
+   },
+   {
+    "id": "07",
+    "title": "Common Real-World Patterns: Email, Phone, IP, Date, URL",
+    "summary": "This lesson stitches the syntax you've lea…"
+   },
+   {
+    "id": "08",
+    "title": "Regex Performance: Catastrophic Backtracking",
+    "summary": "This lesson answers: \"Why does my regex ha…"
+   },
+   {
+    "id": "09",
+    "title": "When Not to Use Regex",
+    "summary": "This lesson is about **knowing when to sto…"
+   },
+   {
+    "id": "10",
+    "title": "Real-World Project: A Log Parser",
+    "summary": "This lesson turns the first 9 regex lesson…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Power Tools",
+  "items": [
+   {
+    "id": "11",
+    "title": "collections.Counter: Counting Made Effortless",
+    "summary": "This lesson answers: \"How do I count thing…"
+   },
+   {
+    "id": "12",
+    "title": "defaultdict and OrderedDict",
+    "summary": "This lesson answers: \"How do I handle nest…"
+   },
+   {
+    "id": "13",
+    "title": "collections.deque: Double-Ended Queue",
+    "summary": "This lesson answers: \"What about queues th…"
+   },
+   {
+    "id": "14",
+    "title": "itertools Essentials: chain, product, combinations, permutations, groupby",
+    "summary": "This lesson covers the five most-used `ite…"
+   },
+   {
+    "id": "15",
+    "title": "functools: Caching, Partial Application, and Reduction",
+    "summary": "This lesson covers the three most practica…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Logging and the CLI",
+  "items": [
+   {
+    "id": "16",
+    "title": "Logging Basics: Stop Debugging with `print`",
+    "summary": "This lesson answers \"why isn't `print` goo…"
+   },
+   {
+    "id": "17",
+    "title": "Logging In Depth: Loggers, Handlers, and Formatters",
+    "summary": "This lesson lays out the internal architec…"
+   },
+   {
+    "id": "18",
+    "title": "Logging in Practice: What Developers Need vs. What Users Need",
+    "summary": "This lesson covers the two audiences for l…"
+   },
+   {
+    "id": "19",
+    "title": "argparse Basics: Parsing Command-Line Arguments Properly",
+    "summary": "This lesson covers the basic usage of `arg…"
+   },
+   {
+    "id": "20",
+    "title": "argparse In Depth: Subcommands and Mutually Exclusive Groups",
+    "summary": "This lesson covers advanced `argparse` usa…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Testing and Quality",
+  "items": [
+   {
+    "id": "21",
+    "title": "Why Tests Matter",
+    "summary": "This lesson covers the need for tests: you…"
+   },
+   {
+    "id": "22",
+    "title": "unittest Basics: Writing Tests with a Framework",
+    "summary": "This lesson covers Python's standard-libra…"
+   },
+   {
+    "id": "23",
+    "title": "Test Organisation: One Function Per Test, Boundary Values, Repeatability",
+    "summary": "This lesson covers how to organise tests s…"
+   },
+   {
+    "id": "24",
+    "title": "Introducing pytest: Why So Many People Use It",
+    "summary": "This lesson covers pytest's core strengths…"
+   },
+   {
+    "id": "25",
+    "title": "Hands-On: Writing a Complete Test Suite for a Small Module",
+    "summary": "This lesson brings everything together: bu…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Capstone Project",
+  "items": [
+   {
+    "id": "26",
+    "title": "Project Design: A Log Analysis CLI Tool",
+    "summary": "This lesson starts building something genu…"
+   },
+   {
+    "id": "27",
+    "title": "The Parsing Layer: Regex Extraction with Fault Tolerance",
+    "summary": "This lesson applies the regex knowledge fr…"
+   },
+   {
+    "id": "28",
+    "title": "The Statistics Layer: Multi-Dimensional Aggregation",
+    "summary": "This lesson uses Counter / defaultdict / i…"
+   },
+   {
+    "id": "29",
+    "title": "The Output Layer: Multiple Formats and Tool Logging",
+    "summary": "This lesson makes statistics visible and s…"
+   },
+   {
+    "id": "30",
+    "title": "Finale: Assembling the CLI and What the Three Books Leave You With",
+    "summary": "The final lesson wires the parsing, statis…"
+   }
+  ],
+  "test": "test-06"
+ }
+]

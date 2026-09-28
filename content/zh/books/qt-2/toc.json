@@ -1,0 +1,188 @@
+[
+ {
+  "title": "第 1 章 · Model/View 架构",
+  "items": [
+   {
+    "id": "01",
+    "title": "为什么要有 Model/View：QTableWidget 用着好好的为什么还要换",
+    "summary": "你用 QTableWidget 写过一个 100 行的表格，很爽。然后产品经理说\"要…"
+   },
+   {
+    "id": "02",
+    "title": "Model 与 View 分工：QAbstractItemModel、QTableView、index 与 row/column",
+    "summary": "上一课你信了 Model/View 的好。这一课要拆开看：model 是数据的\"接口…"
+   },
+   {
+    "id": "03",
+    "title": "QStandardItemModel 入门：最常用的现成 model，增删改查数据",
+    "summary": "不想写自定义 model，又想要 Model/View 的灵活性？QStandard…"
+   },
+   {
+    "id": "04",
+    "title": "自定义 Model：继承 QAbstractTableModel，必须实现的三个方法",
+    "summary": "QStandardItemModel 够用了，但你的数据可能在一个 CSV、一个数据…"
+   },
+   {
+    "id": "05",
+    "title": "数据变更通知：beginInsertRows/endInsertRows，直接改内部列表不通知 view 就不会刷新（经典坑）",
+    "summary": "这是 Model/View 最核心、也最容易被忽略的一课。前面几课的信号都是\"自动\"…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "第 2 章 · Model/View 进阶",
+  "items": [
+   {
+    "id": "06",
+    "title": "QSortFilterProxyModel：排序与过滤不用改原数据，一行接入",
+    "summary": "你写好了 model，产品经理又来了：要排序、要搜索。你不用改 model 一行代码…"
+   },
+   {
+    "id": "07",
+    "title": "自定义排序与过滤：lessThan 与 filterAcceptsRow",
+    "summary": "默认的字符串排序不够用：你想让\"待办 < 进行中 < 完成\"，或者按日期排，或者只显…"
+   },
+   {
+    "id": "08",
+    "title": "委托 Delegate：为什么单元格要能放按钮/进度条/下拉框",
+    "summary": "单元格里只能放文字吗？不是。Model/View 的第三块拼图是 Delegate（…"
+   },
+   {
+    "id": "09",
+    "title": "自定义 Delegate：paint 与 createEditor，以及 setEditorData/setModelData",
+    "summary": "上一课讲了 paint，单元格能\"看起来\"不一样了。这一课让它能\"改\"：双击弹出日历…"
+   },
+   {
+    "id": "10",
+    "title": "选择模型 QItemSelectionModel：获取当前选中、多选、选中变化信号",
+    "summary": "用户点了一行，你怎么知道？view 的选中状态其实归一个专门的类管——QItemSe…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "第 3 章 · 自定义控件",
+  "items": [
+   {
+    "id": "11",
+    "title": "为什么要自定义控件：现有控件拼不出你要的样子",
+    "summary": "QPushButton、QLabel、QProgressBar 已经很好用了。但总有…"
+   },
+   {
+    "id": "12",
+    "title": "继承现有控件扩展：子类化 QPushButton 加个倒计时、加自定义信号",
+    "summary": "完全自绘太重，QSS 又不够。这一课讲\"继承现有控件扩展\"：复用父类全部行为，只加你…"
+   },
+   {
+    "id": "13",
+    "title": "从 QWidget 完全自绘：paintEvent、QPainter，必须在 paintEvent 里画，不能在别处画",
+    "summary": "继承现有控件只能改已有部件的样子。要画一个环形进度条、仪表盘、星星评分，你得从 QW…"
+   },
+   {
+    "id": "14",
+    "title": "事件处理：mousePressEvent / keyPressEvent，event 与 eventFilter 的区别",
+    "summary": "自绘控件不会自动响应点击，你要自己处理鼠标和键盘事件。这一课讲事件分发机制，以及 e…"
+   },
+   {
+    "id": "15",
+    "title": "自定义控件实战：一个圆形进度指示器",
+    "summary": "前三课的工具全用上：继承 QWidget 自绘、处理鼠标事件、加自定义信号、用 QT…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "第 4 章 · 绘图（QPainter）",
+  "items": [
+   {
+    "id": "16",
+    "title": "QPainter 入门",
+    "summary": "想在窗口上画一条线、一个圆、一段文字？PySide6 里所有自定义绘制都绕不开 QP…"
+   },
+   {
+    "id": "17",
+    "title": "基本图形：线、矩形、圆、多边形、文字与图片",
+    "summary": "上一节你画了一条线，这一节把 QPainter 的\"图元工具箱\"一次铺开——直线、矩…"
+   },
+   {
+    "id": "18",
+    "title": "坐标变换：translate、rotate、scale 与状态栈",
+    "summary": "想画一个绕中心旋转的指针、一个重复的花纹、一个缩放到任意尺寸的分形？靠算坐标太痛苦了…"
+   },
+   {
+    "id": "19",
+    "title": "渐变与路径：QLinearGradient / QRadialGradient 与 QPainterPath",
+    "summary": "纯色填充满大街都是，渐变才是让控件\"有质感\"的第一步。而 QPainterPath …"
+   },
+   {
+    "id": "20",
+    "title": "实战：一个自定义仪表盘控件",
+    "summary": "把前面四节全部串起来——paintEvent、图元、坐标变换、渐变、路径。这一节做一…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "第 5 章 · 数据库与网络",
+  "items": [
+   {
+    "id": "21",
+    "title": "Qt 的数据库支持：QtSql 模块与 QSqlTableModel",
+    "summary": "Qt 内置了一套数据库模块 QtSql，不用装 SQLAlchemy 就能连 SQL…"
+   },
+   {
+    "id": "22",
+    "title": "QSqlQuery 与手写 SQL：参数化查询、遍历结果与事务",
+    "summary": "当你需要联表、聚合、复杂条件时，Model 不够用了。QSqlQuery 让你直接写…"
+   },
+   {
+    "id": "23",
+    "title": "QtSql 与 Model/View 结合：QSqlQueryModel vs QSqlTableModel",
+    "summary": "同样是\"把 SQL 结果绑到 QTableView\"，QSqlQueryModel …"
+   },
+   {
+    "id": "24",
+    "title": "QNetworkAccessManager 基础：HTTP 请求与异步响应",
+    "summary": "桌面程序要联网抓数据，用 requests 虽然能跑，但它是同步的——一调用界面就冻…"
+   },
+   {
+    "id": "25",
+    "title": "JSON 与网络数据：解析接口返回并填进 Model",
+    "summary": "网络请求的终点往往是一个 JSON。这一节把\"网络请求 → JSON 解析 → 塞进…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "第 6 章 · 综合实战",
+  "items": [
+   {
+    "id": "26",
+    "title": "项目设计：把 tkinter 记账本用 Qt 重写一遍",
+    "summary": "这一册我们一路从 Model/View 走到绘图再到网络，收官项目是**把你在《窗口…"
+   },
+   {
+    "id": "27",
+    "title": "数据层与 Model：把数据库记录变成 Model",
+    "summary": "上一课定了分层，这一课干实事：写一个 `TransactionModel`，把 SQ…"
+   },
+   {
+    "id": "28",
+    "title": "界面与交互：排序过滤、录入与选中删除",
+    "summary": "Model 写好了，这一课把它接到视图上。重点是两个：用 `QSortFilterP…"
+   },
+   {
+    "id": "29",
+    "title": "自绘图表：用 QPainter 画饼图和柱状图",
+    "summary": "第 4 章的绘图知识终于有了用武之地。这一课我们用 `QPainter` 自己画一个…"
+   },
+   {
+    "id": "30",
+    "title": "收官：打包发布与两册 Qt 带走了什么",
+    "summary": "项目写完了，接下来是两件事：把它打成一个能发给别人的 exe，以及回头看看这两册书到…"
+   }
+  ],
+  "test": "test-06"
+ }
+]

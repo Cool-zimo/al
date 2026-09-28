@@ -1,0 +1,188 @@
+[
+ {
+  "title": "Chapter 1 · Signals and Slots",
+  "items": [
+   {
+    "id": "01",
+    "title": "Setting Up Your Environment and Your First Window",
+    "summary": "tkinter comes with Python — install Python…"
+   },
+   {
+    "id": "02",
+    "title": "Why PySide6",
+    "summary": "The first decision when learning Qt is whi…"
+   },
+   {
+    "id": "03",
+    "title": "Signals and Slots: How They Differ from tkinter's command",
+    "summary": "In tkinter, clicking a button calls a func…"
+   },
+   {
+    "id": "04",
+    "title": "Ways to Write connect",
+    "summary": "Lesson 3 covered the concept of signals an…"
+   },
+   {
+    "id": "05",
+    "title": "Project: A Counter Window",
+    "summary": "The first four lessons laid out the concep…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Layout Management",
+  "items": [
+   {
+    "id": "06",
+    "title": "Why You Shouldn't Use setGeometry for Layout",
+    "summary": "In tkinter you can `btn.place(x=20, y=30)`…"
+   },
+   {
+    "id": "07",
+    "title": "QVBoxLayout and QHBoxLayout",
+    "summary": "Vertical layouts (QVBoxLayout) and horizon…"
+   },
+   {
+    "id": "08",
+    "title": "QGridLayout: Row and Column Grid Layout",
+    "summary": "Calculator interfaces, login forms, settin…"
+   },
+   {
+    "id": "09",
+    "title": "QFormLayout and Nested Layouts",
+    "summary": "A form interface (label + input appearing …"
+   },
+   {
+    "id": "10",
+    "title": "Layout Stretching: sizePolicy, setStretch, and minimumSize",
+    "summary": "Layouts distribute extra space among widge…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Common Widgets",
+  "items": [
+   {
+    "id": "11",
+    "title": "QLabel, QPushButton, and QLineEdit",
+    "summary": "These three are Qt's most basic widgets: Q…"
+   },
+   {
+    "id": "12",
+    "title": "QTextEdit and QPlainTextEdit: Multi-Line Text",
+    "summary": "Single-line input uses QLineEdit; multi-li…"
+   },
+   {
+    "id": "13",
+    "title": "QComboBox, QCheckBox, and QRadioButton",
+    "summary": "Dropdown lists, checkboxes, and radio butt…"
+   },
+   {
+    "id": "14",
+    "title": "QListWidget and QTableWidget",
+    "summary": "Lists and tables are the most common data …"
+   },
+   {
+    "id": "15",
+    "title": "QSlider, QSpinBox, and QProgressBar",
+    "summary": "Numeric input and progress feedback are st…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Dialogs and Menus",
+  "items": [
+   {
+    "id": "16",
+    "title": "QMessageBox: Four Kinds of Prompts and Their Return Values",
+    "summary": "Pop-up dialogs are the fastest way to talk…"
+   },
+   {
+    "id": "17",
+    "title": "QInputDialog / QFileDialog / QColorDialog",
+    "summary": "Three built-in dialogs you'll use constant…"
+   },
+   {
+    "id": "18",
+    "title": "Custom Dialogs with QDialog",
+    "summary": "Built-in dialogs can only fetch a single v…"
+   },
+   {
+    "id": "19",
+    "title": "QMenuBar / QToolBar / QStatusBar",
+    "summary": "Menus, toolbars, and status bars are the \"…"
+   },
+   {
+    "id": "20",
+    "title": "QAction: Define Once, Mount Anywhere",
+    "summary": "A `QAction` is an \"action\" object: one log…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Styling and Resources",
+  "items": [
+   {
+    "id": "21",
+    "title": "Getting Started with QSS",
+    "summary": "Qt Style Sheets (QSS) are Qt's styling lan…"
+   },
+   {
+    "id": "22",
+    "title": "Common QSS Patterns",
+    "summary": "This lesson works through the QSS patterns…"
+   },
+   {
+    "id": "23",
+    "title": "The Resource System: qrc",
+    "summary": "Bundling images into your program means yo…"
+   },
+   {
+    "id": "24",
+    "title": "Icons and Fonts",
+    "summary": "Icons should be sharp and fonts should loo…"
+   },
+   {
+    "id": "25",
+    "title": "Dark Mode and Theme Switching",
+    "summary": "A \"switch theme\" button is really just dyn…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Threading and the Capstone",
+  "items": [
+   {
+    "id": "26",
+    "title": "Why You Must Not Do Heavy Work in the GUI",
+    "summary": "The most damaging mistake in a GUI app is …"
+   },
+   {
+    "id": "27",
+    "title": "QThread and the Worker Pattern",
+    "summary": "Move the heavy work to a background thread…"
+   },
+   {
+    "id": "28",
+    "title": "QTimer: The Right Way to Schedule Work",
+    "summary": "`QTimer` lets you schedule tasks without e…"
+   },
+   {
+    "id": "29",
+    "title": "Project: Batch File Renamer",
+    "summary": "Lessons 14, 15, 17, and 27 come together i…"
+   },
+   {
+    "id": "30",
+    "title": "Wrapping Up: Project Organization and What's Next",
+    "summary": "Twenty-five lessons are done. This final l…"
+   }
+  ],
+  "test": "test-06"
+ }
+]

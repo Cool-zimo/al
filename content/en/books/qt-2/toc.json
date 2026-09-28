@@ -1,0 +1,188 @@
+[
+ {
+  "title": "Chapter 1 · The Model/View Architecture",
+  "items": [
+   {
+    "id": "01",
+    "title": "Why Model/View Exists: QTableWidget Works Fine Until It Doesn't",
+    "summary": "You built a 100-row table with QTableWidge…"
+   },
+   {
+    "id": "02",
+    "title": "Model and View Responsibilities: QAbstractItemModel, QTableView, index, row, and column",
+    "summary": "Last lesson you were sold on Model/View. T…"
+   },
+   {
+    "id": "03",
+    "title": "Getting Started with QStandardItemModel: The Go-To Ready-Made Model",
+    "summary": "Don't want to write a custom model but nee…"
+   },
+   {
+    "id": "04",
+    "title": "Custom Models: Subclassing QAbstractTableModel and the Three Methods You Must Implement",
+    "summary": "QStandardItemModel is enough — until your …"
+   },
+   {
+    "id": "05",
+    "title": "Data Change Notifications: beginInsertRows/endInsertRows — Modifying the Internal List Without Notifying Means No Refresh (The Classic Trap)",
+    "summary": "This is the most core and most easily over…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Views, Delegates and Selection",
+  "items": [
+   {
+    "id": "06",
+    "title": "QSortFilterProxyModel: Sorting and Filtering Without Touching Your Data",
+    "summary": "You built a solid model. Now the product m…"
+   },
+   {
+    "id": "07",
+    "title": "Custom Sorting and Filtering: lessThan and filterAcceptsRow",
+    "summary": "Default string sorting is not enough. You …"
+   },
+   {
+    "id": "08",
+    "title": "Delegates: Why Cells Need to Show Buttons, Progress Bars, and Dropdowns",
+    "summary": "Must a cell contain only text? No. Delegat…"
+   },
+   {
+    "id": "09",
+    "title": "Custom Delegates: paint and createEditor, plus setEditorData and setModelData",
+    "summary": "Lesson 08 covered `paint`, so a cell can n…"
+   },
+   {
+    "id": "10",
+    "title": "Selection Models: QItemSelectionModel for Tracking and Reacting to Selection",
+    "summary": "The user clicked a row — how do you know? …"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Custom Widgets",
+  "items": [
+   {
+    "id": "11",
+    "title": "Why Custom Widgets: When Stock Widgets Cannot Build the Look You Need",
+    "summary": "`QPushButton`, `QLabel`, `QProgressBar` ar…"
+   },
+   {
+    "id": "12",
+    "title": "Subclassing Existing Widgets: Extending QPushButton with a Countdown and a Custom Signal",
+    "summary": "Full custom painting is heavy, and QSS is …"
+   },
+   {
+    "id": "13",
+    "title": "Full Custom Painting: Subclassing QWidget and Painting Only Inside paintEvent",
+    "summary": "Subclassing got you 90% there, but the sha…"
+   },
+   {
+    "id": "14",
+    "title": "Event Handling: mousePressEvent and keyPressEvent, and the Difference Between event and eventFilter",
+    "summary": "A hand-painted widget does not respond to …"
+   },
+   {
+    "id": "15",
+    "title": "Custom Widgets in Practice: A Circular Progress Indicator",
+    "summary": "Every tool from the previous three lessons…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Drawing with QPainter",
+  "items": [
+   {
+    "id": "16",
+    "title": "Getting Started with QPainter",
+    "summary": "Want to draw a line, a circle, or a piece …"
+   },
+   {
+    "id": "17",
+    "title": "Basic Shapes: Lines, Rectangles, Circles, Polygons, Text, and Images",
+    "summary": "Last section you drew a line. This section…"
+   },
+   {
+    "id": "18",
+    "title": "Coordinate Transforms: translate, rotate, scale, and the State Stack",
+    "summary": "Want to draw a needle that rotates around …"
+   },
+   {
+    "id": "19",
+    "title": "Gradients and Paths: QLinearGradient / QRadialGradient and QPainterPath",
+    "summary": "Solid fills are everywhere; gradients are …"
+   },
+   {
+    "id": "20",
+    "title": "Hands-On: A Custom Gauge Control",
+    "summary": "Now we tie together everything from the la…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Data and Networking",
+  "items": [
+   {
+    "id": "21",
+    "title": "Database Support in Qt: The QtSql Module and QSqlTableModel",
+    "summary": "Qt ships with its own database module, `Qt…"
+   },
+   {
+    "id": "22",
+    "title": "QSqlQuery and Hand-Written SQL: Parameterized Queries, Iterating Results, and Transactions",
+    "summary": "When you need joins, aggregation, or compl…"
+   },
+   {
+    "id": "23",
+    "title": "QtSql Meets Model/View: QSqlQueryModel vs QSqlTableModel",
+    "summary": "Both \"bind a SQL result to a QTableView\" —…"
+   },
+   {
+    "id": "24",
+    "title": "QNetworkAccessManager Basics: Asynchronous HTTP Requests and Responses",
+    "summary": "A desktop app that fetches data from the n…"
+   },
+   {
+    "id": "25",
+    "title": "JSON and Network Data: Parsing API Responses and Feeding Them into a Model",
+    "summary": "The end goal of a network request is usual…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Capstone Project",
+  "items": [
+   {
+    "id": "26",
+    "title": "Project Design: Rewriting the tkinter Ledger with Qt",
+    "summary": "This volume has taken you from Model/View …"
+   },
+   {
+    "id": "27",
+    "title": "The Data Layer and the Model: Turning Database Rows into Qt Data",
+    "summary": "The previous lesson settled the layering. …"
+   },
+   {
+    "id": "28",
+    "title": "The Interface and Interaction: Sorting, Filtering, Entry and Delete",
+    "summary": "The model is ready. This lesson wires it u…"
+   },
+   {
+    "id": "29",
+    "title": "Hand-Drawn Charts: Pie and Bar Charts with QPainter",
+    "summary": "Chapter 4's drawing skills finally have re…"
+   },
+   {
+    "id": "30",
+    "title": "Wrapping Up: Packaging for Release and What Two Volumes Leave You With",
+    "summary": "The project is finished. Two things remain…"
+   }
+  ],
+  "test": "test-06"
+ }
+]

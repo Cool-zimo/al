@@ -115,7 +115,8 @@
   "desc": "信号与槽、布局管理、常用控件、样式表 —— Qt 的心智模型。",
   "stage": "桌面",
   "level": "进阶",
-  "ready": false
+  "ready": true,
+  "note": "完整 6 章 30 课"
  },
  {
   "id": "qt-2",
@@ -124,7 +125,8 @@
   "desc": "模型视图、多线程、自定义控件、国际化，以及打包成安装包。",
   "stage": "桌面",
   "level": "高级",
-  "ready": false
+  "ready": true,
+  "note": "完整 6 章 30 课"
  },
  {
   "id": "engineering",
@@ -192,6 +194,7 @@
   "desc": "re for regular expressions, collections / itertools / functools as force multipliers, then logging, argparse, subprocess and unittest — finishing with a logged, tested CLI tool.",
   "stage": "Library",
   "level": "Applied",
-  "ready": false
+  "ready": true,
+  "note": "完整 6 章 30 课"
  }
 ]

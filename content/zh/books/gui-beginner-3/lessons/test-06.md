@@ -276,3 +276,4 @@ checklist:
 - 发布脚本能清理开发产物、读取版本号、打包、复制验证
 - 打包命令含 --onefile --windowed 且产物命名带版本号
 - 最终产物是带版本号的 zip，内含 README 和 LICENSE
+```
