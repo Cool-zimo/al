@@ -1,0 +1,35 @@
+[
+  {
+    "title": "第 1 章 · 环境与依赖",
+    "items": [
+      {"id": "01", "title": "虚拟环境：给每个项目一个独立的小房间", "summary": "为什么不能直接装系统 Python、venv 怎么建、激活的意义、.gitignore 该忽略什么"},
+      {"id": "02", "title": "依赖管理：把在我机器上能跑变成在哪都能跑", "summary": "requirements.txt 与 pyproject.toml 的区别、锁版本的必要性、pip freeze 的坑"},
+      {"id": "03", "title": "pip 之外：uv 与现代工具链", "summary": "uv 为什么快、常用命令对照、何时用何时不用"},
+      {"id": "04", "title": "项目目录结构：让新人 30 秒看懂你的项目", "summary": "src 布局 vs 扁平布局、tests/ 与 README、pip install -e 可编辑安装"},
+      {"id": "05", "title": "配置管理：密钥、开关和在我机器上能跑", "summary": "配置不能硬编码、环境变量 vs 配置文件、.env 与密钥安全"}
+    ],
+    "test": "test-01"
+  },
+  {
+    "title": "第 2 章 · 代码质量",
+    "items": [
+      {"id": "06", "title": "命名与可读性：名字是代码的用户界面", "summary": "好名字的标准、别用 l 和 O、布尔变量用 is_ 前缀"},
+      {"id": "07", "title": "函数设计：一个函数只做一件事", "summary": "参数不要太多、副作用要显式、什么时候该拆"},
+      {"id": "08", "title": "注释与文档字符串：讲 why 不讲 what", "summary": "什么时候该写注释、docstring 规范、类型注解基础"},
+      {"id": "09", "title": "格式化与 lint：把风格争论交给工具", "summary": "black/ruff/flake8 解决什么、提交前自动跑、编辑器集成"},
+      {"id": "10", "title": "错误处理哲学：不该被看见，更不该被吞掉", "summary": "什么时候捕获、别吞异常、自定义异常、assert 不能校验参数"}
+    ],
+    "test": "test-02"
+  },
+  {
+    "title": "第 3 章 · 版本控制",
+    "items": [
+      {"id": "11", "title": "git 基本工作流：add / commit / push 三段式", "summary": "三区模型、add -p 精确暂存、提交粒度、常用命令"},
+      {"id": "12", "title": "写好的提交信息：fix 不算信息", "summary": "为什么 fix 不算信息、Conventional Commits 格式与规范"},
+      {"id": "13", "title": "分支策略：为什么不能直接在 main 上改", "summary": "feature 分支工作流、合并 vs rebase、什么时候用什么"},
+      {"id": "14", "title": ".gitignore 与不该提交的东西", "summary": "__pycache__/.env/大文件、已提交密钥的紧急处理"},
+      {"id": "15", "title": "代码评审：不是找茬，是共同负责", "summary": "评审看什么、怎么提意见、怎么接受意见"}
+    ],
+    "test": "test-03"
+  }
+]

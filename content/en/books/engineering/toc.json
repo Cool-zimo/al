@@ -1,0 +1,188 @@
+[
+ {
+  "title": "Chapter 1 · Environment and Dependencies",
+  "items": [
+   {
+    "id": "01",
+    "title": "Virtual Environments: Give Every Project Its Own Room",
+    "summary": "You have three projects on your machine: o…"
+   },
+   {
+    "id": "02",
+    "title": "Dependency Management: From \"Works on My Machine\" to \"Works Anywhere\"",
+    "summary": "Alice sends you a project whose README say…"
+   },
+   {
+    "id": "03",
+    "title": "Beyond pip: uv and the Modern Toolchain",
+    "summary": "Running `pip install` makes you wait half …"
+   },
+   {
+    "id": "04",
+    "title": "Project Layout: Helping a Newcomer Read Your Project in 30 Seconds",
+    "summary": "You open an open-source project whose root…"
+   },
+   {
+    "id": "05",
+    "title": "Configuration: Secrets, Feature Flags, and \"Works on My Machine\"",
+    "summary": "Alice hardcoded the database password in s…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Code Quality",
+  "items": [
+   {
+    "id": "06",
+    "title": "Naming and Readability: Names Are the UI of Your Code",
+    "summary": "You inherit a codebase and see `def p(data…"
+   },
+   {
+    "id": "07",
+    "title": "Function Design: One Job Per Function",
+    "summary": "You open a 400-line function that parses, …"
+   },
+   {
+    "id": "08",
+    "title": "Comments and Docstrings: Say Why, Not What",
+    "summary": "You see a comment reading `# increment i`,…"
+   },
+   {
+    "id": "09",
+    "title": "Formatting and Linting: Let Tools Settle Style Arguments",
+    "summary": "Alice likes single quotes, Bob likes doubl…"
+   },
+   {
+    "id": "10",
+    "title": "The Philosophy of Error Handling: Exceptions Should Not Be Seen — and Never Swallowed",
+    "summary": "Your API page starts告警 at midnight: 500 er…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Version Control",
+  "items": [
+   {
+    "id": "11",
+    "title": "The Basic Git Workflow: The add / commit / push Trio",
+    "summary": "You changed three files and want to commit…"
+   },
+   {
+    "id": "12",
+    "title": "Writing Good Commit Messages: \"fix\" Is Not Information",
+    "summary": "Six months from now you will search 5,000 …"
+   },
+   {
+    "id": "13",
+    "title": "Branching Strategy: Why You Must Not Edit main Directly",
+    "summary": "You edit main directly, push it, CI fails,…"
+   },
+   {
+    "id": "14",
+    "title": ".gitignore and the Things That Must Never Be Committed",
+    "summary": "`.venv/`, `__pycache__/`, `.env`, `.DS_Sto…"
+   },
+   {
+    "id": "15",
+    "title": "Code Review: Not Fault-Finding, but Shared Responsibility",
+    "summary": "You open a PR and find twenty comments, fi…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Testing and Automation",
+  "items": [
+   {
+    "id": "16",
+    "title": "The Test Pyramid: Not Every Test Should Start From the UI",
+    "summary": "Your project has 200 tests, and every sing…"
+   },
+   {
+    "id": "17",
+    "title": "pytest in Practice: Fixtures, Parametrization, and Test Isolation",
+    "summary": "You have 50 tests, each one copying the sa…"
+   },
+   {
+    "id": "18",
+    "title": "Mocks and Monkey-Patching: Isolate External Dependencies, but Do Not Mock Everything",
+    "summary": "Your function makes an HTTP request, queri…"
+   },
+   {
+    "id": "19",
+    "title": "Coverage: 100% Does Not Mean Bug-Free",
+    "summary": "The report says \"100% coverage\" and you fe…"
+   },
+   {
+    "id": "20",
+    "title": "CI Basics: Why \"It Worked on My Machine\" Is Not a Strategy",
+    "summary": "You ran the tests locally, committed, push…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Shipping and Maintenance",
+  "items": [
+   {
+    "id": "21",
+    "title": "Semantic Versioning: When to Bump major, minor, and patch",
+    "summary": "You made a small change and bumped the ver…"
+   },
+   {
+    "id": "22",
+    "title": "Packaging and Publishing: From Source to `pip install`",
+    "summary": "Your project is done and a colleague says …"
+   },
+   {
+    "id": "23",
+    "title": "Containers: Turning \"It Runs on My Machine\" Into \"It Runs Anywhere\"",
+    "summary": "A script that works on a colleague's lapto…"
+   },
+   {
+    "id": "24",
+    "title": "Documentation: README, CHANGELOG, and Design Docs",
+    "summary": "Finishing the code is not the finish line.…"
+   },
+   {
+    "id": "25",
+    "title": "Capstone: Engineering an Existing Small Project",
+    "summary": "This is the chapter's capstone. The previo…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Performance, Security and Launch",
+  "items": [
+   {
+    "id": "26",
+    "title": "Performance Basics: Measure First, Then Change",
+    "summary": "The first rule of optimization is \"do not …"
+   },
+   {
+    "id": "27",
+    "title": "Logging and Observability: What Tells You Something Is Wrong in Production",
+    "summary": "`print` is fine for local development; it …"
+   },
+   {
+    "id": "28",
+    "title": "Security Basics: Dependencies, Secrets, and Injection Defenses",
+    "summary": "Security is not a decoration added before …"
+   },
+   {
+    "id": "29",
+    "title": "Deployment and Operations: From \"Runs on My Machine\" to \"Runs in Production\"",
+    "summary": "\"It works on my machine\" is the classic pr…"
+   },
+   {
+    "id": "30",
+    "title": "Finale: The Full Ship-It Walkthrough, Then Your Own Project",
+    "summary": "Thirty lessons in, you now have every tool…"
+   }
+  ],
+  "test": "test-06"
+ }
+]

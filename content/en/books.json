@@ -66,7 +66,7 @@
   "stage": "数据",
   "level": "进阶",
   "ready": true,
-  "note": "前 4 章 20 课（选取筛选 / 清洗缺失 / 分组聚合）"
+  "note": "完整 6 章 30 课"
  },
  {
   "id": "data-analysis-3",
@@ -135,7 +135,8 @@
   "desc": "虚拟环境、项目结构、Git 协作、单元测试、日志、打包发布。",
   "stage": "工程",
   "level": "实战",
-  "ready": false
+  "ready": true,
+  "note": "完整 6 章 30 课"
  },
  {
   "id": "algo-1",
