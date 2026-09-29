@@ -1,119 +1,119 @@
-# Chapter 1 · Final Test
+# Chapter 1 · Big Test
 
-> The lists chapter is done. Here's the check — do you **remember it**, can you **use it**, can you **build something** with it?
+> The chapter on lists is finished. Now comes the check — do you **remember it**, can you **use it**, and can you actually **build something** with it?
 >
-> Don't aim for a perfect score on the first try. **Questions you get wrong come back to your review list automatically after 1 day** (Ebbinghaus forgetting curve), so you'll get another shot.
+> Do not worry about getting everything right first time. **Questions you miss will automatically return to your revision queue in 1 day** (Ebbinghaus forgetting curve), so you can try again then.
 
 ---
 
 ## Part 1 · Multiple Choice
 
-Checking whether the concepts actually stuck.
+These test whether the chapter's concepts have really stuck.
 
 ```quiz
 type: choice
-q: With `nums = [10, 20, 30, 40]`, what are `nums[-1]` and `nums[3]`?
+q: 'Given `nums = [10, 20, 30, 40]`, what are `nums[-1]` and `nums[3]`?'
 options:
 - 40 and 40
 - 10 and 40
 - 40 and 30
-- It errors — negative indexes don't exist
+- An error — negative indexes do not exist
 answer: 0
-explain: The negative index -1 is the last element, and positive index 3 (the 4th) is also the last — they point at the same 40. Positive indexes count up from 0, negative indexes count down from -1; they're just opposite directions, and the last element is always nums[-1] or nums[len(nums)-1].
+explain: A negative index of -1 is the last element, and the positive index 3 (the 4th) is also the last — both point to the same element, 40. Positive indexes start at 0, negative indexes start at -1; the two are just counted in opposite directions, and the final element is always nums[-1] or nums[len(nums)-1].
 ```
 
 ```quiz
 type: choice
-q: After running this code, what is `result`?
+q: 'After running the code below, what is `result`?'
 code: |
   scores = [87, 92, 78]
   result = scores.sort()
 options:
-- [78, 87, 92]
+- '[78, 87, 92]'
 - None
-- [87, 92, 78]
-- It errors — sort can't be used that way
+- '[87, 92, 78]'
+- An error — sort cannot be used this way
 answer: 1
-explain: sort() sorts in place — it turns scores itself into [78, 87, 92], but returns **nothing**, so result is None. To actually get the sorted result, either print scores after sort(), or use sorted(scores) — that one returns a new list. This is the single most frequent mistake in the chapter.
+explain: sort() sorts in place — it changes scores itself to [78, 87, 92], but returns nothing, so result is None. To get a sorted result you either sort() and then print scores itself, or use sorted(scores) — that one returns a new list. This is the single most common mistake in the chapter.
 ```
 
 ```quiz
 type: choice
-q: With `nums = [1, 2, 3, 2, 2]`, what does the list become after `nums.remove(2)`?
+q: 'Given `nums = [1, 2, 3, 2, 2]`, what does `nums` become after `nums.remove(2)`?'
 options:
-- [1, 3]
-- [1, 3, 2, 2]
-- [1, 2, 3, 2]
-- It errors, because there are duplicate elements
+- '[1, 3]'
+- '[1, 3, 2, 2]'
+- '[1, 2, 3, 2]'
+- An error, because there are duplicate elements
 answer: 1
-explain: remove deletes by *value*, and only the **first** match per call. So just the 2 at index 1 goes; the two 2s behind it stay put — the result is [1, 3, 2, 2]. To wipe out every 2 you'd need a loop, or build a new list of everything that isn't 2.
+explain: remove deletes by value, and removes only the first match. So only the 2 at index 1 is removed; the two 2s after it stay put — the result is [1, 3, 2, 2]. To remove every 2 you would loop, or build a new list containing only the items that are not 2.
 ```
 
 ```quiz
 type: choice
-q: What does this code print?
+q: What does the following code print?
 code: |
   a = [1, 2, 3]
   b = a
   b.append(4)
   print(a)
 options:
-- [1, 2, 3]
-- [1, 2, 3, 4]
-- [1, 2, 3, 4, 4]
-- It errors
+- '[1, 2, 3]'
+- '[1, 2, 3, 4]'
+- '[1, 2, 3, 4, 4]'
+- An error
 answer: 1
-explain: b = a is **not a copy** — it's a second name for the same list. a and b point at one piece of data, so changing b changes a, and printing a gives [1, 2, 3, 4]. To make a real copy write b = a[:] or b = list(a); then changing b leaves a alone.
+explain: b = a is not a copy — it gives the same list a second name. a and b point at the same data, so changing b means changing a, and printing a also gives [1, 2, 3, 4]. For a genuine copy you write b = a[:] or b = list(a); then changing b no longer affects a.
 ```
 
 ```quiz
 type: choice
-q: With `letters = ["a", "b", "c", "d"]`, how many elements does `letters[1:3]` have?
+q: 'Given `letters = ["a", "b", "c", "d"]`, how many elements are in `letters[1:3]`?'
 options:
 - 2
 - 3
 - 4
 - 1
 answer: 0
-explain: Half-open — index 1 included, index 3 excluded — so only indexes 1 and 2, giving ["b", "c"]. "The stop isn't included" is exactly the same rule as range; two places, one temper.
+explain: The range is half-open — it includes index 1 but excludes index 3, so it contains only the elements at indexes 1 and 2, namely ["b", "c"]. The "end is excluded" rule is identical to range, so the two behave with exactly the same temperament.
 ```
 
 ---
 
 ## Part 2 · Code Questions
 
-Remembering isn't enough — you have to be able to write it.
+Remembering the concepts is not enough — you have to be able to write the code.
 
 ```quiz
 type: code
-q: Starting from an empty list, use append to add the strings "red", "green" and "blue" in that order, then print the list.
+q: Starting from an empty list, use append to add the strings "red", "green", and "blue" in that order, then print the list.
 tests:
 - assert "['red', 'green', 'blue']" in __out
-hint: An empty list is []. append adds one element at a time, so three things means three lines. The order matches the order you added them.
-explain: Write lst = [], then three lines lst.append("red"), lst.append("green"), lst.append("blue"), and finally print(lst). Note that append returns None — never write lst = lst.append("red"), which turns lst into None and breaks everything after it.
+hint: An empty list is []. append adds one element at a time, so three elements means three lines. The order matches the order you appended them in.
+explain: Write lst = [] then three lines — lst.append("red") / lst.append("green") / lst.append("blue") — then print(lst). Remember that append returns None, so never write lst = lst.append("red") — that would turn lst into None and everything after it would break.
 ```
 
 ```quiz
 type: code
-q: Given `data = [5, 10, 15, 20]`, print its first element and its last element (using a negative index), each on its own line.
+q: 'Given the list `data = [5, 10, 15, 20]`, print its first element and its last element (using a negative index), each on its own line.'
 starter: |
   data = [5, 10, 15, 20]
 
-  # print the first
+  # print the first element
 
-  # print the last (using a negative index)
+  # print the last element (use a negative index)
 
 tests:
 - assert "5" in __out
 - assert "20" in __out
 - assert "10" not in __out
-hint: The first is index 0, the last is index -1. Use two separate print lines.
-explain: The answer is print(data[0]) and print(data[-1]). This tests both counting directions at once: positive starts at 0, negative starts at -1. The assertion 10 not in __out stops you from sneaking through with data[1] — that's the second number.
+hint: The first element is at index 0, the last is at index -1. Print them on two separate lines.
+explain: The answer is print(data[0]) and print(data[-1]). This tests indexing in both directions at once: positive counting starts at 0, negative counting starts at -1. The "10 not in __out" check stops you from cheating with data[1] — that would give you the second element instead.
 ```
 
 ```quiz
 type: code
-q: Given `nums = [1, 2, 3]`, change the second element to 99, then append 4 at the end, and print the whole list.
+q: 'Given the list `nums = [1, 2, 3]`, change the second element to 99, then append 4 at the end, then print the whole list.'
 starter: |
   nums = [1, 2, 3]
 
@@ -124,13 +124,13 @@ starter: |
   print(nums)
 tests:
 - assert "[1, 99, 3, 4]" in __out
-hint: The index of "the second" is 1. Change an element with assignment; add one with append.
-explain: You fill in nums[1] = 99 and nums.append(4). Two things tested: indexes start at 0 (the second is 1, not 2), and append only reaches the end — the result is [1, 99, 3, 4] with 4 last. Here the two operations don't interfere: one changes index 1, the other adds at the end, so the order doesn't matter. It would matter if you were changing the *last* element and then appending.
+hint: The second element is at index 1. Change an element with assignment, add an element with append.
+explain: The missing lines are nums[1] = 99 and nums.append(4). Two points are being tested: indexes start at 0 (the second element is 1, not 2), and append only adds at the end. Here the two operations do not interfere — changing index 1 and adding at the end means the order does not affect the result. But if the task were "change the last element to 99, then append", order really would matter.
 ```
 
 ```quiz
 type: code
-q: Given `nums = [10, 20, 30, 40, 50]`, take the **middle three** (20, 30, 40) into a variable called `mid` and print it. Then print the original list to confirm it wasn't changed.
+q: 'Given the list `nums = [10, 20, 30, 40, 50]`, take the **middle three** elements (20, 30, 40), put them in the variable `mid` and print it, then print the original list to confirm it was not changed.'
 starter: |
   nums = [10, 20, 30, 40, 50]
 
@@ -141,27 +141,28 @@ starter: |
 tests:
 - assert "[20, 30, 40]" in __out
 - assert "[10, 20, 30, 40, 50]" in __out
-hint: 20 is at index 1 and 40 is at index 3 — what must the stop be to include 40? Remember the stop isn't included.
-explain: You fill in nums[1:4]. This is the classic test of "the stop isn't included": to capture indexes 1, 2 and 3 you must write 4. With nums[1:3] you'd only get [20, 30]. The second assertion confirms you used a slice rather than pop or del — a slice leaves the original alone.
+hint: 20 is at index 1 and 40 is at index 3 — what end position includes 40? Remember that the end is excluded.
+explain: The answer is nums[1:4]. This is the classic "end is excluded" test: to capture indexes 1, 2, and 3, the end must be 4. Writing nums[1:3] would only give [20, 30]. The second assertion confirms you used a slice rather than pop/del — a slice never modifies the original list.
 ```
 
 ```quiz
 type: code
-q: Given `scores = [55, 90, 72, 48, 88]`, collect every score that **passes** (60 or above) into a new list called `passed` and print it; then print how many passed.
+q: 'Given the list `scores = [55, 90, 72, 48, 88]`, find all the **passing** scores (greater than or equal to 60), put them in a new list called `passed` and print it, then print the number of passing scores.'
 starter: |
   scores = [55, 90, 72, 48, 88]
   passed = []
 
   for s in scores:
-      # write the test here, collecting passing scores into passed
+      # write the test and append the passing scores to passed here
 
   print(passed)
-  print("Passed:", len(passed))
+  print("Passing:", len(passed))
 tests:
 - assert "[90, 72, 88]" in __out
 - assert "3" in __out
 - assert "55" not in __out
 - assert "48" not in __out
-hint: Iterate every score, and if s >= 60 then passed.append(s). Get the count from len(passed) — don't hard-code it.
-explain: You fill in if s >= 60: passed.append(s) — two lines, mind the indentation. This is the chapter's core pattern: iterate → test → collect into a new list. The result [90, 72, 88] keeps the original order, and the count 3 comes from len rather than being written by hand — swap in different data and the code still works. Don't remove while iterating; that skips elements.
+hint: Loop over each score, and if s >= 60 then passed.append(s). Get the count with len(passed) rather than counting by hand.
+explain: The missing code is if s >= 60: passed.append(s) (two lines — watch the indentation). This is the core pattern of the chapter: loop, test, and collect into a new list. The result [90, 72, 88] keeps the original order, and the count of 3 is calculated with len rather than hard-coded — so swapping in different data would not require touching the code. Just do not remove items while iterating, or you will skip some.
 ```
+

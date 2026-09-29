@@ -1,33 +1,188 @@
 [
-  {
-    "title": "Chapter 1 · Remembering a Whole Bunch of Things",
-    "items": [
-      {
-        "id": "01",
-        "title": "Holding Many Things at Once: Lists",
-        "summary": "Why you need lists, how to create one, len()"
-      },
-      {
-        "id": "02",
-        "title": "Indexes: Pulling Things Out by Position",
-        "summary": "Counting from 0, negative indexes, out of range"
-      },
-      {
-        "id": "03",
-        "title": "Adding and Removing",
-        "summary": "append / insert / pop / remove / del"
-      },
-      {
-        "id": "04",
-        "title": "Slicing: Taking Out a Whole Range",
-        "summary": "Half-open ranges, omitting ends, negative slices, no side effects"
-      },
-      {
-        "id": "05",
-        "title": "Iteration and Everyday Operations",
-        "summary": "for / in / sum / max / min, and sort vs sorted"
-      }
-    ],
-    "test": "test-01"
-  }
+ {
+  "title": "Chapter 1 · Remembering a Whole Bunch",
+  "items": [
+   {
+    "id": "01",
+    "title": "One Box, Many Values: Lists",
+    "summary": "So far every variable you have written hol…"
+   },
+   {
+    "id": "02",
+    "title": "Indexes: Reaching in by Position",
+    "summary": "A list can hold a whole pile of values, bu…"
+   },
+   {
+    "id": "03",
+    "title": "Adding and Removing: Making a List Grow and Shrink",
+    "summary": "An index can only change a position that *…"
+   },
+   {
+    "id": "04",
+    "title": "Slicing: Grabbing a Whole Segment at Once",
+    "summary": "An index can only fetch one element at a t…"
+   },
+   {
+    "id": "05",
+    "title": "Iteration and Common Operations: Actually Using a List",
+    "summary": "The previous four lessons answered \"how do…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Tuples and Strings",
+  "items": [
+   {
+    "id": "06",
+    "title": "Tuples: Lists That Cannot Change",
+    "summary": "A list can grow, shrink, and be rewritten …"
+   },
+   {
+    "id": "07",
+    "title": "Tuple Unpacking: Assigning to Several Names at Once",
+    "summary": "Lesson 6 said \"a tuple is defined by its c…"
+   },
+   {
+    "id": "08",
+    "title": "Strings Are Immutable",
+    "summary": "Lesson 3 taught you that you can replace a…"
+   },
+   {
+    "id": "09",
+    "title": "String Formatting: Slipping Data into Strings",
+    "summary": "In earlier lessons you have probably writt…"
+   },
+   {
+    "id": "10",
+    "title": "The Family Resemblance: list, tuple, and str Are Sequences",
+    "summary": "The last four lessons covered lists, tuple…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Dictionaries: Look Up by Name",
+  "items": [
+   {
+    "id": "11",
+    "title": "Why Dictionaries Exist: Look Up by Name, Not by Position",
+    "summary": "Everything we have stored so far — lists a…"
+   },
+   {
+    "id": "12",
+    "title": "Dictionaries: Create, Read, Update, Delete",
+    "summary": "The previous lesson covered creating a dic…"
+   },
+   {
+    "id": "13",
+    "title": "Iterating Dictionaries and Other Common Operations",
+    "summary": "So far we have handled one dictionary entr…"
+   },
+   {
+    "id": "14",
+    "title": "Dictionary Pitfalls: Keys Must Be Hashable, and Do Not Rely on Order",
+    "summary": "Dictionaries are pleasant to use, but ther…"
+   },
+   {
+    "id": "15",
+    "title": "Hands-on: Counting and Grouping",
+    "summary": "The previous four lessons covered the fund…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Sets and Choosing a Container",
+  "items": [
+   {
+    "id": "16",
+    "title": "Sets: Dedupe, Membership and Disorder",
+    "summary": "So far you have met lists, tuples and dict…"
+   },
+   {
+    "id": "17",
+    "title": "Set Operations: Intersection, Union, Difference, Symmetric Difference",
+    "summary": "The most delightful thing about sets is th…"
+   },
+   {
+    "id": "18",
+    "title": "Why `in` Is So Fast on a Set",
+    "summary": "The last lesson said a set lookup is light…"
+   },
+   {
+    "id": "19",
+    "title": "Choosing Among List, Tuple, Dict and Set",
+    "summary": "You have now seen the four built-in contai…"
+   },
+   {
+    "id": "20",
+    "title": "Hands-on: Word Frequency Counting",
+    "summary": "This is the last \"textbook example\" in thi…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Functions",
+  "items": [
+   {
+    "id": "21",
+    "title": "Why We Need Functions: Stop Copying and Pasting",
+    "summary": "Up to now, every program has been one long…"
+   },
+   {
+    "id": "22",
+    "title": "Defining and Calling: def, Parameters, return and Indentation",
+    "summary": "The last lesson covered *why* you want fun…"
+   },
+   {
+    "id": "23",
+    "title": "Parameters in Detail: Positional, Default, Keyword, and Order",
+    "summary": "The previous lesson showed you *how to wri…"
+   },
+   {
+    "id": "24",
+    "title": "Return Values: One, Several, and \"Returning Early\"",
+    "summary": "The previous lesson was about getting valu…"
+   },
+   {
+    "id": "25",
+    "title": "Scope: What Happens Inside Stays Inside",
+    "summary": "In earlier lessons we touched on \"local va…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Advanced Functions and Refactoring",
+  "items": [
+   {
+    "id": "26",
+    "title": "Functions Are Objects: Assign Them, Put Them in Lists, Pass Them In",
+    "summary": "So far we have treated a function as \"a bu…"
+   },
+   {
+    "id": "27",
+    "title": "Variable Arguments: `*args` and `**kwargs`",
+    "summary": "So far every function has had a fixed numb…"
+   },
+   {
+    "id": "28",
+    "title": "Lambda and Higher-Order Functions: Tiny One-Line Functions",
+    "summary": "This lesson covers \"anonymous functions\" w…"
+   },
+   {
+    "id": "29",
+    "title": "Recursion: A Function Calling Itself",
+    "summary": "Recursion is \"a function that calls itself…"
+   },
+   {
+    "id": "30",
+    "title": "Putting It All Together: Refactoring a Mess into Functions",
+    "summary": "This is the final lesson of Chapter 6. It …"
+   }
+  ],
+  "test": "test-06"
+ }
 ]
