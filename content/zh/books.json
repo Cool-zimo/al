@@ -197,5 +197,35 @@
   "level": "实战",
   "ready": true,
   "note": "完整 6 章 30 课"
+ },
+ {
+  "id": "web-1",
+  "title": "网页制作 1",
+  "subtitle": "HTML 与 CSS 基础",
+  "desc": "面向有编程基础的学习者。从浏览器如何把文本变成页面讲起，学完能做出一个好看的静态页面。",
+  "stage": "网页",
+  "level": "入门",
+  "ready": true,
+  "note": "完整 6 章 30 课"
+ },
+ {
+  "id": "web-2",
+  "title": "网页制作 2",
+  "subtitle": "JavaScript 与 DOM（快班）",
+  "desc": "面向已学过 Python 的学习者。重点讲 JS 与 Python 的差异，以及浏览器特有的 DOM 与事件。学完能做出交互式的待办清单。",
+  "stage": "网页",
+  "level": "入门",
+  "ready": true,
+  "note": "完整 6 章 30 课"
+ },
+ {
+  "id": "web-3",
+  "title": "网页制作 3",
+  "subtitle": "JavaScript 进阶（快班）",
+  "desc": "面向学过《网页制作 2》的学习者。讲异步、网络请求、现代 JS 特性与 Canvas，学完能做出能接真实 API 的应用。",
+  "stage": "网页",
+  "level": "进阶",
+  "ready": true,
+  "note": "完整 6 章 30 课"
  }
 ]

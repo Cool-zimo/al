@@ -1,0 +1,188 @@
+[
+ {
+  "title": "Chapter 1 · Asynchronous JavaScript",
+  "items": [
+   {
+    "id": "01",
+    "title": "Why We Need Asynchronous Code: JS Single Thread and the Event Loop",
+    "summary": "This lesson answers the question \"why does…"
+   },
+   {
+    "id": "02",
+    "title": "Callbacks: The Original Asynchronous Pattern and Callback Hell",
+    "summary": "This lesson covers callbacks — the origina…"
+   },
+   {
+    "id": "03",
+    "title": "Promises: Three States and Chaining",
+    "summary": "This lesson covers what a Promise is, its …"
+   },
+   {
+    "id": "04",
+    "title": "async/await: Writing Asynchronous Code Synchronously",
+    "summary": "This lesson covers the `async/await` synta…"
+   },
+   {
+    "id": "05",
+    "title": "Error Handling: try/catch with await and finally",
+    "summary": "This lesson covers how to catch errors in …"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Network Requests",
+  "items": [
+   {
+    "id": "06",
+    "title": "fetch Basics: GET Requests and the Response Object",
+    "summary": "This lesson covers the basic usage of the …"
+   },
+   {
+    "id": "07",
+    "title": "POST Requests and Headers: method, headers, body",
+    "summary": "This lesson covers how to send POST reques…"
+   },
+   {
+    "id": "08",
+    "title": "fetch Does Not Reject on HTTP 404/500",
+    "summary": "This is the classic `fetch` pitfall: **net…"
+   },
+   {
+    "id": "09",
+    "title": "Loading States and Error Handling: Three States and AbortController",
+    "summary": "This lesson covers the essential \"three-st…"
+   },
+   {
+    "id": "10",
+    "title": "Real-World Practice: A Small App Using a Real API and CORS",
+    "summary": "This lesson ties together the first four l…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Data and Storage",
+  "items": [
+   {
+    "id": "11",
+    "title": "JSON Deep Cloning, Circular References, and structuredClone",
+    "summary": "This lesson covers the \"deep clone\" proble…"
+   },
+   {
+    "id": "12",
+    "title": "Map and Set: Knowing When to Use Them Instead of Object / Array",
+    "summary": "This lesson covers two \"enhanced\" data str…"
+   },
+   {
+    "id": "13",
+    "title": "localStorage Advanced: Capacity, Version Migration, and JSON.parse Safety",
+    "summary": "This lesson covers advanced localStorage u…"
+   },
+   {
+    "id": "14",
+    "title": "IndexedDB: When to Use It and When Not To",
+    "summary": "This lesson gives you a \"storage selection…"
+   },
+   {
+    "id": "15",
+    "title": "Data Sync: Local Cache + Network Updates, and Optimistic Updates",
+    "summary": "This lesson covers common patterns in real…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Modern JavaScript",
+  "items": [
+   {
+    "id": "16",
+    "title": "Destructuring, Spread, Optional Chaining and Nullish Coalescing",
+    "summary": "This lesson covers four bits of syntax tha…"
+   },
+   {
+    "id": "17",
+    "title": "Iterators and Generators: Building the Intuition First",
+    "summary": "This lesson skips the spec details and foc…"
+   },
+   {
+    "id": "18",
+    "title": "Classes and Modules: `class` and ES Modules",
+    "summary": "This lesson covers two tools for organisin…"
+   },
+   {
+    "id": "19",
+    "title": "New Array Tricks: flat / flatMap / Object.fromEntries / at",
+    "summary": "This lesson covers a handful of array and …"
+   },
+   {
+    "id": "20",
+    "title": "Debounce and Throttle: The Most Practical Lesson in This Book",
+    "summary": "This lesson covers two tools for controlli…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Canvas and Visualisation",
+  "items": [
+   {
+    "id": "21",
+    "title": "Canvas Basics: getContext, Coordinates and Rectangles",
+    "summary": "This lesson builds the basic intuition for…"
+   },
+   {
+    "id": "22",
+    "title": "Canvas Paths and Shapes: beginPath / moveTo / lineTo / arc / fill / stroke",
+    "summary": "This lesson covers Canvas's \"path\" mechani…"
+   },
+   {
+    "id": "23",
+    "title": "Canvas Text and Images: fillText, Fonts, Chinese Fonts, and measureText",
+    "summary": "This lesson covers writing text and drawin…"
+   },
+   {
+    "id": "24",
+    "title": "Canvas Animation: requestAnimationFrame and the Animation Loop",
+    "summary": "This lesson covers how to make a Canvas mo…"
+   },
+   {
+    "id": "25",
+    "title": "Hands-on: Drawing a Simple Bar Chart with Canvas",
+    "summary": "This lesson ties everything together: axes…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Capstone Project",
+  "items": [
+   {
+    "id": "26",
+    "title": "Project Design: Breaking Down a Weather and Exchange-Rate App",
+    "summary": "This lesson writes no code. It figures out…"
+   },
+   {
+    "id": "27",
+    "title": "Structure and Styling: the HTML Skeleton and CSS Layout",
+    "summary": "This lesson turns last chapter's sketch in…"
+   },
+   {
+    "id": "28",
+    "title": "Connecting to Real APIs: fetch + async/await + Error Handling + Loading State",
+    "summary": "This lesson wires the frontend to a real e…"
+   },
+   {
+    "id": "29",
+    "title": "Adding Cache, Debounced Search, and Request Race Handling",
+    "summary": "This lesson solves three common real-world…"
+   },
+   {
+    "id": "30",
+    "title": "Wrapping Up: Code Organisation, Performance, Accessibility, and What's Next",
+    "summary": "The final lesson turns the project from \"i…"
+   }
+  ],
+  "test": "test-06"
+ }
+]

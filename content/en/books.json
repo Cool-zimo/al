@@ -197,5 +197,35 @@
   "level": "Applied",
   "ready": true,
   "note": "完整 6 章 30 课"
+ },
+ {
+  "id": "web-1",
+  "title": "网页制作 1",
+  "subtitle": "HTML and CSS Fundamentals",
+  "desc": "面向有编程基础的学习者。从浏览器如何把文本变成页面讲起，学完能做出一个好看的静态页面。",
+  "stage": "网页",
+  "level": "入门",
+  "ready": true,
+  "note": "Complete: 6 chapters, 30 lessons"
+ },
+ {
+  "id": "web-2",
+  "title": "Web Design 2",
+  "subtitle": "JavaScript and the DOM (Fast Track)",
+  "desc": "For learners who already know Python. Focuses on how JS differs from Python, plus the browser-only DOM and events. Build an interactive to-do list.",
+  "stage": "网页",
+  "level": "入门",
+  "ready": true,
+  "note": "完整 6 章 30 课"
+ },
+ {
+  "id": "web-3",
+  "title": "Web Design 3",
+  "subtitle": "Advanced JavaScript (Fast Track)",
+  "desc": "For learners who finished Web Design 2. Covers async, network requests, modern JS features and Canvas. Build an app that talks to a real API.",
+  "stage": "网页",
+  "level": "进阶",
+  "ready": true,
+  "note": "完整 6 章 30 课"
  }
 ]
