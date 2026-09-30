@@ -1,0 +1,188 @@
+[
+ {
+  "title": "Chapter 1 · How a Browser Turns Text into a Page",
+  "items": [
+   {
+    "id": "01",
+    "title": "What the Browser, HTML and CSS Each Do",
+    "summary": "This lesson answers the question: \"How doe…"
+   },
+   {
+    "id": "02",
+    "title": "Your First HTML Document: Get the Skeleton Right",
+    "summary": "This lesson answers the question: \"Why doe…"
+   },
+   {
+    "id": "03",
+    "title": "Headings and Paragraphs: The Semantics of h1-h6",
+    "summary": "This lesson answers the question: \"Which t…"
+   },
+   {
+    "id": "04",
+    "title": "Text Tags: strong, em, span and div",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "05",
+    "title": "Attributes and Links: href, target and alt",
+    "summary": "This lesson answers the question: \"How do …"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · CSS Fundamentals",
+  "items": [
+   {
+    "id": "06",
+    "title": "Three Ways to Write CSS",
+    "summary": "This lesson answers the question: \"Where d…"
+   },
+   {
+    "id": "07",
+    "title": "Selectors: Tag, Class and id",
+    "summary": "This lesson answers the question: \"Exactly…"
+   },
+   {
+    "id": "08",
+    "title": "Colours and Units",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "09",
+    "title": "The Box Model: Every Element Is a Box",
+    "summary": "This lesson answers the question: \"Why is …"
+   },
+   {
+    "id": "10",
+    "title": "Text Styling: Fonts, Line Height and Alignment",
+    "summary": "This lesson answers the question: \"Why doe…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Giving the Page Structure",
+  "items": [
+   {
+    "id": "11",
+    "title": "Lists: ul, ol and dl",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "12",
+    "title": "Tables: table, tr, td and th",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "13",
+    "title": "Images: img's src, alt, width and height",
+    "summary": "This lesson answers the question: \"Why is …"
+   },
+   {
+    "id": "14",
+    "title": "Semantic Tags: header, nav, main, section, article and footer",
+    "summary": "This lesson answers the question: \"My page…"
+   },
+   {
+    "id": "15",
+    "title": "Forms Basics: form, input, label, button, textarea and select",
+    "summary": "This lesson answers the question: \"How do …"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Layout",
+  "items": [
+   {
+    "id": "16",
+    "title": "display: the three states of block, inline and inline-block",
+    "summary": "This lesson answers the question: \"Why do …"
+   },
+   {
+    "id": "17",
+    "title": "float and clearing floats: the normal flow, bypassed",
+    "summary": "This lesson answers two questions: \"How do…"
+   },
+   {
+    "id": "18",
+    "title": "position: putting elements exactly where you want them",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "19",
+    "title": "Flex basics: one-dimensional layout with flexbox",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "20",
+    "title": "Flex further: direction, wrapping and flexible distribution",
+    "summary": "This lesson answers the question: \"How do …"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Responsive Design and Motion",
+  "items": [
+   {
+    "id": "21",
+    "title": "Why responsive design matters",
+    "summary": "This lesson answers the question: \"How can…"
+   },
+   {
+    "id": "22",
+    "title": "The viewport and media queries",
+    "summary": "This lesson answers two questions: \"Why do…"
+   },
+   {
+    "id": "23",
+    "title": "Relative units and fluid layout",
+    "summary": "This lesson answers the question: \"Why sho…"
+   },
+   {
+    "id": "24",
+    "title": "Grid basics: the two-dimensional grid system",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "25",
+    "title": "Transitions and animations: bring the page to life",
+    "summary": "This lesson answers two questions: \"How do…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Putting It All Together",
+  "items": [
+   {
+    "id": "26",
+    "title": "Project design: planning a personal CV page",
+    "summary": "This lesson answers the question: \"Where d…"
+   },
+   {
+    "id": "27",
+    "title": "Building the HTML skeleton: semantic tags for the CV",
+    "summary": "This lesson turns the design from the prev…"
+   },
+   {
+    "id": "28",
+    "title": "Writing the CSS: a proto design system",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "29",
+    "title": "A little JavaScript: dark-mode toggle and nav highlight",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "30",
+    "title": "Wrapping up: the checklist and going live",
+    "summary": "This lesson answers two questions: \"How do…"
+   }
+  ],
+  "test": "test-06"
+ }
+]
