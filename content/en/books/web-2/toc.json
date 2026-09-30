@@ -1,0 +1,188 @@
+[
+ {
+  "title": "Chapter 1 · How JS Differs from Python",
+  "items": [
+   {
+    "id": "01",
+    "title": "Variables: `let`, `const` and the `var` Trap",
+    "summary": "This lesson settles one question: how do y…"
+   },
+   {
+    "id": "02",
+    "title": "`==` vs `===`: the type-coercion trap",
+    "summary": "This lesson answers one question: what is …"
+   },
+   {
+    "id": "03",
+    "title": "Types and conversion: `NaN`, `typeof null` and string-plus-number",
+    "summary": "This lesson answers: how do types actually…"
+   },
+   {
+    "id": "04",
+    "title": "Functions: declarations, expressions and arrow functions",
+    "summary": "This lesson answers: what are the several …"
+   },
+   {
+    "id": "05",
+    "title": "Arrays and objects: Python's `list` and `dict` compared",
+    "summary": "This lesson answers: how do JS arrays and …"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Array and Object Methods",
+  "items": [
+   {
+    "id": "06",
+    "title": "Common array methods: `push`/`pop`/`slice`/`splice`",
+    "summary": "This lesson answers: what are the common o…"
+   },
+   {
+    "id": "07",
+    "title": "Iteration: `for`, `for...of`, `forEach` and the `return` trap",
+    "summary": "This lesson answers: how do you iterate ov…"
+   },
+   {
+    "id": "08",
+    "title": "`map`, `filter`, `reduce`: the functional trio",
+    "summary": "This lesson answers: how do you process ar…"
+   },
+   {
+    "id": "09",
+    "title": "Objects: create, read, update, delete, iterate, and the missing-property trap",
+    "summary": "This lesson answers: how do you create, re…"
+   },
+   {
+    "id": "10",
+    "title": "String methods: template literals, `split`/`join`/`includes`",
+    "summary": "This lesson answers: what are the common s…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · The DOM: Turning a Page into Data",
+  "items": [
+   {
+    "id": "11",
+    "title": "What the DOM is: a tree of live objects",
+    "summary": "This lesson answers: what exactly is the D…"
+   },
+   {
+    "id": "12",
+    "title": "Finding elements: `getElementById` / `querySelector` / `querySelectorAll`",
+    "summary": "This lesson answers: how do you find the e…"
+   },
+   {
+    "id": "13",
+    "title": "Changing content: `textContent` vs `innerHTML`",
+    "summary": "This lesson answers: how do you change an …"
+   },
+   {
+    "id": "14",
+    "title": "Changing attributes and styles: `getAttribute`/`setAttribute`, `classList`, `style`",
+    "summary": "This lesson answers: how do you change an …"
+   },
+   {
+    "id": "15",
+    "title": "Creating and removing elements: `createElement` / `appendChild` / `remove`",
+    "summary": "This lesson answers: how do you create and…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Events",
+  "items": [
+   {
+    "id": "16",
+    "title": "Your first event: `addEventListener`",
+    "summary": "This lesson answers: how do you make a pag…"
+   },
+   {
+    "id": "17",
+    "title": "The event object: `event.target` vs `event.currentTarget`",
+    "summary": "This lesson answers: what is that `event` …"
+   },
+   {
+    "id": "18",
+    "title": "Event delegation: one listener to rule them all",
+    "summary": "This lesson answers: when a list has hundr…"
+   },
+   {
+    "id": "19",
+    "title": "Common events: `click` / `input` / `submit` / `keydown` and `preventDefault`",
+    "summary": "This lesson answers: which events show up …"
+   },
+   {
+    "id": "20",
+    "title": "Bubbling and capturing: the three-phase event flow",
+    "summary": "This lesson answers: when you click a butt…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Forms, Storage and Debugging",
+  "items": [
+   {
+    "id": "21",
+    "title": "Reading form values: inputs, selects, checkboxes and radios",
+    "summary": "This lesson answers: how do you get the va…"
+   },
+   {
+    "id": "22",
+    "title": "Form validation: required fields, patterns and friendly messages",
+    "summary": "This lesson answers: how do you check whet…"
+   },
+   {
+    "id": "23",
+    "title": "`localStorage` and `sessionStorage`: keeping data after a reload",
+    "summary": "This lesson answers: how do you store data…"
+   },
+   {
+    "id": "24",
+    "title": "Console debugging: `log`, `table` and `dir`, breakpoints, and reading the stack",
+    "summary": "This lesson answers: when your code does n…"
+   },
+   {
+    "id": "25",
+    "title": "`setTimeout` and `setInterval`: the asynchronous intuition",
+    "summary": "This lesson answers: why does code not run…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Capstone Project",
+  "items": [
+   {
+    "id": "26",
+    "title": "Project design: breaking down a to-do list into features and data",
+    "summary": "This lesson answers: when you are handed a…"
+   },
+   {
+    "id": "27",
+    "title": "Structure and style: the HTML skeleton and CSS layout",
+    "summary": "This lesson answers: how do you turn last …"
+   },
+   {
+    "id": "28",
+    "title": "CRUD in the browser: render functions and event handling",
+    "summary": "This lesson answers: how do you turn the d…"
+   },
+   {
+    "id": "29",
+    "title": "Adding persistence and filters: reading localStorage and rendering by condition",
+    "summary": "This lesson answers: how do you make the d…"
+   },
+   {
+    "id": "30",
+    "title": "Wrapping up: organising the code and revisiting the classic bugs",
+    "summary": "This lesson answers: now that the project …"
+   }
+  ],
+  "test": "test-06"
+ }
+]

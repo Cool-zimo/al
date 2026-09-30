@@ -10,7 +10,7 @@ const MD = (() => {
   function extract(md) {
     const blocks = [];
     const quizzes = [];
-    const out = md.replace(/```(\w+)?\n([\s\S]*?)```/g, (m, lang, code) => {
+    const out = md.replace(/```(\w+)?\n([\s\S]*?)^```\s*$/gm, (m, lang, code) => {
       const L = (lang || 'text').toLowerCase();
       const body = code.replace(/\n$/, '');
       if (L === 'quiz') {

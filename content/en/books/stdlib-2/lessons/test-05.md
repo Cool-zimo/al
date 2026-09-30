@@ -106,6 +106,23 @@ explain: A combined exercise in scanning and classification. Note the three leve
 ```
 
 ```quiz
+type: code
+q: Write a function backup_excludes(files, rules): given a list of files and a list of exclusion rules (fnmatch patterns), return the list of excluded files (keeping the original order). A rule must match either the full path or any single directory segment.
+starter: |
+  from fnmatch import fnmatch
+
+  def backup_excludes(files, rules):
+      return []
+tests:
+- assert backup_excludes(["a.py", "__pycache__/x.py", ".git/config"], ["__pycache__", ".git", "*.pyc"]) == ["__pycache__/x.py", ".git/config"]
+- assert backup_excludes(["main.py", "data.csv"], ["__pycache__"]) == []
+- assert backup_excludes(["node_modules/x.js"], ["node_modules"]) == ["node_modules/x.js"]
+hint: For each file, try every rule against both the full path and each directory segment split out with fnmatch.
+explain: This models a backup tool's exclusion logic. Matching directory segments is the point — "__pycache__" should exclude anything inside that folder, not just a file literally named it.
+```
+
+
+```quiz
 type: function
 q: Implement build_undo_plan(plan): plan is {dest_rel: src_abs}. Return an undo plan {original_dest: original_src} (a dictionary with keys and values swapped). Then implement apply_with_undo(plan, log_path): write the undo plan to log_path as a JSON string and return the written dictionary. This question performs no real file writes; return only the content that would be written.
 func: apply_with_undo

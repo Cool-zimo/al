@@ -59,7 +59,8 @@ const Quiz = (() => {
   /** 从 markdown 里抽出所有 quiz 块 */
   function extractBlocks(md) {
     const out = [];
-    const re = /```quiz\n([\s\S]*?)```/g;
+    // 结束围栏必须独占一行：否则题干里若含 ``` 文本会提前截断，options/answer 读不到
+    const re = /```quiz\n([\s\S]*?)^```\s*$/gm;
     let m;
     while ((m = re.exec(md)) !== null) out.push(parse(m[1]));
     return out;
@@ -83,7 +84,8 @@ const Quiz = (() => {
     const badge = ({
       choice: q0.choice, fill: q0.fill, code: q0.code,
       function: q0.function || q0.code, project: q0.project,
-      local: q0.local || q0.project
+      local: q0.local || q0.project,
+      html: q0.html || 'HTML', css: q0.css || 'CSS', js: q0.js || 'JavaScript'
     })[q.type] || '练习';
     head.innerHTML = `<span class="quiz-badge">${badge}</span><span class="quiz-q">${escapeHtml(q.q || '')}</span>`;
     box.appendChild(head);
@@ -107,7 +109,8 @@ const Quiz = (() => {
 
     ({
       choice: renderChoice, fill: renderFill, code: renderCode,
-      function: renderFunction, project: renderProject, local: renderLocal
+      function: renderFunction, project: renderProject, local: renderLocal,
+      html: renderWeb, css: renderWeb, js: renderWeb
     }[q.type] || renderChoice)(q, body, foot, id, ctx);
 
     return box;
@@ -189,6 +192,205 @@ const Quiz = (() => {
 
     const saved = getResult(id);
     if (saved && saved.ok) { btnRun.textContent = Q().passed; }
+  }
+
+  /* --- 网页三件套题（HTML / CSS / JavaScript） --- */
+  /**
+   * 三种题型共用一套编辑器，区别只在"哪块是可编辑的"：
+   *   html  → starter 是 HTML，可附带 css
+   *   css   → starter 是 CSS，html 是题目给好的固定结构
+   *   js    → starter 是 JS，html 是可选的固定结构；有 func/cases 时按函数题判
+   *
+   * 判分不去比对源码字符串，而是查 DOM 结构和 getComputedStyle 的计算值：
+   * 学生把颜色写成 red / #f00 / rgb(255,0,0) 都算对，因为浏览器算出来本来就是同一个值。
+   */
+  function renderWeb(q, body, foot, id, ctx) {
+    const starter = q.starter || '';
+    const fixedHtml = q.html || '';
+    const fixedCss = q.css || '';
+    const checks = toList(q.checks);
+    const funcName = (q.func || '').trim();
+    const cases = funcName ? parseCases(q.cases || '') : [];
+    const isFn = !!funcName && cases.length > 0;
+    const zh = window.I18N.lang === 'zh';
+
+    // 题目给好的固定结构（只读展示，学生不用改）
+    if (fixedHtml) {
+      const sn = document.createElement('div');
+      sn.className = 'quiz-snippet';
+      sn.innerHTML = '<pre><code>' + escapeHtml(String(fixedHtml).replace(/\n$/, '')) + '</code></pre>';
+      body.appendChild(sn);
+    }
+
+    const wrap = document.createElement('div');
+    wrap.className = 'quiz-code';
+    const ta = document.createElement('textarea');
+    ta.className = 'quiz-ta';
+    ta.spellcheck = false;
+    ta.value = starter;
+    wrap.appendChild(ta);
+    body.appendChild(wrap);
+
+    // 实时预览：不需要点运行就能看到页面长什么样
+    const pv = document.createElement('div');
+    pv.className = 'quiz-preview';
+    pv.innerHTML = '<iframe class="quiz-frame" title="preview"></iframe>';
+    body.appendChild(pv);
+    const frame = pv.querySelector('iframe');
+
+    const out = document.createElement('div');
+    out.className = 'quiz-out';
+    body.appendChild(out);
+
+    function assemble() {
+      const v = ta.value;
+      if (q.type === 'css') return { html: fixedHtml, css: v, js: '' };
+      if (q.type === 'js') return { html: fixedHtml, css: fixedCss, js: v };
+      return { html: v, css: fixedCss, js: '' };
+    }
+
+    // 输入时防抖刷新预览
+    let pvTimer = null;
+    ta.addEventListener('input', () => {
+      clearTimeout(pvTimer);
+      pvTimer = setTimeout(() => {
+        const o = assemble();
+        WebRunner.preview(frame, o).then(p => {
+          if (p && p.err && out.className.includes('show') === false) {
+            // 预览出错先在输出区悄悄提示，不打断打字
+            out.className = 'quiz-out show err';
+            out.textContent = '⚠ ' + p.err;
+          }
+        });
+      }, 350);
+    });
+
+    const btnRun = mkBtn(Q().run, 'primary');
+    const btnHint = mkBtn(Q().hint, 'ghost');
+    const btnReset = mkBtn(Q().reset, 'ghost');
+
+    btnReset.onclick = () => {
+      ta.value = starter;
+      out.className = 'quiz-out';
+      out.textContent = '';
+      WebRunner.preview(frame, assemble());
+    };
+    btnHint.onclick = () => {
+      out.className = 'quiz-out show hint';
+      out.textContent = '💡 ' + (q.hint || Q().noHint);
+    };
+
+    btnRun.onclick = async () => {
+      btnRun.disabled = true;
+      btnRun.textContent = Q().running;
+      out.className = 'quiz-out show';
+      out.textContent = Q().running;
+
+      const o = assemble();
+      let r;
+      if (isFn) r = await WebRunner.checkFunction(o.js, funcName, cases, o.html, o.css);
+      else r = await WebRunner.checkStatic(o.html, o.css, o.js, checks);
+
+      // 顺手把预览刷新成最终结果
+      WebRunner.preview(frame, o);
+
+      const lines = [];
+      let ok = false;
+
+      if (r.err) {
+        let msg = r.err === 'TIMEOUT'
+          ? (zh ? '运行超时（代码里可能有死循环）' : 'Timed out — there may be an infinite loop in the code')
+          : r.err;
+        if (r.syntaxErr) {
+          msg = (zh ? 'JavaScript 语法错误，代码没能运行起来 —— 检查括号、引号是否配对'
+                    : 'JavaScript syntax error, the code never ran — check that brackets and quotes match')
+                + (r.err ? '\n' + r.err : '');
+        } else if (r.errLine) {
+          msg += zh ? `（第 ${r.errLine} 行）` : ` (line ${r.errLine})`;
+        }
+        out.className = 'quiz-out show err';
+        out.textContent = '❌ ' + msg;
+        finish(id, false, q, foot, null);
+        btnRun.disabled = false;
+        btnRun.textContent = Q().retry;
+        return;
+      }
+
+      if (isFn && r.fnMissing) {
+        const msg = zh
+          ? `没有找到名为 ${funcName} 的函数 —— 检查一下是不是拼错了，或者压根没定义`
+          : `No function named ${funcName} was found — check the spelling, or maybe it isn't defined at all`;
+        out.className = 'quiz-out show err';
+        out.textContent = '❌ ' + msg;
+        finish(id, false, q, foot, null);
+        btnRun.disabled = false;
+        btnRun.textContent = Q().retry;
+        return;
+      }
+
+      if (isFn) {
+        const pass = r.fnResults.filter(x => x.ok).length;
+        ok = pass === r.fnResults.length && r.fnResults.length > 0;
+        r.fnResults.forEach(x => {
+          const flag = x.ok ? '✅' : '❌';
+          if (x.ok) lines.push(`${flag} ${funcName}(${x.args.map(String).join(', ')}) → ${x.got}`);
+          else if (x.err) lines.push(`${flag} ${funcName}(${x.args.map(String).join(', ')}) → ${x.err}`);
+          else lines.push(`${flag} ${funcName}(${x.args.map(String).join(', ')})  ${zh ? '期望' : 'expected'} ${x.expect}，${zh ? '实际' : 'got'} ${x.got}`);
+        });
+        lines.push('');
+        lines.push(`${pass} / ${r.fnResults.length} ` + (zh ? '个用例通过' : 'cases passed'));
+      } else if (!checks.length) {
+        out.className = 'quiz-out show err';
+        out.textContent = '❌ ' + (Q().noCheck || 'This question has no checks configured');
+        finish(id, false, q, foot, null);
+        btnRun.disabled = false;
+        btnRun.textContent = Q().retry;
+        return;
+      } else {
+        const pass = r.results.filter(x => x.ok).length;
+        ok = pass === r.results.length && r.results.length > 0;
+        r.results.forEach(x => {
+          if (x.ok) { lines.push('✅ ' + x.expr); return; }
+          let s = '❌ ' + x.expr;
+          if (x.left !== undefined) s += `\n     ${zh ? '实际' : 'got'} ${x.left} ，${zh ? '应为' : 'expected'} ${x.right}`;
+          else if (x.got !== undefined) s += `\n     ${zh ? '实际' : 'got'} ${x.got}`;
+          if (x.err) s += `\n     ${x.err}`;
+          lines.push(s);
+        });
+        lines.push('');
+        lines.push(`${pass} / ${r.results.length} ` + (zh ? '项检查通过' : 'checks passed'));
+      }
+
+      if (r.log && r.log.length) {
+        lines.push('');
+        lines.push(zh ? '控制台输出：' : 'Console:');
+        lines.push(...r.log);
+      }
+
+      out.className = 'quiz-out show ' + (ok ? 'ok' : 'err');
+      out.textContent = lines.join('\n');
+
+      finish(id, ok, q, foot, null);
+      if (ok) btnRun.textContent = Q().passed;
+      else { btnRun.disabled = false; btnRun.textContent = Q().retry; }
+    };
+
+    foot.appendChild(btnRun);
+    if (q.hint) foot.appendChild(btnHint);
+    foot.appendChild(btnReset);
+
+    const saved = getResult(id);
+    if (saved && saved.ok) btnRun.textContent = Q().passed;
+
+    // 首次渲染就出预览，别让学生对着空白框发呆
+    WebRunner.preview(frame, assemble());
+  }
+
+  /** checks 允许写成列表或块，统一成数组 */
+  function toList(v) {
+    if (Array.isArray(v)) return v;
+    if (!v) return [];
+    return String(v).split('\n').map(s => s.replace(/^\s*-\s+/, '').trim()).filter(Boolean);
   }
 
   /**
@@ -273,6 +475,11 @@ const Quiz = (() => {
     if (s === 'True') return true;
     if (s === 'False') return false;
     if (s === 'None') return null;
+    // JavaScript 题用小写字面量
+    if (s === 'true') return true;
+    if (s === 'false') return false;
+    if (s === 'null') return null;
+    if (s === 'undefined') return undefined;
     if (/^".*"$/.test(s)) return s.slice(1, -1);
     if (/^'.*'$/.test(s)) return s.slice(1, -1);
     if (/^[[{]/.test(s)) {
