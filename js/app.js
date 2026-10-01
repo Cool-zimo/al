@@ -24,6 +24,22 @@
     return `${CONTENT}/books/${bookId}`;
   }
 
+  /**
+   * 读一本书里的文件。
+   *
+   * 第三方书优先读本地书架（已下载到 IndexedDB），
+   * 本地没有才回退到 raw 直读 —— 这样断网也能看，翻页也不用等网络。
+   */
+  async function readBookFile(bookId, relPath, chapterIdx) {
+    const x = EXTERNAL[bookId];
+    if (!x) return fetchText(`${CONTENT}/books/${bookId}/${relPath}`);
+    if (x.entry) {
+      const t = await Shelf.readFile(api, x.entry, CFG.lang, relPath, chapterIdx);
+      if (t != null) return t;
+    }
+    return fetchText(`${bookBase(bookId)}/${relPath}`);
+  }
+
   let TOC = [];
   let LESSON_BLOCKS = [];   // 当前课的 python 代码块，实验室用
   let LESSON_QUIZ_COUNT = {};  // 当前课的正式测验题数，决定"学完"的判定方式
@@ -226,29 +242,85 @@
     }));
   }
 
-  /** 从课文里抓「# 标题」和第一句引言，用来填目录（抓不到就退回课号） */
+  /**
+   * 从课文里抓「# 标题」和第一句引言，用来填目录。
+   *
+   * 第三方书要抓几十篇课文才能凑齐目录，但正文是「按章缓存」的，
+   * 不能为了目录就把整本下下来。所以标题单独缓存一份（只有几十字节），
+   * 第二次打开这本书就不用再抓了。
+   */
   async function enrichTOC(bookId, toc) {
+    const x = EXTERNAL[bookId];
+    const repo = x && x.repo;
+    const cache = repo ? Shelf.getTitles(repo, CFG.lang) : null;
+    const map = cache ? { ...cache } : {};
+
     const need = [];
-    for (const ch of toc) for (const it of ch.items) if (!it.title) need.push(it);
+    for (const ch of toc) for (const it of ch.items) {
+      if (map[it.id]) { it.title = map[it.id].t; it.summary = map[it.id].s; }
+      else if (!it.title) need.push(it);
+    }
     if (!need.length) return;
+
     await Promise.all(need.map(async it => {
       try {
-        const md = await fetchText(`${bookBase(bookId)}/lessons/${it.id}.md`);
+        const md = await readBookFile(bookId, `lessons/${it.id}.md`, null);
         const h = md.split('\n').find(l => /^#\s+\S/.test(l));
         if (h) it.title = h.replace(/^#\s+/, '').replace(/^\d{2}\s+/, '').trim();
         const q = md.split('\n').find(l => /^>\s+\S/.test(l));
         if (q) it.summary = q.replace(/^>\s+/, '').trim();
       } catch (e) { /* 抓不到就留空，目录仍可点开 */ }
       if (!it.title) it.title = it.id;
+      map[it.id] = { t: it.title, s: it.summary || '' };
     }));
+    if (repo) Shelf.saveTitles(repo, CFG.lang, map);
+  }
+
+  /**
+   * 打开第三方书的某一章时，把这一章的文件拉下来缓存。
+   * 只下这一章（5 课 + 章测），不整本下 —— 读者往往只看前几章。
+   */
+  async function syncChapter(bookId, chapterIdx, paths) {
+    const x = EXTERNAL[bookId];
+    if (!x || !x.entry || !api) return true;
+    try {
+      const r = await Shelf.ensureChapter(api, x.entry, CFG.lang, chapterIdx, paths);
+      if (!r.ok) {
+        $('lesson').innerHTML = `<h1>${escapeHtml(T().bookshelf?.failTitle || '这一章没能下载')}</h1>
+          <p>${escapeHtml(r.error || '')}</p>
+          <p style="opacity:.7;font-size:13px">${escapeHtml(T().bookshelf?.failHint || '可能是仓库已删除，或你的 token 没有读取权限。')}</p>`;
+        return false;
+      }
+      return true;
+    } catch (e) {
+      // 缓存失败不该阻断阅读 —— 回退到 raw 直读
+      console.warn('[al] 章节缓存失败，改用直读:', e.message);
+      return true;
+    }
+  }
+
+  /** 某一章要下载哪些文件 */
+  function chapterPaths(chIdx) {
+    const ch = TOC[chIdx];
+    if (!ch) return [];
+    const ps = (ch.items || []).map(it => `lessons/${it.id}.md`);
+    if (ch.test) ps.push(`lessons/${ch.test}.md`);
+    return ps;
   }
 
   async function loadTOC(bookId) {
-    const raw = await fetchJSON(`${bookBase(bookId)}/toc.json`);
+    // 记下"我读过这本第三方书"，会随 config 同步到别的设备
+    const x0 = EXTERNAL[bookId];
+    if (x0 && x0.entry) Shelf.record(x0.entry);
+    const raw = EXTERNAL[bookId]
+      ? JSON.parse(await readBookFile(bookId, 'toc.json'))
+      : await fetchJSON(`${CONTENT}/books/${bookId}/toc.json`);
     TOC = normalizeTOC(raw);
     if (EXTERNAL[bookId]) await enrichTOC(bookId, TOC);
     flat = [];
-    for (const ch of TOC) for (const it of ch.items) flat.push({ ...it, chapter: ch.title });
+    TOC.forEach((ch, ci) => {
+      for (const it of ch.items) flat.push({ ...it, chapter: ch.title, chIdx: ci });
+    });
   }
 
   function renderTOC() {
@@ -340,7 +412,11 @@
 
     let md;
     try {
-      md = await fetchText(`${bookBase(bookId)}/lessons/${lessonId}.md`);
+      // 第三方书：先把这一章拉下来缓存，再读
+      if (EXTERNAL[bookId] && item.chIdx != null) {
+        await syncChapter(bookId, item.chIdx, chapterPaths(item.chIdx));
+      }
+      md = await readBookFile(bookId, `lessons/${lessonId}.md`, item.chIdx);
     } catch (e) {
       art.innerHTML = `<h1>${T().loadFailTitle || '加载失败'}</h1><p><code>${escapeHtml(lessonId)}.md</code></p>`;
       return;
@@ -512,7 +588,11 @@
 
     let md;
     try {
-      md = await fetchText(`${bookBase(bookId)}/lessons/${lessonId}.md`);
+      const ci = item.chIdx != null ? item.chIdx : flat.find(x => String(x.id) === String(lessonId))?.chIdx;
+      if (EXTERNAL[bookId] && ci != null) {
+        await syncChapter(bookId, ci, chapterPaths(ci));
+      }
+      md = await readBookFile(bookId, `lessons/${lessonId}.md`, ci);
     } catch (e) {
       art.innerHTML = `<h1>${T().loadFailTitle || '加载失败'}</h1>`;
       return;
@@ -584,7 +664,11 @@
 
     let md;
     try {
-      md = await fetchText(`${bookBase(bookId)}/lessons/${testId}.md`);
+      const ci = TOC.findIndex(c => c.test === testId);
+      if (EXTERNAL[bookId] && ci >= 0) {
+        await syncChapter(bookId, ci, chapterPaths(ci));
+      }
+      md = await readBookFile(bookId, `lessons/${testId}.md`, ci >= 0 ? ci : null);
     } catch (e) {
       art.innerHTML = `<h1>${T().loadFailTitle || '加载失败'}</h1>`;
       return;
@@ -957,8 +1041,36 @@
       ${owner ? `<p style="font-size:13px;color:var(--faint)">${S.account(escapeHtml(owner))}<code>anylearn-notes</code></p>` : ''}
       <h3>${S.exportTitle}</h3>
       <button class="ghost-btn" id="btn-export">${S.exportBtn}</button>
+
+      <h3>${S.shelfTitle || '第三方书籍缓存'}</h3>
+      <p class="dim" style="font-size:13px;line-height:1.7">${S.shelfDesc || '看第三方书时按章缓存，默认只存在当前标签页，关掉就清掉。'}</p>
+      <label class="switch-row">
+        <input type="checkbox" id="chk-shelf-persist" ${Shelf.persistent() ? 'checked' : ''}>
+        <span>${S.shelfPersist || '存到浏览器本地（关掉标签页也保留，可离线阅读）'}</span>
+      </label>
+      <p class="dim" id="shelf-usage" style="font-size:12.5px"></p>
+      <button class="ghost-btn danger" id="btn-shelf-clear">${S.shelfClear || '清空缓存'}</button>
     `;
     $('modal').hidden = false;
+
+    const paintUsage = () => {
+      const u = Shelf.usage();
+      $('shelf-usage').textContent =
+        `${S.shelfUsage ? S.shelfUsage(u.chapters, Math.round(u.chars / 1024)) : `已缓存 ${u.chapters} 章（约 ${Math.round(u.chars / 1024)} KB），上限 ${u.max} 章`}`;
+    };
+    paintUsage();
+    $('chk-shelf-persist').onchange = (e) => {
+      Shelf.setPersistent(e.target.checked);
+      toast(Shelf.persistent()
+        ? (S.shelfPersistOn || '以后缓存会保留在浏览器本地')
+        : (S.shelfPersistOff || '已改为只存在当前标签页'));
+    };
+    $('btn-shelf-clear').onclick = () => {
+      if (!confirm(S.shelfClearConfirm || '清空所有第三方书籍缓存？下次看需要重新下载。')) return;
+      Shelf.clearAll();
+      paintUsage();
+      toast(S.shelfCleared || '缓存已清空');
+    };
 
     $('btn-save-token').onclick = async () => {
       const v = $('token-input').value.trim();
@@ -1126,38 +1238,66 @@
    * 从 al-docs 读索引，把「通过校验且支持当前语言」的第三方书并入书单。
    * 失败时静默跳过 —— 索引站挂了不该影响官方书的使用。
    */
+  function addExternal(b, entry) {
+    if (BOOKS.some(x => x.id === b.id)) return false;
+    EXTERNAL[b.id] = { repo: b.repo, branch: b.branch || 'main', entry: entry || null };
+    BOOKS.push({
+      id: b.id,
+      title: b.title || b.id,
+      subtitle: b.subtitle || '',
+      desc: b.desc || '',
+      stage: b.stage || 'other',
+      level: b.level || '',
+      ready: true,
+      external: true,
+      author: b.author || {},
+      license: b.license || '',
+      repo: b.repo,
+      url: b.url,
+      stars: b.stars || 0,
+    });
+    return true;
+  }
+
   async function loadExternal() {
+    // 一、登录了：拿用户的 token 自己搜，不依赖中心索引站。
+    //     额度是 5000 次/小时，而且能实时发现新书，不必等机器人 6 小时扫一次。
+    if (api) {
+      try {
+        const found = await BookShelf.discover(api);
+        let added = 0;
+        for (const b of found) {
+          if (!b.langs.includes(CFG.lang)) continue;
+          if (addExternal(b, b)) added++;
+        }
+        if (added) console.log(`[al] 用 token 搜到第三方书籍 ${added} 本`);
+      } catch (e) {
+        console.warn('[al] 搜索第三方书籍失败:', e.message);
+      }
+    }
+
+    // 二、没登录（或搜索失败）：回退到 al-docs 的中心索引，从原作者仓库直读。
+    //     未登录时 GitHub 只给 60 次/小时，所以这条路只够翻书，不够搜书。
     let reg;
     try {
       const r = await fetch(REGISTRY_URL, { cache: 'no-store' });
-      if (!r.ok) return;
-      reg = await r.json();
-    } catch (e) {
-      return;
-    }
+      if (r.ok) reg = await r.json();
+    } catch (e) { /* 索引站挂了也不影响官方书 */ }
     let added = 0;
-    for (const b of (reg.books || [])) {
+    for (const b of ((reg && reg.books) || [])) {
       if (!b.ok) continue;
-      // 只在作者声明支持当前语言时才收录
+      if (EXTERNAL[b.id]) continue;
       if (Array.isArray(b.langs) && b.langs.length && !b.langs.includes(CFG.lang)) continue;
-      EXTERNAL[b.id] = { repo: b.repo, branch: b.branch || 'main' };
-      BOOKS.push({
-        id: b.id,
-        title: b.title || b.id,
-        subtitle: b.subtitle || '',
-        desc: b.desc || '',
-        stage: b.stage || 'other',
-        level: b.level || '',
-        ready: true,
-        external: true,
-        author: b.author || {},
-        license: b.license || '',
-        repo: b.repo,
-        url: b.url,
-      });
-      added++;
+      if (addExternal(b, null)) added++;
     }
-    if (added) console.log(`[al] 第三方书籍 ${added} 本`);
+    if (added) console.log(`[al] 从索引站并入第三方书籍 ${added} 本`);
+  }
+
+  /** 第三方书是在登录后并入的，可能晚于首页渲染 —— 这里补一次 */
+  function renderHomeOrPending() {
+    if (!book && (location.hash === '' || location.hash === '#' || location.hash === '#/')) {
+      renderHome();
+    }
   }
 
   /* ================= 启动 ================= */
@@ -1168,11 +1308,14 @@
       $('lesson').innerHTML = `<h1>${T().toast.loadFail}</h1><p><code>${CONTENT}/books.json</code></p>`;
       return;
     }
-    await loadExternal();
     bindUI();
     Notes.attach(null, () => book && renderTOC());
 
+    // 先登录再找第三方书 —— 搜索要用用户的 token，
+    // 顺序反了就只能用未认证的 60 次/小时额度，搜不动。
     try { await initSync(); } catch (e) { syncState('err'); }
+    await loadExternal();
+    if (book) renderHomeOrPending();
 
     Guardian.start(showBreakPanel);
     await route();

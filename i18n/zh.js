@@ -78,6 +78,9 @@ window.I18N = {
     projectPlaceholder: '把你的代码贴在这里（可选）。贴了就必须能跑通，没贴也能提交 —— 项目可以在 VSCode 里完成。',
     projectNote: '小项目不判功能对不对（那太主观了），只要求：代码跑得通 + 你自己对照上面的清单验收。',
     local: '本机运行题',
+    html: 'HTML 题', css: 'CSS 题', js: 'JavaScript 题',
+    preview: '实时预览',
+    noCheck: '这道题没有配置检查项 —— 题目数据有问题',
     localWhyTitle: '为什么要在本机跑：',
     localWhy: 'tkinter / pygame / Qt 这类库需要真实的窗口系统。浏览器沙箱里既没有显示器，也没有 GUI 后端，在线运行必然失败 —— 不是代码写错了，是环境不支持。所以这类题改为：把代码带回 VS Code，在本机跑，自己按清单验收。',
     localOpen: '在 VS Code 里打开',
@@ -126,6 +129,15 @@ window.I18N = {
     account: (o) => `账号：<code>${o}</code>　笔记仓库：`,
     exportTitle: '导出全部笔记',
     exportBtn: '下载我的笔记（Markdown）',
+    shelfUsage: (n, kb) => `已缓存 ${n} 章（约 ${kb} KB）`,
+    shelfTitle: "第三方书籍缓存",
+    shelfDesc: "看第三方书时按章缓存：看第几章就下第几章，不整本下。默认只存在当前标签页，关掉浏览器就清掉。",
+    shelfPersist: "存到浏览器本地（关掉标签页也保留，可离线阅读）",
+    shelfClear: "清空缓存",
+    shelfPersistOn: "以后缓存会保留在浏览器本地",
+    shelfPersistOff: "已改为只存在当前标签页，关掉即清空",
+    shelfClearConfirm: "清空所有第三方书籍缓存？下次看需要重新下载。",
+    shelfCleared: "缓存已清空",
     connected: '已连接，笔记与复习计划将自动同步',
     disconnected: '已断开'
   },
@@ -248,4 +260,10 @@ window.I18N = {
     goReview: '去复习已学的 →',
     continueAnyway: '我知道了，还是要继续'
   },
+  bookshelf: {
+    syncing: "正在把这本书下载到本地…",
+    done: "已下载到本地",
+    failTitle: "这本书没能下载",
+    failHint: "可能是仓库已删除，或你的 token 没有读取权限。"
+  }
 };

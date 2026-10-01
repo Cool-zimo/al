@@ -186,13 +186,15 @@ class ConfigSync {
       return out;
     };
     return {
-      version: 3,
+      version: 4,
       app: 'python-tutorial',
       updatedAt: new Date().toISOString(),
       notes: pack(notes, 'text'),
       progress: pack(progress, 'done'),
       quiz: pack(quiz, 'ok'),
-      review: pack(review, 'stage')
+      review: pack(review, 'stage'),
+      // shelf 是「读过的书」的集合，不是逐条可取最新值的记录，直接原样存
+      shelf: Store.get(Store.K.SHELF, {}) || {}
     };
   }
 
@@ -214,6 +216,17 @@ class ConfigSync {
       }
       return out;
     };
+
+    // 书架：按仓库名取记录更全的那一侧（本来就是"我看过哪些书"的并集）
+    const localShelf = Store.get(Store.K.SHELF, {}) || {};
+    if (remote.shelf && typeof remote.shelf === 'object') {
+      const out = { ...localShelf };
+      for (const [repo, v] of Object.entries(remote.shelf)) {
+        const l = localShelf[repo];
+        if (!l || (v?.at || 0) > (l?.at || 0)) out[repo] = v;
+      }
+      Store.set(Store.K.SHELF, out);
+    }
 
     const localNotes = Store.get(Store.K.NOTES, {}) || {};
     const localProg = Store.get(Store.K.PROGRESS, {}) || {};

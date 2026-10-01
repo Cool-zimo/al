@@ -138,6 +138,76 @@ class GitHubAPI {
     return (r || []).map(x => x.name);
   }
 
+  /* ===== 第三方书籍：搜索 + 整仓拉取 ===== */
+
+  /**
+   * 搜索仓库。
+   *
+   * 用登录用户的 token 走 5000 次/小时的额度，而不是未认证的 60 次/小时 ——
+   * 未认证限流在书多起来以后根本扫不动。
+   */
+  async searchRepositories(q, { perPage = 100, page = 1, sort = 'updated' } = {}) {
+    const url = `${this.base}/search/repositories?q=${encodeURIComponent(q)}` +
+                `&per_page=${perPage}&page=${page}&sort=${sort}`;
+    const d = await this._req('GET', url);
+    return d?.items || [];
+  }
+
+  /** 仓库的 topic 列表 */
+  async getTopics(owner, repo) {
+    try {
+      const d = await this._req('GET', `/repos/${owner}/${repo}/topics`);
+      return d?.names || [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /** 递归文件树，返回 [{path, sha, size}] */
+  async getTree(owner, repo, ref = 'main') {
+    const d = await this._req(
+      'GET',
+      `/repos/${owner}/${repo}/git/trees/${encodeURIComponent(ref)}?recursive=1`
+    );
+    return (d?.tree || []).filter(x => x.type === 'blob');
+  }
+
+  /** 分支最新提交的 sha，用来判断缓存是否过期 */
+  async getBranchSha(owner, repo, branch = 'main') {
+    try {
+      const d = await this._req('GET', `/repos/${owner}/${repo}/git/ref/heads/${encodeURIComponent(branch)}`);
+      return d?.object?.sha || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /**
+   * 批量读文件。并发但有上限 —— 一次几百个请求会把浏览器连接打满，
+   * 也会更快撞上限流。
+   */
+  async getManyFiles(owner, repo, paths, ref = 'main', concurrency = 8) {
+    const out = {};
+    let i = 0;
+    async function worker() {
+      while (i < paths.length) {
+        const p = paths[i++];
+        try {
+          const f = await this.getFileContents(owner, repo, p, ref);
+          if (f) out[p] = { text: f.content, sha: f.sha };
+        } catch (e) {
+          // 单个文件失败不影响整本书
+        }
+      }
+    }
+    const workers = [];
+    for (let n = 0; n < Math.min(concurrency, paths.length || 1); n++) {
+      workers.push(worker.call(this));
+    }
+    await Promise.all(workers);
+    return out;
+  }
+
   _cacheBuster() {
     return `&t=${Date.now()}`;
   }

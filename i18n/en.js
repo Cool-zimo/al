@@ -86,6 +86,9 @@ window.I18N = {
     projectPlaceholder: 'Paste your code here (optional). If you paste it, it must run clean; if not, you can still submit — build it in VS Code instead.',
     projectNote: 'Mini projects are not judged on functionality (too subjective). The bar is: it runs + you ticked the checklist above.',
     local: 'Run locally',
+    html: 'HTML', css: 'CSS', js: 'JavaScript',
+    preview: 'Live preview',
+    noCheck: 'This question has no checks configured — the question data is broken',
     localWhyTitle: 'Why this must run on your machine: ',
     localWhy: 'tkinter, pygame and Qt all need a real windowing system. The browser sandbox has neither a display nor a GUI backend, so running them online always fails — not because your code is wrong, but because the environment cannot support it. So these exercises work differently: take the code back to VS Code, run it locally, and self-check against the list above.',
     localOpen: 'Open in VS Code',
@@ -134,6 +137,15 @@ window.I18N = {
     account: (o) => `Account: <code>${o}</code> 　Notes repo: `,
     exportTitle: 'Export all notes',
     exportBtn: 'Download my notes (Markdown)',
+    shelfUsage: (n, kb) => `Cached ${n} chapters (~${kb} KB)`,
+    shelfTitle: "Third-party book cache",
+    shelfDesc: "Books are cached chapter by chapter — only the chapter you open gets downloaded. By default the cache lives in this tab and is cleared when you close it.",
+    shelfPersist: "Keep in browser storage (survives closing the tab, enables offline reading)",
+    shelfClear: "Clear cache",
+    shelfPersistOn: "Cache will now persist in browser storage",
+    shelfPersistOff: "Cache is tab-only again and will be cleared on close",
+    shelfClearConfirm: "Clear all cached third-party book content? You'll need to re-download next time.",
+    shelfCleared: "Cache cleared",
     connected: 'Connected — notes and review schedule will sync automatically',
     disconnected: 'Disconnected'
   },
@@ -256,4 +268,10 @@ window.I18N = {
     goReview: 'Review what I learned →',
     continueAnyway: 'Got it, continuing anyway'
   },
+  bookshelf: {
+    syncing: "Downloading this book to your device…",
+    done: "Saved locally",
+    failTitle: "Could not download this book",
+    failHint: "The repository may be gone, or your token lacks read access."
+  }
 };

@@ -46,6 +46,7 @@ const Store = (() => {
       LAST_POS: 'lastPos',   // 上次阅读位置 { bookId, lessonId }
       READ_POS: 'readPos',   // 课内滚动位置 { [lessonKey]: { y, at } }
       IDE_FILES: 'ideFiles', // 代码实验室里的"我的文件" { [name]: { text, updatedAt } }
+      SHELF: 'shelf',       // 看过的第三方书 { [repo]: { title, branch, at, ... } }
       SYNCED_AT: 'syncedAt',
       DARK: 'dark'
     },
