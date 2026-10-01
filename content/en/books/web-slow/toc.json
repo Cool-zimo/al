@@ -1,0 +1,188 @@
+[
+ {
+  "title": "Chapter 1 · What Programming Is",
+  "items": [
+   {
+    "id": "01",
+    "title": "What Code Actually Is",
+    "summary": "This lesson answers the question: \"How doe…"
+   },
+   {
+    "id": "02",
+    "title": "Variables: Labels You Stick on Boxes",
+    "summary": "This lesson answers the question: \"How doe…"
+   },
+   {
+    "id": "03",
+    "title": "Data Types: What Is Actually Inside the Box",
+    "summary": "This lesson answers the question: \"What ca…"
+   },
+   {
+    "id": "04",
+    "title": "Numbers vs Strings: Why \"3\" + \"4\" = \"34\"",
+    "summary": "This lesson answers the question: \"Why on …"
+   },
+   {
+    "id": "05",
+    "title": "Output and Debugging: Making Your Program Tell You What It Did",
+    "summary": "This lesson answers the question: \"How do …"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Making Decisions",
+  "items": [
+   {
+    "id": "06",
+    "title": "Comparisons: Teaching Your Program to Make Judgements",
+    "summary": "This lesson answers the question: \"How doe…"
+   },
+   {
+    "id": "07",
+    "title": "If / Else: Making Your Program Choose",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "08",
+    "title": "AND, OR and NOT: Combining Conditions",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "09",
+    "title": "The for Loop: Repeating Work Without Writing It Twice",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "10",
+    "title": "The while Loop and Picking the Right Kind",
+    "summary": "This lesson answers the question: \"When sh…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Containers for Things",
+  "items": [
+   {
+    "id": "11",
+    "title": "Arrays: A Row of Numbered Boxes",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "12",
+    "title": "Changing an Array: Adding, Removing, and Editing",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "13",
+    "title": "Objects: One Thing with Several Labels",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "14",
+    "title": "Arrays of Objects: What Real Data Looks Like",
+    "summary": "This lesson answers the question: \"How do …"
+   },
+   {
+    "id": "15",
+    "title": "Putting It All Together: A Class Roster",
+    "summary": "This lesson ties together everything you h…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Functions",
+  "items": [
+   {
+    "id": "16",
+    "title": "What a Function Is: Wrapping Up a Block of Code",
+    "summary": "For the first 15 lessons, your code ran to…"
+   },
+   {
+    "id": "17",
+    "title": "Parameters: Making Functions Reusable",
+    "summary": "So far every function we wrote did exactly…"
+   },
+   {
+    "id": "18",
+    "title": "Return Values: The Function's Output Chute",
+    "summary": "Every function we have written so far just…"
+   },
+   {
+    "id": "19",
+    "title": "Scope: Where a Variable Lives",
+    "summary": "Why can't you use a variable declared insi…"
+   },
+   {
+    "id": "20",
+    "title": "Array Methods: forEach / map / filter",
+    "summary": "In lesson 13 we used a `for` loop to walk …"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Web Pages and the DOM",
+  "items": [
+   {
+    "id": "21",
+    "title": "The Web Page Is a Tree: What the DOM Is",
+    "summary": "Every line of JavaScript we have written s…"
+   },
+   {
+    "id": "22",
+    "title": "Finding Elements: `querySelector` / `querySelectorAll`",
+    "summary": "Last lesson we learned that `document` is …"
+   },
+   {
+    "id": "23",
+    "title": "Reading and Changing Content: `textContent` vs `innerHTML`",
+    "summary": "Once you have found an element, the most c…"
+   },
+   {
+    "id": "24",
+    "title": "Changing Styles: `classList` and Editing `style` Directly",
+    "summary": "This lesson covers two ways to change styl…"
+   },
+   {
+    "id": "25",
+    "title": "Events: `addEventListener` and Why Not `onclick`",
+    "summary": "A web page is not a program that \"runs onc…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Capstone Project",
+  "items": [
+   {
+    "id": "26",
+    "title": "Chapter 6 Capstone Project (26–30)",
+    "summary": "Starting from this lesson, we build a real…"
+   },
+   {
+    "id": "27",
+    "title": "Structure and Styles: Build the Shell First",
+    "summary": "Last lesson fixed the data and the functio…"
+   },
+   {
+    "id": "28",
+    "title": "Rendering the List: Turning an Array into Elements on the Page",
+    "summary": "Last lesson put up the shell. This lesson …"
+   },
+   {
+    "id": "29",
+    "title": "Adding and Deleting: Add One, Remove One, and Re-render After Every Change",
+    "summary": "Last lesson implemented render. This lesso…"
+   },
+   {
+    "id": "30",
+    "title": "The Final Lesson: Code Organisation, Common Bugs, and What Comes Next",
+    "summary": "This is the last lesson of *Web Design · J…"
+   }
+  ],
+  "test": "test-06"
+ }
+]

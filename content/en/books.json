@@ -227,5 +227,15 @@
   "level": "进阶",
   "ready": true,
   "note": "完整 6 章 30 课"
+ },
+ {
+  "id": "web-slow",
+  "title": "Web Design · JavaScript from Scratch",
+  "subtitle": "Slow Track · No programming experience needed",
+  "desc": "For learners with zero programming background. From \"what is a variable\" to DOM manipulation, one small step at a time. Continue with Web Design 2 afterwards.",
+  "stage": "网页",
+  "level": "入门",
+  "ready": true,
+  "note": "完整 6 章 30 课"
  }
 ]

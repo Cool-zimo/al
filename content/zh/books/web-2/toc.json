@@ -1,0 +1,188 @@
+[
+ {
+  "title": "第 1 章 · JS 与 Python 的差异",
+  "items": [
+   {
+    "id": "01",
+    "title": "变量：let、const 与 var 的函数作用域",
+    "summary": "这一节解决\"JS 里怎么声明变量，以及为什么 `var` 会坑人\"的问题。你学过 P…"
+   },
+   {
+    "id": "02",
+    "title": "`==` 与 `===`：类型转换的陷阱",
+    "summary": "这一节解决\"JS 里两个等号和三个等号有什么区别\"的问题。`==` 会做隐式类型转换…"
+   },
+   {
+    "id": "03",
+    "title": "类型与转换：NaN、`typeof null` 与字符串数字相加",
+    "summary": "这一节解决\"JS 里类型是怎么工作的\"的问题。JS 是动态类型语言，变量可以存任何类…"
+   },
+   {
+    "id": "04",
+    "title": "函数：声明、表达式与箭头函数",
+    "summary": "这一节解决\"JS 里函数有几种写法，以及箭头函数和 Python lambda 有什…"
+   },
+   {
+    "id": "05",
+    "title": "数组与对象：对比 Python 的 list 和 dict",
+    "summary": "这一节解决\"JS 的数组和对象怎么用，和 Python 的 list/dict 有什…"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "第 2 章 · 数组与对象的方法",
+  "items": [
+   {
+    "id": "06",
+    "title": "数组常用方法：push/pop/slice/splice",
+    "summary": "这一节解决\"JS 数组有哪些常用操作\"的问题。你熟悉 Python list 的 `…"
+   },
+   {
+    "id": "07",
+    "title": "遍历：for、for...of、forEach 与 return 的陷阱",
+    "summary": "这一节解决\"JS 里怎么遍历数组\"的问题。JS 有多种遍历方式，它们之间有微妙但重要…"
+   },
+   {
+    "id": "08",
+    "title": "map、filter、reduce：函数式三剑客",
+    "summary": "这一节解决\"JS 怎么用函数式的方式处理数组\"的问题。你学过 Python 的列表推…"
+   },
+   {
+    "id": "09",
+    "title": "对象：增删改查、遍历与属性不存在的陷阱",
+    "summary": "这一节解决\"JS 对象怎么增删改查、怎么遍历\"的问题。你已经知道 JS 对象类似 P…"
+   },
+   {
+    "id": "10",
+    "title": "字符串方法：模板字符串、split/join/includes",
+    "summary": "这一节解决\"JS 字符串有哪些常用操作\"的问题。你熟悉 Python 的字符串方法，…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "第 3 章 · DOM：把网页变成能操作的数据",
+  "items": [
+   {
+    "id": "11",
+    "title": "什么是 DOM：树形结构与活的对象",
+    "summary": "这一节解决\"DOM 到底是什么\"的问题。这是 JS 独有的概念——Python 里没…"
+   },
+   {
+    "id": "12",
+    "title": "查询元素：getElementById / querySelector / querySelectorAll",
+    "summary": "这一节解决\"怎么从 DOM 树里找到我想要的元素\"的问题。这是所有 DOM 操作的第…"
+   },
+   {
+    "id": "13",
+    "title": "改内容：textContent vs innerHTML",
+    "summary": "这一节解决\"怎么修改元素的文字和 HTML 内容\"的问题。`textContent`…"
+   },
+   {
+    "id": "14",
+    "title": "改属性与样式：getAttribute/setAttribute、classList、style",
+    "summary": "这一节解决\"怎么修改元素的属性和 CSS 样式\"的问题。你改过 Python 对象的…"
+   },
+   {
+    "id": "15",
+    "title": "创建与删除元素：createElement / appendChild / remove",
+    "summary": "这一节解决\"怎么动态创建和删除 DOM 元素\"的问题。之前都是改已有的元素，现在要学…"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "第 4 章 · 事件",
+  "items": [
+   {
+    "id": "16",
+    "title": "第一个事件：addEventListener",
+    "summary": "这一节解决\"怎么让页面响应用户操作\"的问题。Python 脚本是顺序执行的——读完最…"
+   },
+   {
+    "id": "17",
+    "title": "事件对象：event.target vs currentTarget",
+    "summary": "这一节解决\"事件回调里的 event 参数是什么，target 和 currentT…"
+   },
+   {
+    "id": "18",
+    "title": "事件委托：给父元素绑一次管所有子元素",
+    "summary": "这一节解决\"列表有很多项，每项都要绑定点击事件，怎么避免绑几百次\"的问题。答案就是事…"
+   },
+   {
+    "id": "19",
+    "title": "常见事件：click / input / submit / keydown 与 preventDefault",
+    "summary": "这一节解决\"日常开发中常用的事件有哪些，怎么用，以及 preventDefault …"
+   },
+   {
+    "id": "20",
+    "title": "事件冒泡与捕获：事件流的三阶段模型",
+    "summary": "这一节解决\"点击一个按钮，为什么它的父元素也收到了事件\"的问题，以及怎么利用或阻止这…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "第 5 章 · 表单、存储与调试",
+  "items": [
+   {
+    "id": "21",
+    "title": "表单取值：input、select、checkbox、radio 的正确取法",
+    "summary": "这一节解决\"怎么从表单元素中拿到用户填的值\"的问题——不同类型的输入框取法不同，用错…"
+   },
+   {
+    "id": "22",
+    "title": "表单验证：必填校验、格式校验与友好提示",
+    "summary": "这一节解决\"怎么在用户提交前检查数据合法性，并给出清晰可读的错误提示\"的问题。"
+   },
+   {
+    "id": "23",
+    "title": "localStorage / sessionStorage：浏览器本地存储",
+    "summary": "这一节解决\"怎么在浏览器里保存数据，让页面刷新后数据还在\"的问题。核心要点：**只能…"
+   },
+   {
+    "id": "24",
+    "title": "控制台调试：console、断点与读报错信息",
+    "summary": "这一节解决\"代码不工作了怎么办\"的问题——学会用 console 打日志、用断点单步…"
+   },
+   {
+    "id": "25",
+    "title": "setTimeout / setInterval：异步直觉入门",
+    "summary": "这一节解决\"为什么我的代码没有按写的顺序执行\"的问题——理解 JS 的异步机制和事件…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "第 6 章 · 综合实战",
+  "items": [
+   {
+    "id": "26",
+    "title": "项目设计：待办清单的功能拆解与数据结构",
+    "summary": "这一节解决\"拿到一个项目需求，怎么拆解功能、定义数据结构、画界面草图\"的问题。"
+   },
+   {
+    "id": "27",
+    "title": "搭结构与样式：HTML 骨架与 CSS 布局",
+    "summary": "这一节解决\"怎么把上一节设计的界面草图变成实际的 HTML 和 CSS\"的问题。"
+   },
+   {
+    "id": "28",
+    "title": "实现增删改查：渲染函数与核心交互",
+    "summary": "这一节解决\"怎么把上一节的数据结构变成可交互的待办应用\"的问题——实现渲染函数和增删…"
+   },
+   {
+    "id": "29",
+    "title": "加持久化与筛选：localStorage 存取与条件渲染",
+    "summary": "这一节解决\"怎么让数据刷新不丢失，以及怎么按条件筛选显示\"的问题。"
+   },
+   {
+    "id": "30",
+    "title": "收官：代码组织与常见 Bug 复盘",
+    "summary": "这一节解决\"项目写完了，怎么让代码更清晰可维护，以及那些经典 bug 为什么会出现\"…"
+   }
+  ],
+  "test": "test-06"
+ }
+]

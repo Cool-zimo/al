@@ -1,0 +1,188 @@
+[
+ {
+  "title": "第 1 章 · 异步",
+  "items": [
+   {
+    "id": "01",
+    "title": "为什么需要异步：JS 单线程与事件循环",
+    "summary": "这一节回答\"为什么 `alert` 能卡住整个页面\"，以及为什么耗时操作必须异步执行…"
+   },
+   {
+    "id": "02",
+    "title": "回调：callback 与回调地狱",
+    "summary": "这一节讲异步最初的样子——回调，以及为什么嵌套多了会变成\"地狱\"。"
+   },
+   {
+    "id": "03",
+    "title": "Promise：三种状态与链式调用",
+    "summary": "这一节讲 Promise 是什么、有哪三种状态，以及 `.then`/`.catch…"
+   },
+   {
+    "id": "04",
+    "title": "async/await：异步代码的同步写法",
+    "summary": "这一节讲 `async/await` 语法糖，以及\"并行执行\"这一性能关键点。"
+   },
+   {
+    "id": "05",
+    "title": "错误处理：try/catch 配 await 与 finally",
+    "summary": "这一节讲异步代码里的错误怎么抓、怎么别让 `.catch` 把错误\"吞掉\"。"
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "第 2 章 · 网络请求",
+  "items": [
+   {
+    "id": "06",
+    "title": "fetch 基础：GET 请求与 Response 对象",
+    "summary": "这一节讲浏览器原生 API `fetch` 的基本用法，重点是 `Response`…"
+   },
+   {
+    "id": "07",
+    "title": "POST 请求与请求头：method、headers、body",
+    "summary": "这一节讲怎么用 fetch 发 POST 请求，以及 `JSON.stringify…"
+   },
+   {
+    "id": "08",
+    "title": "fetch 不会因 HTTP 404/500 而 reject",
+    "summary": "这是 fetch 最经典的坑：**网络层面的成功 ≠ 业务层面的成功**，需要手动检…"
+   },
+   {
+    "id": "09",
+    "title": "加载状态与错误处理：三态与 AbortController",
+    "summary": "这一节讲一个真实应用必备的\"三态管理\"，以及如何取消一个已经发出去的请求。"
+   },
+   {
+    "id": "10",
+    "title": "实战：接真实 API 的小应用与 CORS",
+    "summary": "这一节把前 4 课串起来，做一个能调用公开 API 的小应用，并搞懂跨域到底是怎么回…"
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "第 3 章 · 数据与存储进阶",
+  "items": [
+   {
+    "id": "11",
+    "title": "JSON 深拷贝与循环引用、structuredClone",
+    "summary": "这一节讲对象的\"深拷贝\"问题，以及 `JSON.parse(JSON.stringi…"
+   },
+   {
+    "id": "12",
+    "title": "Map 与 Set：对比 Object / Array 的适用边界",
+    "summary": "这一节讲两个\"增强版\"数据结构：Map（键值对）和 Set（不重复集合），以及什么时…"
+   },
+   {
+    "id": "13",
+    "title": "localStorage 进阶：容量、版本迁移与 JSON.parse 安全",
+    "summary": "这一节讲 localStorage 的进阶用法，重点是怎么避免\"读出来一段坏数据导致…"
+   },
+   {
+    "id": "14",
+    "title": "IndexedDB 简介：何时该用，何时不必",
+    "summary": "这一节给你一张\"存储选型图\"，搞清楚 IndexedDB 和 localStorag…"
+   },
+   {
+    "id": "15",
+    "title": "数据同步：本地缓存 + 网络更新、乐观更新",
+    "summary": "这一节讲真实应用的常见模式：先展示缓存、再更新网络，以及\"先假装成功\"的乐观更新。"
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "第 4 章 · 现代 JS 特性",
+  "items": [
+   {
+    "id": "16",
+    "title": "解构、展开运算符进阶与可选链、空值合并",
+    "summary": "这一节讲几个让代码\"变短变稳\"的语法糖：解构、展开、`?.`、`??`。"
+   },
+   {
+    "id": "17",
+    "title": "迭代器与生成器入门：先建立直觉",
+    "summary": "这一节不深入规范，只讲一件事：**生成器是\"能暂停的函数\"，可以逐个产出值**。"
+   },
+   {
+    "id": "18",
+    "title": "类与模块：class 与 ES Module",
+    "summary": "这一节讲两个组织代码的工具：`class` 的面向对象写法，和 `import/ex…"
+   },
+   {
+    "id": "19",
+    "title": "常用数组新特性：flat / flatMap / Object.fromEntries / at",
+    "summary": "这一节讲几个\"写出来短、读起来爽\"的数组与对象新方法。"
+   },
+   {
+    "id": "20",
+    "title": "防抖与节流：本册最能落地的一节",
+    "summary": "这一节讲两个控制函数执行频率的工具：防抖（debounce）和节流（throttle…"
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "第 5 章 · Canvas 与可视化",
+  "items": [
+   {
+    "id": "21",
+    "title": "Canvas 基础：getContext、坐标系与矩形",
+    "summary": "这一节建立 Canvas 的基本直觉：它是一块画布，所有绘图都靠一个\"绘图上下文\"对…"
+   },
+   {
+    "id": "22",
+    "title": "Canvas 路径与图形：beginPath / moveTo / lineTo / arc / fill / stroke",
+    "summary": "这一节讲 Canvas 的\"路径\"机制——它是画任意形状（线、圆、多边形）的基础。"
+   },
+   {
+    "id": "23",
+    "title": "Canvas 文字与图片：fillText / drawImage / 中文字体 / measureText",
+    "summary": "这一节讲怎么在 Canvas 上写字、画图片，以及绕不开的\"中文不显示\"和\"文字排版…"
+   },
+   {
+    "id": "24",
+    "title": "Canvas 动画：requestAnimationFrame 与动画循环",
+    "summary": "这一节讲怎么让 Canvas 动起来，以及为什么 `requestAnimation…"
+   },
+   {
+    "id": "25",
+    "title": "实战：用 Canvas 画一个简易柱状图",
+    "summary": "这一节把前面的知识串起来：坐标轴、刻度、柱子、标签，全部用 Canvas 手动画出来…"
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "第 6 章 · 综合实战",
+  "items": [
+   {
+    "id": "26",
+    "title": "项目设计：天气/汇率查询应用的功能拆解",
+    "summary": "这一节不写代码，先把要做的东西想清楚——需求、数据结构、API 选型、界面草图，四步…"
+   },
+   {
+    "id": "27",
+    "title": "搭结构与样式：HTML 骨架与 CSS 布局",
+    "summary": "这一节把上一节的草图落成真实的 HTML 和 CSS，重点是语义化结构和状态切换。"
+   },
+   {
+    "id": "28",
+    "title": "接入真实 API：fetch + async/await + 错误处理 + 加载状态",
+    "summary": "这一节把前端和真实接口连起来：用 fetch 拿数据、用 async/await 写…"
+   },
+   {
+    "id": "29",
+    "title": "加缓存、防抖搜索与请求竞态处理",
+    "summary": "这一节解决三个实战高频问题：把结果存到 localStorage、让搜索输入别太勤快…"
+   },
+   {
+    "id": "30",
+    "title": "收官：代码组织、性能、可访问性与后续学习",
+    "summary": "最后一节，把项目从\"能跑\"变成\"能维护\"：拆模块、抠性能、照顾可访问性、学会调试。"
+   }
+  ],
+  "test": "test-06"
+ }
+]
