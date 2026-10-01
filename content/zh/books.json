@@ -227,5 +227,15 @@
   "level": "进阶",
   "ready": true,
   "note": "完整 6 章 30 课"
+ },
+ {
+  "id": "web-slow",
+  "title": "网页制作 · 零基础 JavaScript",
+  "subtitle": "慢班 · 没有编程经验？从这里开始",
+  "desc": "面向完全没有编程经验的学习者。从「变量是什么」讲到 DOM 操作，每一步都不跳。学完可继续《网页制作 2》。",
+  "stage": "网页",
+  "level": "入门",
+  "ready": true,
+  "note": "完整 6 章 30 课"
  }
 ]

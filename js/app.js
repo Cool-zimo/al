@@ -12,6 +12,18 @@
   const CONTENT = CFG.content;
 
   let BOOKS = [];
+  /** 第三方书籍：id -> {repo, branch, url, author...}，来自 al-docs 的索引 */
+  let EXTERNAL = {};
+  const REGISTRY_URL = 'https://cool-zimo.github.io/al-docs/registry.json';
+  const RAW = 'https://raw.githubusercontent.com';
+
+  /** 一本书的内容根目录。官方书在站内，第三方书从原作者的仓库直读 */
+  function bookBase(bookId) {
+    const x = EXTERNAL[bookId];
+    if (x) return `${RAW}/${x.repo}/${x.branch}/content/${CFG.lang}`;
+    return `${CONTENT}/books/${bookId}`;
+  }
+
   let TOC = [];
   let LESSON_BLOCKS = [];   // 当前课的 python 代码块，实验室用
   let LESSON_QUIZ_COUNT = {};  // 当前课的正式测验题数，决定"学完"的判定方式
@@ -170,15 +182,27 @@
       for (const b of list) {
         html += `
           <a class="book-card${b.ready ? '' : ' locked'}" href="#/book/${b.id}">
-            <div class="book-level">${escapeHtml(b.level)}</div>
+            <div class="book-level">${escapeHtml(b.level)}${b.external ? ' · 第三方' : ''}</div>
             <div class="book-title">${escapeHtml(b.title)}</div>
             <div class="book-sub">${escapeHtml(b.subtitle)}</div>
             <div class="book-desc">${escapeHtml(b.desc)}</div>
+            ${b.external && b.author && b.author.name
+              ? `<div class="book-desc" style="opacity:.75;font-size:12.5px">✍ ${escapeHtml(b.author.name)}${b.license ? ' · ' + escapeHtml(b.license) : ''}</div>`
+              : ''}
             <div class="book-foot">${b.ready ? H.start : H.building}</div>
           </a>`;
       }
       html += `</div>`;
     }
+
+    const n3p = Object.keys(EXTERNAL).length;
+    html += `
+      <div class="home-contrib">
+        <b>${n3p ? `已收录 ${n3p} 本第三方教材` : '还没有第三方教材'}</b>
+        <span>任何人都可以给 AnyLearn 写书：建一个符合格式的仓库，机器人自动校验并收录。</span>
+        <a href="https://cool-zimo.github.io/al-docs/" target="_blank" rel="noopener">查看格式规范与投稿说明 →</a>
+      </div>`;
+
     art.innerHTML = html;
     $('lesson-nav').innerHTML = '';
     $('progress-label').textContent = `${doneCount} ${H.statDone}`;
@@ -187,8 +211,42 @@
   }
 
   /* ================= 目录 ================= */
+  /**
+   * 第三方书的 toc.json 是 { book, chapters:[{title, lessons, test}] }，比官方的简略
+   * （作者不必为每课手写摘要）。这里统一成官方的形状，并从课文中抓标题和摘要补上。
+   */
+  function normalizeTOC(raw) {
+    if (Array.isArray(raw)) return raw;
+    const chapters = (raw && raw.chapters) || [];
+    return chapters.map(ch => ({
+      title: ch.title || '',
+      items: (ch.lessons || []).map(L =>
+        typeof L === 'string' ? { id: L } : { id: String(L.id), title: L.title, summary: L.summary }),
+      test: ch.test || null,
+    }));
+  }
+
+  /** 从课文里抓「# 标题」和第一句引言，用来填目录（抓不到就退回课号） */
+  async function enrichTOC(bookId, toc) {
+    const need = [];
+    for (const ch of toc) for (const it of ch.items) if (!it.title) need.push(it);
+    if (!need.length) return;
+    await Promise.all(need.map(async it => {
+      try {
+        const md = await fetchText(`${bookBase(bookId)}/lessons/${it.id}.md`);
+        const h = md.split('\n').find(l => /^#\s+\S/.test(l));
+        if (h) it.title = h.replace(/^#\s+/, '').replace(/^\d{2}\s+/, '').trim();
+        const q = md.split('\n').find(l => /^>\s+\S/.test(l));
+        if (q) it.summary = q.replace(/^>\s+/, '').trim();
+      } catch (e) { /* 抓不到就留空，目录仍可点开 */ }
+      if (!it.title) it.title = it.id;
+    }));
+  }
+
   async function loadTOC(bookId) {
-    TOC = await fetchJSON(`${CONTENT}/books/${bookId}/toc.json`);
+    const raw = await fetchJSON(`${bookBase(bookId)}/toc.json`);
+    TOC = normalizeTOC(raw);
+    if (EXTERNAL[bookId]) await enrichTOC(bookId, TOC);
     flat = [];
     for (const ch of TOC) for (const it of ch.items) flat.push({ ...it, chapter: ch.title });
   }
@@ -282,7 +340,7 @@
 
     let md;
     try {
-      md = await fetchText(`${CONTENT}/books/${bookId}/lessons/${lessonId}.md`);
+      md = await fetchText(`${bookBase(bookId)}/lessons/${lessonId}.md`);
     } catch (e) {
       art.innerHTML = `<h1>${T().loadFailTitle || '加载失败'}</h1><p><code>${escapeHtml(lessonId)}.md</code></p>`;
       return;
@@ -454,7 +512,7 @@
 
     let md;
     try {
-      md = await fetchText(`${CONTENT}/books/${bookId}/lessons/${lessonId}.md`);
+      md = await fetchText(`${bookBase(bookId)}/lessons/${lessonId}.md`);
     } catch (e) {
       art.innerHTML = `<h1>${T().loadFailTitle || '加载失败'}</h1>`;
       return;
@@ -526,7 +584,7 @@
 
     let md;
     try {
-      md = await fetchText(`${CONTENT}/books/${bookId}/lessons/${testId}.md`);
+      md = await fetchText(`${bookBase(bookId)}/lessons/${testId}.md`);
     } catch (e) {
       art.innerHTML = `<h1>${T().loadFailTitle || '加载失败'}</h1>`;
       return;
@@ -1063,6 +1121,45 @@
     return renderHome();
   }
 
+  /* ================= 第三方书籍 ================= */
+  /**
+   * 从 al-docs 读索引，把「通过校验且支持当前语言」的第三方书并入书单。
+   * 失败时静默跳过 —— 索引站挂了不该影响官方书的使用。
+   */
+  async function loadExternal() {
+    let reg;
+    try {
+      const r = await fetch(REGISTRY_URL, { cache: 'no-store' });
+      if (!r.ok) return;
+      reg = await r.json();
+    } catch (e) {
+      return;
+    }
+    let added = 0;
+    for (const b of (reg.books || [])) {
+      if (!b.ok) continue;
+      // 只在作者声明支持当前语言时才收录
+      if (Array.isArray(b.langs) && b.langs.length && !b.langs.includes(CFG.lang)) continue;
+      EXTERNAL[b.id] = { repo: b.repo, branch: b.branch || 'main' };
+      BOOKS.push({
+        id: b.id,
+        title: b.title || b.id,
+        subtitle: b.subtitle || '',
+        desc: b.desc || '',
+        stage: b.stage || 'other',
+        level: b.level || '',
+        ready: true,
+        external: true,
+        author: b.author || {},
+        license: b.license || '',
+        repo: b.repo,
+        url: b.url,
+      });
+      added++;
+    }
+    if (added) console.log(`[al] 第三方书籍 ${added} 本`);
+  }
+
   /* ================= 启动 ================= */
   async function startApp() {
     try {
@@ -1071,6 +1168,7 @@
       $('lesson').innerHTML = `<h1>${T().toast.loadFail}</h1><p><code>${CONTENT}/books.json</code></p>`;
       return;
     }
+    await loadExternal();
     bindUI();
     Notes.attach(null, () => book && renderTOC());
 
