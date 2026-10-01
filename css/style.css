@@ -442,6 +442,7 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
   text-decoration: none;
 }
 .home-contrib a:hover { text-decoration: underline; }
+.home-contrib-links { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 4px; }
 
 /* ============================================================
    复习

@@ -220,7 +220,10 @@
       <div class="home-contrib">
         <b>${n3p ? `已收录 ${n3p} 本第三方教材` : '还没有第三方教材'}</b>
         <span>任何人都可以给 AnyLearn 写书：建一个符合格式的仓库，机器人自动校验并收录。</span>
-        <a href="https://cool-zimo.github.io/al-docs/" target="_blank" rel="noopener">查看格式规范与投稿说明 →</a>
+        <div class="home-contrib-links">
+          <a href="docs/index.html">浏览第三方书 →</a>
+          <a href="docs/check.html">自查我的仓库 →</a>
+        </div>
       </div>`;
 
     art.innerHTML = html;
