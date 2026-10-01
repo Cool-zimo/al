@@ -195,23 +195,23 @@ const Shelf = (() => {
     if (cached) {
       const missing = paths.filter(p => !(p in cached));
       if (!missing.length) return { ok: true, fromCache: true };
-      const got = await api.getManyFiles(entry.owner, entry.name,
-        missing.map(p => `content/${lang}/${p}`), branch);
+      const got = await GhSrc.many(entry.owner, entry.name, branch,
+        missing.map(p => `content/${lang}/${p}`));
       for (const p of missing) {
         const f = got[`content/${lang}/${p}`];
-        if (f) cached[p] = f.text;
+        if (f) cached[p] = f;
       }
       _toSession(repo, branch, lang, chapterIdx, cached);
       if (persistent()) await idbPut(ck(repo, branch, lang, chapterIdx), cached);
       return { ok: true, fromCache: false, updated: missing.length };
     }
 
-    const got = await api.getManyFiles(entry.owner, entry.name,
-      paths.map(p => `content/${lang}/${p}`), branch);
+    const got = await GhSrc.many(entry.owner, entry.name, branch,
+      paths.map(p => `content/${lang}/${p}`));
     const files = {};
     for (const p of paths) {
       const f = got[`content/${lang}/${p}`];
-      if (f) files[p] = f.text;
+      if (f) files[p] = f;
     }
     if (!Object.keys(files).length) {
       return { ok: false, error: '这一章的文件都没读到' };
@@ -228,11 +228,9 @@ const Shelf = (() => {
                   || await idbGet(ck(entry.repo, entry.branch, lang, chapterIdx));
       if (cached && relPath in cached) return cached[relPath];
     }
-    if (!api) return null;
     try {
-      const f = await api.getFileContents(entry.owner, entry.name,
-        `content/${lang}/${relPath}`, entry.branch);
-      return f ? f.content : null;
+      return await GhSrc.text(entry.owner, entry.name, entry.branch,
+        `content/${lang}/${relPath}`);
     } catch (e) { return null; }
   }
 

@@ -27,8 +27,8 @@
   /**
    * 读一本书里的文件。
    *
-   * 第三方书优先读本地书架（已下载到 IndexedDB），
-   * 本地没有才回退到 raw 直读 —— 这样断网也能看，翻页也不用等网络。
+   * 顺序：本地章节缓存 → GhSrc 多源自动回退（API / CDN / raw）。
+   * 缓存命中就不走网络；没缓存时 GhSrc 会自动绕开连不上的源。
    */
   async function readBookFile(bookId, relPath, chapterIdx) {
     const x = EXTERNAL[bookId];
@@ -36,6 +36,10 @@
     if (x.entry) {
       const t = await Shelf.readFile(api, x.entry, CFG.lang, relPath, chapterIdx);
       if (t != null) return t;
+    }
+    if (x.repo) {
+      const [o, n] = x.repo.split('/');
+      return GhSrc.text(o, n, x.branch || 'main', `content/${CFG.lang}/${relPath}`);
     }
     return fetchText(`${bookBase(bookId)}/${relPath}`);
   }
@@ -1050,6 +1054,18 @@
       </label>
       <p class="dim" id="shelf-usage" style="font-size:12.5px"></p>
       <button class="ghost-btn danger" id="btn-shelf-clear">${S.shelfClear || '清空缓存'}</button>
+
+      <h3>${S.srcTitle || '第三方书内容源'}</h3>
+      <p class="dim" style="font-size:13px;line-height:1.7">${S.srcDesc || 'raw.githubusercontent.com 在国内常常连不上。自动模式会依次尝试各个源，并记住上次成功的那个。'}</p>
+      <select id="sel-src" style="padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13.5px;background:#fff;font-family:inherit;min-width:260px">
+      </select>
+      <button class="ghost-btn" id="btn-src-probe">${S.srcProbe || '测一下'}</button>
+      <div id="src-probe-out" class="dim" style="font-size:12.5px;margin-top:6px"></div>
+      <div id="src-custom-row" style="margin-top:10px" hidden>
+        <input type="text" id="src-custom" placeholder="https://你的镜像/https://raw.githubusercontent.com" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit">
+        <button class="ghost-btn" id="btn-src-custom" style="margin-top:6px">${S.save || '保存'}</button>
+      </div>
+      <p class="dim" id="src-desc" style="font-size:12.5px;margin-top:6px"></p>
     `;
     $('modal').hidden = false;
 
@@ -1065,6 +1081,41 @@
         ? (S.shelfPersistOn || '以后缓存会保留在浏览器本地')
         : (S.shelfPersistOff || '已改为只存在当前标签页'));
     };
+    // ---- 内容源 ----
+    const selSrc = $('sel-src');
+    const paintSrc = () => {
+      const cur = GhSrc.preferred();
+      selSrc.innerHTML =
+        `<option value="">${S.srcAuto || '自动（记住上次成功的）'}</option>` +
+        GhSrc.list().map(x =>
+          `<option value="${escapeHtml(x.id)}"${x.id === cur ? ' selected' : ''}${x.usable ? '' : ' disabled'}>`
+          + `${escapeHtml(x.label)}${x.usable ? '' : '（需登录）'}</option>`).join('');
+      const d = GhSrc.list().find(x => x.id === selSrc.value);
+      $('src-desc').textContent = d ? d.desc : (S.srcAutoDesc || '依次尝试各源，成功一次就记住');
+      $('src-custom-row').hidden = selSrc.value !== 'custom';
+    };
+    paintSrc();
+    selSrc.onchange = () => {
+      GhSrc.setPreferred(selSrc.value);
+      paintSrc();
+      if (selSrc.value === 'custom') $('src-custom').value = GhSrc.custom();
+    };
+    $('btn-src-custom').onclick = () => {
+      GhSrc.setCustom($('src-custom').value.trim());
+      GhSrc.setPreferred('custom');
+      paintSrc();
+      toast(S.srcSaved || '镜像已保存');
+    };
+    $('btn-src-probe').onclick = async () => {
+      const id = selSrc.value || (GhSrc.lastOk() || 'jsdelivr');
+      const out = $('src-probe-out');
+      out.textContent = (S.srcProbing || '测试中…');
+      const r = await GhSrc.probe(id);
+      out.textContent = r.ok
+        ? `${S.srcProbeOk ? S.srcProbeOk(r.ms) : `可用 · ${r.ms}ms`}`
+        : `${S.srcProbeFail ? S.srcProbeFail(r.error) : `不可用：${r.error}`}`;
+    };
+
     $('btn-shelf-clear').onclick = () => {
       if (!confirm(S.shelfClearConfirm || '清空所有第三方书籍缓存？下次看需要重新下载。')) return;
       Shelf.clearAll();
@@ -1174,6 +1225,7 @@
     if (!token) { syncState('off'); return false; }
     try {
       api = new GitHubAPI(token);
+      GhSrc.setApi(api);          // 登录后 API 源才可用（最快最稳）
       sync = new ConfigSync(api, 'anylearn-notes');
       sync.onStateChange = syncState;
       await sync.init();
