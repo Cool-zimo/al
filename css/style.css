@@ -1145,6 +1145,13 @@ body.no-notes .main { margin-right: 0; max-width: 1040px; }
 
 /* ===== 首页：官方 / 第三方分区 ===== */
 .home-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.home-search{display:flex;gap:8px;margin-top:18px;max-width:560px}
+.home-search input{flex:1;min-width:0;padding:10px 14px;font-size:14px;font-family:inherit;
+  color:var(--text);background:var(--panel);border:1px solid var(--border);border-radius:10px;outline:none}
+.home-search input:focus{border-color:var(--accent)}
+.home-search button{padding:10px 20px;font-size:14px;font-family:inherit;color:#fff;
+  background:var(--accent);border:0;border-radius:10px;cursor:pointer}
+.home-search button:hover{filter:brightness(1.1)}
 .home-act-btn{display:inline-flex;align-items:center;padding:8px 16px;border-radius:9px;
   background:var(--accent);color:#fff;font-size:13.5px;font-weight:600;text-decoration:none}
 .home-act-btn:hover{filter:brightness(1.1);text-decoration:none}

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Search · AnyLearn</title>
+<meta name="description" content="Search across 25 textbooks and 700+ lessons">
+<meta name="theme-color" content="#0a0c11">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>🦉</text></svg>">
+<link rel="stylesheet" href="../../css/style.css?v=51">
+<link rel="stylesheet" href="../../css/search.css?v=51">
+</head>
+<body class="search-page">
+
+<header class="s-top">
+  <a class="s-back" id="back" href="../">← 返回首页</a>
+  <form class="s-form" id="form">
+    <input type="text" id="q" autocomplete="off" spellcheck="false" placeholder="搜索全部教材（书名 / 课文 / 正文）">
+    <button type="submit" id="btn">搜索</button>
+  </form>
+  <a class="s-lang" href="../../zh/search/">中文 →</a>
+</header>
+
+<main class="s-main">
+  <div class="s-state" id="state"></div>
+  <div id="results"></div>
+</main>
+
+<script src="../../js/search.js?v=51"></script>
+</body>
+</html>

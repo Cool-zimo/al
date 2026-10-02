@@ -183,9 +183,9 @@
     const doneCount = Object.keys(progress).length;
     const H = T().home;
 
-    // 官方书按 stage 分组；第三方书单独一区（要懒加载 + 搜索）
-    const official = BOOKS.filter(b => !b.external);
-    const third = BOOKS.filter(b => b.external);
+    // 全部书按 stage 分组。第三方书不再单独占一区 —— 书多了会淹没官方教材，
+    // 它混在书单里、卡上标「第三方」，靠顶部搜索框找。
+    const official = BOOKS.slice();
     const groups = {};
     official.forEach(b => { (groups[b.stage] = groups[b.stage] || []).push(b); });
 
@@ -199,43 +199,33 @@
           <div class="stat"><b>${st.due}</b><span>${H.statDue}</span></div>
           <div class="stat"><b>${st.inProgress}</b><span>${H.statMem}</span></div>
         </div>
-        <div class="home-actions">
-          <a class="home-act-btn" href="#/dev">${escapeHtml(HT.devPlatform)}</a>
-          <a class="home-act-btn ghost" href="#/docs">${escapeHtml(HT.browseMore)}</a>
-        </div>
+        <form class="home-search" id="home-search" autocomplete="off">
+          <input type="text" id="home-q" placeholder="${escapeHtml(HT.searchAllPh)}" aria-label="${escapeHtml(HT.searchAllPh)}">
+          <button type="submit">${escapeHtml(HT.searchAllBtn)}</button>
+        </form>
       </div>`;
 
-    html += `<h2 class="home-stage">${escapeHtml(HT.official)} <span class="stage-n">${official.length}</span></h2>`;
+    html += `<h2 class="home-stage">${escapeHtml(HT.allBooks)} <span class="stage-n">${official.length}</span></h2>`;
     for (const [stage, list] of Object.entries(groups)) {
       html += `<div class="home-substage">${escapeHtml(stage)}</div><div class="book-grid">`;
       for (const b of list) html += bookCard(b, H);
       html += `</div>`;
     }
 
+    // 第三方书不再占首页一整区（书多了会淹没官方教材），只在书卡上标「第三方」。
+    // 想找书用顶部搜索框，进 /zh/search/ 全站搜。
     html += `
-      <div class="third-head">
-        <h2 class="home-stage" style="margin:0">${escapeHtml(HT.third)}
-          <span class="stage-n">${third.length}</span></h2>
-        <div class="third-tools">
-          <input type="text" id="third-q" placeholder="${escapeHtml(HT.searchPh)}" autocomplete="off">
-          <button class="third-refresh" id="third-refresh" title="${escapeHtml(HT.refresh)}">↻</button>
-        </div>
-      </div>
-      <div class="third-note">${escapeHtml(HT.thirdNote)}</div>
-      <div class="book-grid" id="third-grid"></div>
-      <div id="third-sentinel" class="third-sentinel"></div>
       <div class="home-contrib">
         <b>${escapeHtml(HT.writeOne)}</b>
         <span>${escapeHtml(HT.writeDesc)}</span>
         <div class="home-contrib-links">
           <a href="#/book/creator-guide">${escapeHtml(HT.howTo)} →</a>
           <a href="#/dev">${escapeHtml(HT.devPlatform)} →</a>
-          <a href="#/docs">${escapeHtml(HT.browseMore)} →</a>
         </div>
       </div>`;
 
     art.innerHTML = html;
-    mountThirdParty(third);
+    mountHomeSearch();
 
     $('lesson-nav').innerHTML = '';
     $('progress-label').textContent = `${doneCount} ${H.statDone}`;
@@ -266,65 +256,22 @@
   }
 
   /**
-   * 第三方书区：搜索 + 懒加载。
+   * 首页搜索框：跳到 /zh/search/ 全站搜索页。
    *
-   * 以后书会很多，一次性渲染上百张卡会让首屏卡住，
-   * 所以用 IntersectionObserver 滚到底再加载下一批。
+   * 为什么是真实路径而不是 #/search：真实路径能被浏览器记住、能收藏、
+   * 能在新标签打开，分享出去别人也能直接看到结果。hash 做不到。
    */
-  let thirdObserver = null;
-  function mountThirdParty(list) {
-    const PAGE = 12;
-    const grid = $('third-grid');
-    const sentinel = $('third-sentinel');
-    if (!grid) return;
-
-    let shown = 0;
-    let pool = list.slice();
-
-    if (thirdObserver) { thirdObserver.disconnect(); thirdObserver = null; }
-
-    const applyFilter = () => {
-      const q = ($('third-q').value || '').trim().toLowerCase();
-      pool = !q ? list.slice() : list.filter(b =>
-        [b.title, b.subtitle, b.desc, (b.author || {}).name, b.repo, (b.tags || []).join(' ')]
-          .filter(Boolean).join(' ').toLowerCase().includes(q));
-      shown = 0;
-      grid.innerHTML = '';
-      renderMore();
-    };
-
-    function renderMore() {
-      const slice = pool.slice(shown, shown + PAGE);
-      if (slice.length) {
-        grid.insertAdjacentHTML('beforeend', slice.map(b => bookCard(b, T().home)).join(''));
-        shown += slice.length;
-      }
-      if (sentinel) {
-        sentinel.textContent = shown < pool.length
-          ? T().homeThird.more.replace('{n}', pool.length - shown)
-          : (!pool.length ? T().homeThird.noMatch : (pool.length > PAGE ? T().homeThird.allShown : ''));
-      }
-    }
-
-    const qEl = $('third-q');
-    if (qEl) qEl.addEventListener('input', applyFilter);
-
-    const rb = $('third-refresh');
-    if (rb) rb.onclick = async () => {
-      rb.classList.add('spinning');
-      rb.disabled = true;
-      try { await refreshExternal(); }
-      finally { rb.classList.remove('spinning'); rb.disabled = false; }
-    };
-
-    renderMore();
-
-    if (sentinel && 'IntersectionObserver' in window) {
-      thirdObserver = new IntersectionObserver(entries => {
-        if (entries.some(e => e.isIntersecting) && shown < pool.length) renderMore();
-      }, { rootMargin: '200px' });
-      thirdObserver.observe(sentinel);
-    }
+  function mountHomeSearch() {
+    const form = $('home-search');
+    const input = $('home-q');
+    if (!form || !input) return;
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const v = input.value.trim();
+      if (!v) return;
+      // 当前页是 /al/zh/ 下的 index.html，./search/ 解析成 /al/zh/search/
+      location.href = './search/?keyword=' + encodeURIComponent(v);
+    });
   }
 
   /** 重新拉第三方书（刷新按钮 / 发布新书后调用） */
@@ -1383,7 +1330,13 @@
 
     if (!parts.length) return renderHome();
     if (parts[0] === 'review') return renderReview();
-    if (parts[0] === 'docs') return renderDocs(parts[1]);
+    // 第三方书籍列表页已下线（书多了会淹没官方教材，找书改用顶部搜索）。
+    // 只留 #/docs/check —— 作者在主站内自查一本书，这个还有用。
+    if (parts[0] === 'docs') {
+      if (parts[1] === 'check') return renderDocs('check');
+      location.hash = '#/';
+      return;
+    }
     if (parts[0] === 'dev') return renderDev(parts[1]);
     if (parts[0] === 'book' && parts[1]) {
       const bid = parts[1];
@@ -1429,7 +1382,7 @@
     const host = document.createElement('div');
     $('lesson').appendChild(host);
     Docs.boot(api);                    // 复用主站已有的登录态
-    Docs.mount(host, sub === 'check' ? 'check' : 'index',
+    Docs.mount(host, 'check',          // 列表页已下线，只剩自查
                { embedded: true, lang: CFG.lang });
     document.title = `${T().brand} · ${T().homeThird.browseMore}`;
   }

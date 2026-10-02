@@ -39,10 +39,13 @@ window.I18N = {
     building: '🚧 Coming soon'
   },
   homeThird: {
+    allBooks: "All textbooks",
     official: "Official",
     third: "Community",
     badge: "Community",
     searchPh: "Search community books (title / author / repo)",
+    searchAllPh: "Search all textbooks: title, lesson, body",
+    searchAllBtn: "Search",
     refresh: "Refresh",
     thirdNote: "Community books are written by contributors and read straight from the author's repo. Listing only means the format is valid.",
     more: "{n} more — scroll down to load",

@@ -254,7 +254,7 @@ const Docs = (() => {
   async function mountCheck(root) {
     root.innerHTML = `
       <div class="docs-head">
-        <a class="docs-back" href="#/docs">← ${esc(T('backList'))}</a>
+        <a class="docs-back" href="#/">← ${esc(T('backList'))}</a>
         <h1>${esc(T('checkTitle'))}</h1>
         <p class="docs-sub">${esc(T('checkSub'))}</p>
       </div>
@@ -375,7 +375,7 @@ const Docs = (() => {
       goLogin: '去登录 →', repoLink: '仓库', read: '阅读',
       notPassed: '未通过的原因：',
       checkTitle: '自查一本书', checkSub: '贴入仓库名，立刻跑完整校验，并预览目录和课文。',
-      backList: '返回索引', repoPh: 'owner/repo，例如 Cool-zimo/al-book-office-automation',
+      backList: '返回首页', repoPh: 'owner/repo，例如 Cool-zimo/al-book-office-automation',
       checkBtn: '检查', tryDemo: '用示例书试试', reading: '正在读取仓库…',
       pass: '通过校验 —— 这本书可以被收录', fail: '有 {n} 处错误，暂时不会被收录',
       mustFix: '必须修掉的', suggest: '建议改进（不影响收录）', clean: '一条问题都没有，很干净。',
@@ -394,7 +394,7 @@ const Docs = (() => {
       goLogin: 'Sign in →', repoLink: 'Repo', read: 'Read',
       notPassed: 'Why it failed:',
       checkTitle: 'Check a book', checkSub: 'Paste a repo name to run the full validation, and preview its TOC and lessons.',
-      backList: 'Back to index', repoPh: 'owner/repo, e.g. Cool-zimo/al-book-office-automation',
+      backList: 'Back home', repoPh: 'owner/repo, e.g. Cool-zimo/al-book-office-automation',
       checkBtn: 'Check', tryDemo: 'Try the sample', reading: 'Reading repository…',
       pass: 'Validation passed — this book can be listed', fail: '{n} errors — will not be listed yet',
       mustFix: 'Must fix', suggest: 'Suggestions (won\'t block listing)', clean: 'No issues at all. Clean.',
