@@ -1375,6 +1375,11 @@
     const h = location.hash.replace(/^#\/?/, '');
     const parts = h.split('/').filter(Boolean);
 
+    // 上一次在开发者平台/文档站（全宽），这次不是 → 还原布局
+    if (document.body.classList.contains('wide-view') && parts[0] !== 'dev' && parts[0] !== 'docs') {
+      leaveModuleView();
+    }
+
     if (!parts.length) return renderHome();
     if (parts[0] === 'review') return renderReview();
     if (parts[0] === 'docs') return renderDocs(parts[1]);
@@ -1407,9 +1412,15 @@
     closeSidebar();
     resetLab();
     setNotesVisible(false);
+    document.body.classList.add('wide-view');   // 收掉侧栏和笔记栏，正文全宽
     $('toc').innerHTML = '';
     $('lesson-nav').innerHTML = '';
     $('lesson').innerHTML = '';
+  }
+
+  /** 从开发者平台 / 文档站回到正常视图时把布局还原 */
+  function leaveModuleView() {
+    document.body.classList.remove('wide-view');
   }
 
   function renderDocs(sub) {

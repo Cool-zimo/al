@@ -1537,6 +1537,18 @@ hint: ${zh ? '用加法' : 'Use addition'}
     margin-left:8px;white-space:nowrap}
 
 
+
+  /* 整页模式下三栏要撑满，不再受 900px 的正文宽度限制 */
+  body.wide-view .dev-wrap{max-width:1560px;padding:26px 30px 70px}
+  body.wide-view .dev-ed{grid-template-columns:260px minmax(0,1fr) minmax(0,1fr)}
+  /* 窄屏不隐藏预览，改成上下堆叠 —— 直接藏掉的话作者就没法边写边看了 */
+  @media(max-width:1180px){
+    body.wide-view .dev-ed{grid-template-columns:230px minmax(0,1fr)}
+    body.wide-view .dev-view{grid-column:1/-1}
+    body.wide-view .dev-edit textarea{min-height:340px}
+  }
+  @media(max-width:820px){ body.wide-view .dev-ed{grid-template-columns:1fr} }
+
   /* 轻提示 */
   .dev-toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%);
     background:var(--text);color:var(--panel);padding:10px 20px;border-radius:9px;

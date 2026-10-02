@@ -1165,3 +1165,17 @@ body.no-notes .main { margin-right: 0; max-width: 1040px; }
 @keyframes thirdspin{to{transform:rotate(360deg)}}
 .third-note{font-size:12.5px;color:var(--faint);margin:2px 0 12px;line-height:1.6}
 .third-sentinel{padding:16px 0;text-align:center;font-size:12.5px;color:var(--faint);min-height:20px}
+
+/* 开发者平台 / 文档站：整页模式
+   编辑器是三栏布局，再被主站侧栏和笔记栏夹住就没地方了。
+   所以这两个视图下把两侧都收掉，正文全宽。 */
+body.wide-view .sidebar { display: none; }
+body.wide-view .scrim { display: none !important; }
+body.wide-view .main {
+  margin-left: 0;
+  margin-right: 0;
+  max-width: none;
+  padding: 0;
+}
+body.wide-view .notes,
+body.wide-view .note-fab { display: none !important; }
