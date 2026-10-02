@@ -199,10 +199,6 @@
           <div class="stat"><b>${st.due}</b><span>${H.statDue}</span></div>
           <div class="stat"><b>${st.inProgress}</b><span>${H.statMem}</span></div>
         </div>
-        <form class="home-search" id="home-search" autocomplete="off">
-          <input type="text" id="home-q" placeholder="${escapeHtml(HT.searchAllPh)}" aria-label="${escapeHtml(HT.searchAllPh)}">
-          <button type="submit">${escapeHtml(HT.searchAllBtn)}</button>
-        </form>
       </div>`;
 
     html += `<h2 class="home-stage">${escapeHtml(HT.allBooks)} <span class="stage-n">${official.length}</span></h2>`;
@@ -225,7 +221,6 @@
       </div>`;
 
     art.innerHTML = html;
-    mountHomeSearch();
 
     $('lesson-nav').innerHTML = '';
     $('progress-label').textContent = `${doneCount} ${H.statDone}`;
@@ -253,25 +248,6 @@
           : ''}
         <div class="book-foot">${b.ready ? H.start : H.building}</div>
       </a>`;
-  }
-
-  /**
-   * 首页搜索框：跳到 /zh/search/ 全站搜索页。
-   *
-   * 为什么是真实路径而不是 #/search：真实路径能被浏览器记住、能收藏、
-   * 能在新标签打开，分享出去别人也能直接看到结果。hash 做不到。
-   */
-  function mountHomeSearch() {
-    const form = $('home-search');
-    const input = $('home-q');
-    if (!form || !input) return;
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      const v = input.value.trim();
-      if (!v) return;
-      // 当前页是 /al/zh/ 下的 index.html，./search/ 解析成 /al/zh/search/
-      location.href = './search/?keyword=' + encodeURIComponent(v);
-    });
   }
 
   /** 重新拉第三方书（刷新按钮 / 发布新书后调用） */
@@ -1065,6 +1041,22 @@
     };
 
     $('btn-lab').onclick = () => openLab();
+
+    // 顶部搜索框：常驻在实验室按钮左边，任何页面都能直接搜
+    const tsForm = $('top-search');
+    if (tsForm) {
+      tsForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const v = ($('top-q').value || '').trim();
+        if (!v) return;
+        $('top-q').blur();
+        // 去掉 hash 再解析，否则在 #/book/xxx 下 ./search/ 会拼到课的路径上
+        location.href = new URL('./search/?keyword=' + encodeURIComponent(v),
+                                location.href.split('#')[0]).href;
+      });
+      const ph = T().homeThird.searchAllPh;
+      if (ph) $('top-q').placeholder = ph;
+    }
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && !$('lab').hidden) closeLab();
     });

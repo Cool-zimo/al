@@ -100,19 +100,17 @@
   }
 
   /* ---------- 第三方教材 ----------
-   * 站内索引只覆盖 content/ 下的官方教材。第三方书在作者自己的仓库里，
-   * 构建时拿不到，只能运行时去 al-docs 的 registry 里认领。
-   * 不做这一步的话，搜「Python 自动化办公」永远 0 条 —— 书明明就在首页。
-   * 只抓 toc + 课标题，不抓正文，所以请求量很小。
+   * 构建时（build_search.py）已经把 registry 里通过校验的书内联进索引了 ——
+   * 运行时零依赖，一定能搜到。
+   *
+   * 这里只做一件事：看看有没有「上次构建之后新收录」的书，有就补进来。
+   * 失败完全不影响 —— 内联的那批已经能搜了。
    */
   var REGISTRY = [
     'https://cdn.jsdelivr.net/gh/Cool-zimo/al-docs@main/registry.json',
     'https://raw.githubusercontent.com/Cool-zimo/al-docs/main/registry.json',
-    'https://cool-zimo.github.io/al-docs/registry.json',
   ];
-  var EXT_CACHE = 'al.search.ext.' + LANG;
-  var EXT_TTL = 6 * 3600 * 1000;      // registry 机器人 6 小时扫一次，缓存对齐
-  var MAX_EXT_BOOKS = 24;
+  var EXT_TTL = 30 * 60 * 1000;       // 半小时看一次就够了，机器人 6 小时才扫一次
 
   function extSources(repo, branch, path) {
     var b = branch || 'main';
@@ -122,48 +120,21 @@
     ];
   }
 
-  /** 官方式 toc：[{title, items:[{id,title,summary}]}]；第三方简写：{chapters:[{title, lessons:[id]}]} */
-  function tocEntries(toc) {
-    var out = [];
-    var chs = Array.isArray(toc) ? toc : (toc && toc.chapters) || [];
-    chs.forEach(function (ch, ci) {
-      (ch.items || []).forEach(function (it) {
-        out.push({ c: ci, id: String(it.id), t: it.title || String(it.id), s: it.summary || '', md: false });
-      });
-      // 简写格式只有课号，标题得去课文里抓（md: true 标记待抓）
-      (ch.lessons || []).forEach(function (lid) {
-        if (typeof lid === 'string') out.push({ c: ci, id: lid, t: lid, s: '', md: true });
-      });
-    });
-    return { chs: chs.map(function (c) { return c.title || ''; }), items: out };
-  }
-
   function firstLine(md, re) {
     var line = String(md || '').split('\n').find(function (l) { return re.test(l); });
     return line ? line.replace(re, '').trim() : '';
   }
 
-  /** 并发抓课文首行补标题。并发上限 6，别把 CDN 打挂 */
-  function fillTitles(entries, repo, branch) {
-    var queue = entries.filter(function (e) { return e.md; });
-    var running = 0;
-    return new Promise(function (resolve) {
-      function pump() {
-        if (!queue.length) { if (!running) resolve(); return; }
-        while (running < 6 && queue.length) {
-          running++;
-          var e = queue.shift();
-          fetchText(extSources(repo, branch, 'content/' + LANG + '/lessons/' + e.id + '.md'))
-            .then(function (t) {
-              e.t = firstLine(t, /^#\s+/) || e.id;
-              e.s = firstLine(t, /^>\s+/);
-            })
-            .catch(function () { /* 抓不到就留课号，目录照样可点 */ })
-            .then(function () { running--; pump(); });
-        }
-      }
-      pump();
+  /** 第三方 toc 是简写格式：{chapters:[{title, lessons:[id]}]}，标题要去课文里抓 */
+  function tocEntries(toc) {
+    var out = [];
+    var chs = (toc && toc.chapters) || [];
+    chs.forEach(function (ch, ci) {
+      (ch.lessons || []).forEach(function (lid) {
+        out.push({ c: ci, id: String(lid), t: String(lid), s: '' });
+      });
     });
+    return { chs: chs.map(function (c) { return c.title || ''; }), items: out };
   }
 
   function applyExternal(one) {
@@ -172,7 +143,6 @@
       id: one.id, title: one.title, sub: one.sub || '',
       stage: one.stage || (LANG === 'zh' ? '第三方' : 'Community'),
       chs: one.chs, ext: true,
-      // 简介 / 标签 / 作者 / 章标题都进可搜字段 —— 搜「openpyxl」命中的就是它们
       x: [one.desc, (one.tags || []).join(' '), (one.author || {}).name,
           (one.chs || []).join(' ')].filter(Boolean).join(' '),
     });
@@ -182,42 +152,44 @@
   }
 
   async function loadExternal() {
-    var cached = null;
-    try {
-      var raw = localStorage.getItem(EXT_CACHE);
-      if (raw) {
-        var o = JSON.parse(raw);
-        if (o && Date.now() - o.t < EXT_TTL) cached = o.list;
-      }
-    } catch (e) { /* 缓存坏了就重新拉 */ }
-
-    if (cached) {
-      cached.forEach(applyExternal);
-      render();
-      return;
-    }
+    var have = {};
+    idx.books.forEach(function (b) { if (b.ext) have[b.id] = 1; });
 
     var reg = await fetchJSON(REGISTRY);
-    var books = (reg.books || []).filter(function (b) {
-      return b.ok && (!b.langs || !b.langs.length || b.langs.indexOf(LANG) >= 0);
-    }).slice(0, MAX_EXT_BOOKS);
+    var fresh = (reg.books || []).filter(function (b) {
+      return b.ok && !have[b.id] && (!b.langs || !b.langs.length || b.langs.indexOf(LANG) >= 0);
+    }).slice(0, 12);
+    if (!fresh.length) return;
 
-    var list = [];
-    for (const b of books) {
+    for (const b of fresh) {
       try {
         var toc = await fetchJSON(extSources(b.repo, b.branch, 'content/' + LANG + '/toc.json'));
         var e = tocEntries(toc);
-        await fillTitles(e.items, b.repo, b.branch);
-        var one = { id: b.id, title: b.title, sub: b.subtitle, stage: b.stage,
-                    desc: b.desc, tags: b.tags, author: b.author,
-                    chs: e.chs, items: e.items };
-        list.push(one);
-        applyExternal(one);     // 抓一本就上一本，别等全部抓完
+        // 并发补标题，上限 6
+        var queue = e.items.slice(), running = 0;
+        await new Promise(function (resolve) {
+          function pump() {
+            if (!queue.length) { if (!running) resolve(); return; }
+            while (running < 6 && queue.length) {
+              running++;
+              var it = queue.shift();
+              fetchText(extSources(b.repo, b.branch, 'content/' + LANG + '/lessons/' + it.id + '.md'))
+                .then(function (md) {
+                  it.t = firstLine(md, /^#\s+/) || it.id;
+                  it.s = firstLine(md, /^>\s+/);
+                })
+                .catch(function () {})
+                .then(function () { running--; pump(); });
+            }
+          }
+          pump();
+        });
+        applyExternal({ id: b.id, title: b.title, sub: b.subtitle, stage: b.stage,
+                        desc: b.desc, tags: b.tags, author: b.author,
+                        chs: e.chs, items: e.items });
         render();
-      } catch (err) { /* 某本抓不到就跳过，不影响其它书 */ }
+      } catch (err) { /* 某本抓不到就跳过 */ }
     }
-    try { localStorage.setItem(EXT_CACHE, JSON.stringify({ t: Date.now(), list: list })); }
-    catch (e) { /* 存不下就算了，下次重新拉 */ }
   }
 
   /* ---------- 状态 ---------- */
@@ -419,8 +391,14 @@
     get(LANG + '/search-index.json').then(function (d) {
       idx = d;
       render();
-      // 第三方教材后台并入，不阻塞首屏
-      loadExternal().catch(function () { /* 拿不到就算了，官方书照搜 */ });
+      // 索引里已内联了第三方书。这里只补「上次构建之后新收录」的，失败了也不影响。
+      try {
+        var last = parseInt(localStorage.getItem('al.search.ext.at') || '0', 10);
+        if (Date.now() - last > EXT_TTL) {
+          localStorage.setItem('al.search.ext.at', String(Date.now()));
+          loadExternal().catch(function () {});
+        }
+      } catch (e) { /* 隐私模式下 localStorage 不可用 */ }
     }).catch(function () {
       $('#state').textContent = T.err;
     });

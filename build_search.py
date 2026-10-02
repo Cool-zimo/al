@@ -8,10 +8,118 @@
 
 索引里也不存代码：代码里全是 print、return 这类高频词，存进去全是噪音。
 """
-import os, re, json, sys
+import os, re, json, sys, urllib.request, urllib.error
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 CONTENT = os.path.join(ROOT, 'content')
+
+# 第三方书在作者自己的仓库里，构建时扫不到。
+# 以前是浏览器运行时去 al-docs 拉 registry —— 三个源都可能挂（jsDelivr 间歇 502、
+# GitHub Pages 403），一挂就搜不到第三方书。
+# 改成构建时拉一次写进索引，运行时零依赖：一定能搜到。
+# 新收录的书靠下次构建进来（机器人本来就是 6 小时扫一次，够用）。
+REGISTRY_URLS = [
+    'https://raw.githubusercontent.com/Cool-zimo/al-docs/main/registry.json',
+    'https://cdn.jsdelivr.net/gh/Cool-zimo/al-docs@main/registry.json',
+]
+TOKFILE = os.path.join(os.path.dirname(ROOT), '.tokens')
+
+
+def _http(url, tok=None, timeout=60):
+    """带 token 走 GitHub API / raw。token 只是提高限流额度，没有也能读公开文件。"""
+    h = {'User-Agent': 'al-build'}
+    if tok:
+        h['Authorization'] = 'Bearer ' + tok
+    r = urllib.request.Request(url, headers=h)
+    with urllib.request.urlopen(r, timeout=timeout) as resp:
+        return resp.read().decode('utf-8', 'replace')
+
+
+def load_registry():
+    toks = []
+    try:
+        toks = [l.strip() for l in open(TOKFILE, encoding='utf-8') if l.strip()]
+    except Exception:
+        pass
+    for url in REGISTRY_URLS:
+        for tok in (toks + [None]):
+            try:
+                reg = json.loads(_http(url, tok))
+                if isinstance(reg, dict) and reg.get('books'):
+                    return reg
+            except Exception:
+                continue
+    print('  ! registry 拉取失败，第三方书不进索引')
+    return None
+
+
+def fetch_lessons(repo, branch, lang, toc):
+    """第三方书：从原作者仓库抓课标题和引言。只抓这两个，不抓正文。"""
+    chs, items = [], []
+    for ci, ch in enumerate(toc.get('chapters', []) if isinstance(toc, dict) else []):
+        chs.append(ch.get('title', ''))
+        for lid in ch.get('lessons', []):
+            lid = str(lid)
+            t, sm = lid, ''
+            try:
+                u = ('https://raw.githubusercontent.com/%s/%s/content/%s/lessons/%s.md'
+                     % (repo, branch or 'main', lang, lid))
+                md = _http(u, timeout=30)
+                m = re.search(r'^#\s+(.+)$', md, re.M)
+                if m:
+                    t = re.sub(r'^\d+\s*', '', m.group(1).strip())
+                m = re.search(r'^>\s+(.+)$', md, re.M)
+                if m:
+                    sm = m.group(1).strip()
+            except Exception:
+                pass
+            items.append({'b': 0, 'c': ci, 'id': lid, 't': t, 's': sm})
+    return chs, items
+
+
+def build_external(lang):
+    reg = load_registry()
+    if not reg:
+        return []
+    toks = []
+    try:
+        toks = [l.strip() for l in open(TOKFILE, encoding='utf-8') if l.strip()]
+    except Exception:
+        pass
+    out = []
+    for b in reg.get('books', []):
+        if not b.get('ok'):
+            continue
+        langs = b.get('langs') or []
+        if langs and lang not in langs:
+            continue
+        repo, branch = b.get('repo'), b.get('branch') or 'main'
+        if not repo:
+            continue
+        toc = None
+        for tok in (toks + [None]):
+            try:
+                u = 'https://raw.githubusercontent.com/%s/%s/content/%s/toc.json' % (repo, branch, lang)
+                toc = json.loads(_http(u, tok, timeout=30))
+                break
+            except Exception:
+                continue
+        if not toc:
+            print('  ! 跳过 %s（toc 拉取失败）' % repo)
+            continue
+        chs, items = fetch_lessons(repo, branch, lang, toc)
+        for it in items:
+            it['b'] = len(out)          # 占位，下面统一改成真实下标
+        out.append({
+            'id': b.get('id'), 'title': b.get('title') or b.get('id'),
+            'sub': b.get('subtitle') or '', 'stage': b.get('stage') or '第三方',
+            'ext': True,
+            'x': ' '.join([b.get('desc') or '', ' '.join(b.get('tags') or []),
+                           (b.get('author') or {}).get('name', ''), ' '.join(chs)]),
+            'chs': chs, '_items': items,
+        })
+        print('  + %s（%d 课）' % (b.get('title'), len(items)))
+    return out
 
 
 def first(md, pat):
@@ -70,9 +178,21 @@ def build(lang):
 if __name__ == '__main__':
     langs = sys.argv[1:] or ['zh', 'en']
     for L in langs:
+        print(f'== {L} ==')
         d = build(L)
+        n_official = len(d['books'])
+
+        # 第三方书并进来：书号要接着官方的往下排，items.b 指的是 books 下标
+        ext = build_external(L)
+        for e in ext:
+            bi = len(d['books'])
+            d['books'].append({k: v for k, v in e.items() if k != '_items'})
+            for it in e['_items']:
+                it['b'] = bi
+                d['items'].append(it)
+
         p = os.path.join(CONTENT, L, 'search-index.json')
         with open(p, 'w', encoding='utf-8') as f:
             json.dump(d, f, ensure_ascii=False, separators=(',', ':'))
-        print(f'{L}: {len(d["books"])} 本 / {len(d["items"])} 课 / '
-              f'{os.path.getsize(p)//1024}KB')
+        print(f'{L}: 官方 {n_official} 本 + 第三方 {len(ext)} 本 / '
+              f'{len(d["items"])} 课 / {os.path.getsize(p)//1024}KB')
