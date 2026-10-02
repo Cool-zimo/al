@@ -408,8 +408,12 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
     if (!await ensureCloud()) throw new Error(T('cloudNeedLogin'));
     const branch = await cloudBranch();
     const files = bookFiles(b);
+    // 改名/删课留下的旧文件一并删掉，避免草稿仓库里堆孤儿
+    const mine = pendingDeletes.filter(d => d.book === b.id);
+    for (const d of mine) files.push({ path: d.path, delete: true });
     await api.commitTree(owner, DRAFT_REPO, branch,
       `draft: ${b.title} (${new Date().toISOString().slice(0, 16).replace('T', ' ')})`, files);
+    for (const d of mine) pendingDeletes.splice(pendingDeletes.indexOf(d), 1);
     const shas = {};
     shas[b.id] = Date.now();
     const info = cloudInfo();
@@ -1062,8 +1066,11 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
     const ch = (cur.chapters || [])[curLesson.chIdx];
     if (!ch) return null;
     if (curLesson.isTest) {
-      // 章测也当作一"课"来编辑，只是内容存在 chapter.testMd 上
-      return { id: ch.test || 'test', title: T('testName'), get md() { return ch.testMd || ''; },
+      // 章测也当作一"课"来编辑，只是内容存在 chapter.testMd 上。
+      // 注意：这里每次调用都返回一个新对象，所以别往它上面写持久字段 ——
+      // 章测在 al-book 格式里只有文件名（toc 的 test 字段），没有"标题"这一说。
+      return { id: ch.test || 'test', isTest: true,
+               get md() { return ch.testMd || ''; },
                set md(v) { ch.testMd = v; } };
     }
     return (ch.lessons || [])[curLesson.lsIdx] || null;
@@ -1090,7 +1097,8 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
           <div class="dev-ls test ${curLesson && curLesson.isTest && curLesson.chIdx === ci ? 'on' : ''}"
                data-gotest="${ci}">
             <span class="n">测</span>
-            <span class="t">${esc(ch.test)}.md${ch.testMd ? '' : ` <i class="dim">${T('testEmpty')}</i>`}</span>
+            <span class="t">${esc(T('testName'))}<i class="fn">${esc(ch.test)}.md</i>${
+              ch.testMd ? '' : ` <i class="dim">${T('testEmpty')}</i>`}</span>
           </div>` : ''}
         <button class="dev-btn xs ghost wide" data-addls="${ci}">${T('addLesson')}</button>
       </div>`).join('');
@@ -1160,13 +1168,63 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
       return;
     }
     ta.disabled = false;
-    head.innerHTML = `<input type="text" class="dev-ls-t" id="de-lstitle" value="${esc(ls.title || '')}"
-      placeholder="${T('lsTitlePh')}"><span class="dim">${esc(ls.id)}.md</span>`;
-    $('de-lstitle').oninput = () => { ls.title = $('de-lstitle').value; markDirty(); drawTree(); };
+    if (ls.isTest) {
+      // 章测没有"标题"这个字段（格式里只有文件名），
+      // 所以这里给的是文件名本身 —— 改它才是真的改了显示出来的那个名字。
+      head.innerHTML = `<span class="dev-ls-tag">${esc(T('testName'))}</span>
+        <input type="text" class="dev-ls-t" id="de-testid" value="${esc(ls.id)}"
+          spellcheck="false" placeholder="test-01"><span class="dim">.md</span>`;
+      // 用 change（输完/回车/失焦）而不是 input：
+      // 边打字边改的话，"test-02" 打成 "quiz-02" 会中途经过 q / qu / qui…，
+      // 每步都是一次真实改名，还会攒下一串根本不存在的待删路径。
+      const ti = $('de-testid');
+      ti.onchange = () => renameTest(ti.value);
+      ti.onblur = () => {                       // 输了非法字符就退回上一个合法值
+        const ch = (cur.chapters || [])[curLesson.chIdx];
+        if (ch && ti.value.trim() !== ch.test) ti.value = ch.test || '';
+      };
+    } else {
+      head.innerHTML = `<input type="text" class="dev-ls-t" id="de-lstitle" value="${esc(ls.title || '')}"
+        placeholder="${T('lsTitlePh')}"><span class="dim">${esc(ls.id)}.md</span>`;
+      $('de-lstitle').oninput = () => { ls.title = $('de-lstitle').value; markDirty(); drawTree(); };
+    }
     ta.value = ls.md || '';
     lastQuizSig = null;
     drawPreview();
     drawFoot();
+  }
+
+  /** 改名留下的云端旧文件，下次推送时一并删掉（否则草稿仓库里会攒一堆孤儿） */
+  const pendingDeletes = [];
+
+  /**
+   * 改章测文件名。
+   *
+   * 为什么要能改：目录树和编辑器里显示的就是这个文件名，
+   * 而章测在格式里没有"标题"字段 —— 想改显示的名字，只能改文件名。
+   *
+   * 只接受安全字符：这是要落盘的文件名，空格和斜杠会写出脏路径。
+   */
+  function renameTest(v) {
+    const ch = (cur && cur.chapters || [])[curLesson.chIdx];
+    if (!ch) return;
+    // 允许中文等 Unicode 字符（GitHub 存得住），只挡空白和会写出脏路径的符号。
+    // 只挡 ASCII 字母数字的话，中文作者想叫「章测-01」就被拒了，没必要。
+    const next = String(v || '').trim().replace(/\.md$/i, '');
+    if (!next || /[\s/\\:*?"<>|]/.test(next)) return;
+    if (next === ch.test) return;
+    const oldName = ch.test;
+    if (oldName && cur.id) {
+      const p = `drafts/${cur.id}/lessons/${oldName}.md`;
+      if (!pendingDeletes.some(d => d.book === cur.id && d.path === p)) {
+        pendingDeletes.push({ book: cur.id, path: p });
+      }
+    }
+    ch.test = next;
+    curLesson = { chIdx: curLesson.chIdx, isTest: true };
+    putBook(cur);
+    markDirty();
+    drawTree();
   }
 
   function drawPreview() {
@@ -1593,6 +1651,8 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
   .dev-ls .n{color:var(--faint);font-variant-numeric:tabular-nums;min-width:22px;font-size:12px}
   .dev-ls .t{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .dev-ls.test{border-top:1px dashed var(--border);margin-top:3px;padding-top:6px}
+  .dev-ls .fn{font-style:normal;color:var(--faint);font-size:11.5px;margin-left:6px}
+  .dev-ls-tag{font-size:12px;font-weight:650;color:var(--accent);white-space:nowrap}
   .dev-edit,.dev-view{display:flex;flex-direction:column}
   .dev-edit textarea{flex:1;min-height:460px;border:none;outline:none;resize:vertical;
     padding:12px 16px;background:transparent;color:var(--text);font-size:13.5px;line-height:1.75;
