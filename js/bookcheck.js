@@ -95,7 +95,12 @@ const BookCheck = (() => {
           if (fnm && !st.includes('def ' + fnm) && !st.includes('class ' + fnm)) {
             errors.push(`${tag}: func="${fnm}" 在 starter 里找不到定义`);
           }
-          if (!String(q.cases || '').trim()) errors.push(`${tag}: function 题缺 cases`);
+          if (!String(q.cases || '').trim()) { errors.push(`${tag}: function 题缺 cases`); }
+          else { const bad = badCaseLine(q.cases); if (bad) {
+            // 参数只按逗号分隔。写空格的话整段会变成一个参数，
+            // 运行时报"缺少参数"而不是告诉你写法错了 —— 所以在这里提前拦。
+            errors.push(`${tag}: cases 里 "${bad}" 的参数要用逗号分隔（如 1, 2 -> 3）`);
+          } }
         }
         if (t === 'code' && !(q.tests || []).length) errors.push(`${tag}: code 题缺 tests`);
         if (['js','css','html'].includes(t) && !(q.checks || []).length) {
@@ -227,5 +232,37 @@ const BookCheck = (() => {
     };
   }
 
-  return { validate, blocks };
+  /**
+   * 找出"参数段有空格却没有逗号"的用例行。
+   *
+   * 什么情况算可疑：参数段里含空格，但整个参数段既不含逗号，
+   * 也没有被引号/括号包起来 —— 那基本就是想写多个参数却用了空格。
+   *
+   * 反过来这些要放过：
+   *   "hello world" -> 5     单参数字符串，里面本来就有空格
+   *   [1, 2, 3] -> 6         列表参数（含逗号）
+   *   -> 3                   无参
+   */
+  function badCaseLine(cases) {
+    const lines = Array.isArray(cases) ? cases
+      : String(cases || '').split('\n');
+    for (const raw of lines) {
+      const line = String(raw).trim();
+      if (!line || !line.includes('->')) continue;
+      let argStr = line.slice(0, line.indexOf('->')).trim();
+      if (!argStr) continue;                                  // 无参
+      const m = /^\*(\d+)\s*(?:,\s*(.*))?$/.exec(argStr);   // *N 前缀
+      if (m) argStr = (m[2] || '').trim();
+      if (!argStr) continue;
+      if (!/\s/.test(argStr)) continue;                       // 没有空格，正常
+      if (argStr.includes(',')) continue;                      // 有逗号，正常写法
+      const ch = argStr[0];
+      if ((ch === '"' || ch === "'") && argStr.length > 1 && argStr.endsWith(ch)) continue;
+      if (ch === '[' || ch === '(' || ch === '{') continue;
+      return line;
+    }
+    return null;
+  }
+
+  return { validate, blocks, badCaseLine };
 })();

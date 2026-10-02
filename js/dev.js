@@ -100,6 +100,9 @@ const DevPlatform = (() => {
       minAgo: "分钟前",
       hourAgo: "小时前",
       dayAgo: "天前",
+      focus: "专注",
+      focusExit: "退出专注",
+      focusTitle: "收起章节树，只留编辑和预览（Ctrl/Cmd+B，Esc 退出）",
       bookInfo: "书籍信息",
       fTitle: "书名",
       fSubtitle: "副标题",
@@ -182,6 +185,9 @@ const DevPlatform = (() => {
       minAgo: "min ago",
       hourAgo: "h ago",
       dayAgo: "d ago",
+      focus: "Focus",
+      focusExit: "Exit focus",
+      focusTitle: "Hide the chapter tree, keep editor + preview (Ctrl/Cmd+B, Esc to exit)",
       bookInfo: "Book info",
       fTitle: "Title",
       fSubtitle: "Subtitle",
@@ -296,9 +302,9 @@ starter: |
   def add(a, b):
       return 0
 cases: |
-  1 2 -> 3
-  5 7 -> 12
-hint: ${zh ? '用加法' : 'Use addition'}
+  1, 2 -> 3
+  5, 7 -> 12
+hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas'}
 \`\`\`
 `;
   }
@@ -612,6 +618,14 @@ hint: ${zh ? '用加法' : 'Use addition'}
         wrap.className = 'dev-qbox-inline' + (exam ? ' exam' : '');
         pv.appendChild(wrap);
         try {
+          // 写完立刻能看出来的问题，别等到发布或运行时才发现
+          const warn = quizWarning(q);
+          if (warn) {
+            const w = document.createElement('div');
+            w.className = 'dev-qwarn';
+            w.innerHTML = '⚠ ' + esc(warn);
+            wrap.appendChild(w);
+          }
           // 用预览前缀，避免污染真实进度
           const box = Quiz.render(q, i, { key: (Quiz.PREVIEW_PREFIX || '__dev__:') + sigKey });
           if (exam) {
@@ -637,6 +651,35 @@ hint: ${zh ? '用加法' : 'Use addition'}
       if (head) pv.appendChild(head);
       keep.forEach(el => pv.appendChild(el));
     }
+  }
+
+  /** 题面里"当场就能查出来"的问题 —— 在预览卡片上直接标出来 */
+  function quizWarning(q) {
+    const zh = lang === 'zh';
+    const t = String(q.type || 'choice');
+    if (t === 'function') {
+      if (!String(q.func || '').trim()) return zh ? 'function 题缺 func' : 'function question needs func';
+      const bad = BookCheck.badCaseLine ? BookCheck.badCaseLine(q.cases) : null;
+      if (bad) return zh
+        ? `cases 里 "${bad}" 的参数要用逗号分隔（如 1, 2 -> 3）`
+        : `in cases, "${bad}" args must be comma-separated (e.g. 1, 2 -> 3)`;
+      if (!String(q.cases || '').trim()) return zh ? 'function 题缺 cases' : 'function question needs cases';
+      return '';
+    }
+    if (t === 'choice') {
+      const opts = q.options || [];
+      if (opts.length < 2) return zh ? '选择题至少 2 个选项' : 'choice needs at least 2 options';
+      const a = Number(q.answer);
+      if (!(a >= 0 && a < opts.length)) return zh ? `answer=${q.answer} 越界（共 ${opts.length} 个选项）` : `answer out of range (${opts.length} options)`;
+      return '';
+    }
+    if (['js', 'css', 'html'].includes(t) && !(q.checks || []).length) {
+      return zh ? `${t} 题没有 checks，无法判分` : `${t} question has no checks — cannot be graded`;
+    }
+    if (t === 'local' && !(q.checklist || []).length) {
+      return zh ? 'local 题缺 checklist' : 'local question needs a checklist';
+    }
+    return '';
   }
 
   /** 兼容旧的静态预览调用（评审报告等非交互场景用不到，这里保留纯文本版） */
@@ -945,6 +988,7 @@ hint: ${zh ? '用加法' : 'Use addition'}
         <span class="dev-state" id="de-state">${T('allSaved')}</span>
         <button class="dev-btn sm" id="de-save">${T('save')}</button>
         <button class="dev-btn sm ghost" id="de-cloud" title="${T('cloudPushTitle')}">☁ ${T('cloudPush')}</button>
+        <button class="dev-btn sm ghost" id="de-focus" title="${T('focusTitle')}">⤢ ${T('focus')}</button>
         <button class="dev-btn sm ghost" id="de-info">${T('bookInfo')}</button>
         <button class="dev-btn sm ghost" id="de-report">${T('report')}</button>
         <button class="dev-btn sm" id="de-publish">${T('publish')}</button>
@@ -968,12 +1012,20 @@ hint: ${zh ? '用加法' : 'Use addition'}
 
     drawTree();
     drawLesson();
+    applyFocus();
     paintCloudState();
     // 登录了就后台建好私有草稿仓，这样第一次自动保存不会卡住
     ensureCloud().then(() => paintCloudState()).catch(() => {});
 
-    $('de-back').onclick = () => { flush(); scheduleCloud(); mountList(root); };
+    $('de-back').onclick = () => {
+      flush(); scheduleCloud();
+      document.removeEventListener('keydown', onDevKey);
+      mountList(root);
+    };
     $('de-info').onclick = () => showBookInfo(b);
+    $('de-focus').onclick = () => toggleFocus();
+    document.addEventListener('keydown', onDevKey);
+
     $('de-cloud').onclick = async () => {
       const btn = $('de-cloud');
       btn.disabled = true;
@@ -1133,6 +1185,50 @@ hint: ${zh ? '用加法' : 'Use addition'}
     const s = stats(cur);
     f.innerHTML = `<span>${tf('statsBar', { c: s.chapters, l: s.lessons, q: s.questions })}</span>
       <span class="dim">${T('writeHint')}</span>`;
+  }
+
+  /**
+   * 专注模式：收起章节树，只留编辑 + 预览两栏。
+   *
+   * 写长课文时左侧那棵树纯占地方 —— 一课的 Markdown 能有几千行，
+   * 编辑区宽一点能少滚很多屏。
+   *
+   * Esc 退出。状态记在 localStorage，下次进编辑器还是上次的模式。
+   */
+  let focused = false;
+  try { focused = localStorage.getItem('pytut:devFocus') === '1'; } catch (e) {}
+
+  function toggleFocus() {
+    focused = !focused;
+    try { localStorage.setItem('pytut:devFocus', focused ? '1' : '0'); } catch (e) {}
+    applyFocus();
+  }
+
+  function applyFocus() {
+    const ed = document.querySelector('.dev-ed');
+    const btn = $('de-focus');
+    if (ed) ed.classList.toggle('focused', focused);
+    if (btn) {
+      btn.textContent = (focused ? '⤡ ' : '⤢ ') + (focused ? T('focusExit') : T('focus'));
+      btn.classList.toggle('on', focused);
+    }
+  }
+
+  /** 编辑器内的快捷键：Esc 退出专注，Ctrl/Cmd+S 保存 */
+  function onDevKey(e) {
+    const inField = /^(INPUT|TEXTAREA)$/.test((e.target && e.target.tagName) || '');
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      flush(true);
+      if (cur) pushBook(cur).then(() => paintCloudState()).catch(() => {});
+      return;
+    }
+    if (e.key === 'Escape' && focused) { toggleFocus(); return; }
+    // Ctrl/Cmd+B 切换专注（在输入框里也能用）
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B') && inField) {
+      e.preventDefault();
+      toggleFocus();
+    }
   }
 
   function markDirty() {
@@ -1529,6 +1625,8 @@ hint: ${zh ? '用加法' : 'Use addition'}
 
 
   /* 预览里的题目卡片（内嵌真 Quiz 组件） */
+  .dev-qwarn{background:#fff6e5;border:1px solid #f0d9a8;color:#8a5a00;border-radius:7px;
+    padding:6px 11px;font-size:12.5px;margin:8px 0 0}
   .dev-qbox-inline{margin:10px 0}
   .dev-qbox-inline.exam .quiz{border-color:color-mix(in srgb,var(--accent) 45%,var(--border))}
   .dev-pv-body .quiz{margin:0}
@@ -1541,6 +1639,13 @@ hint: ${zh ? '用加法' : 'Use addition'}
   /* 整页模式下三栏要撑满，不再受 900px 的正文宽度限制 */
   body.wide-view .dev-wrap{max-width:1560px;padding:26px 30px 70px}
   body.wide-view .dev-ed{grid-template-columns:260px minmax(0,1fr) minmax(0,1fr)}
+  /* 专注模式：收起章节树 */
+  .dev-ed.focused{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .dev-ed.focused .dev-tree{display:none}
+  .dev-wrap.focused .dev-ed-top{max-width:1560px}
+  .dev-btn.sm.on{border-color:var(--accent);color:var(--accent);
+    background:color-mix(in srgb,var(--accent) 14%,transparent)}
+  body.wide-view .dev-ed.focused .dev-edit textarea{min-height:620px}
   /* 窄屏不隐藏预览，改成上下堆叠 —— 直接藏掉的话作者就没法边写边看了 */
   @media(max-width:1180px){
     body.wide-view .dev-ed{grid-template-columns:230px minmax(0,1fr)}
