@@ -1426,7 +1426,8 @@
     enterModuleView();
     const host = document.createElement('div');
     $('lesson').appendChild(host);
-    DevPlatform.mount(host, sub === 'editor' ? 'editor' : 'list', { lang: CFG.lang });
+    DevPlatform.mount(host, sub === 'editor' ? 'editor' : 'list',
+                      { lang: CFG.lang, api });   // 复用主站登录态，草稿仓库要用它
     document.title = `${T().brand} · ${T().homeThird.devPlatform}`;
   }
 

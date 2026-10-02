@@ -126,6 +126,59 @@ class GitHubAPI {
     return this._req('PUT', `/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`, body);
   }
 
+  /**
+   * 一次提交里写多个文件 / 删多个文件（Git Tree API）。
+   *
+   * 为什么需要它：开发者平台的草稿是"一本几十个文件"，
+   * 用 contents API 一个一个写要几十次请求，慢且容易中途失败留半截。
+   * 走 tree 则是一次提交，要么全成要么全不成。
+   *
+   * 删文件：把 sha 显式设为 null（GitHub 用这个表示删除）。
+   */
+  async commitTree(owner, repo, branch, message, changes) {
+    const ref = await this._req('GET',
+      `/repos/${owner}/${repo}/git/ref/heads/${encodeURIComponent(branch)}`)
+      .catch(async () => {
+        // 分支不存在（空仓库）：拿默认分支再试
+        const b = await this.getDefaultBranch(owner, repo);
+        return this._req('GET', `/repos/${owner}/${repo}/git/ref/heads/${encodeURIComponent(b)}`);
+      });
+    const baseSha = ref.object.sha;
+    const baseCommit = await this._req('GET',
+      `/repos/${owner}/${repo}/git/commits/${baseSha}`);
+
+    // 一次性建 blob（并发，但别太猛）
+    const blobs = [];
+    const queue = changes.slice();
+    async function worker() {
+      while (queue.length) {
+        const c = queue.shift();
+        if (c.delete) { blobs.push({ path: c.path, sha: null }); continue; }
+        const b = await this._req('POST', `/repos/${owner}/${repo}/git/blobs`,
+          { content: c.content, encoding: 'utf-8' });
+        blobs.push({ path: c.path, sha: b.sha, mode: '100644', type: 'blob' });
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(6, changes.length) },
+      () => worker.call(this)));
+
+    const tree = await this._req('POST', `/repos/${owner}/${repo}/git/trees`,
+      { base_tree: baseCommit.tree.sha, tree: blobs });
+    const commit = await this._req('POST', `/repos/${owner}/${repo}/git/commits`,
+      { message, tree: tree.sha, parents: [baseSha] });
+    await this._req('PATCH',
+      `/repos/${owner}/${repo}/git/refs/heads/${encodeURIComponent(branch)}`,
+      { sha: commit.sha });
+    return commit;
+  }
+
+  /** 读一棵树（用于列出草稿仓库里有哪些书） */
+  async getTree(owner, repo, branch, recursive = true) {
+    const d = await this._req('GET',
+      `/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}${recursive ? '?recursive=1' : ''}`);
+    return (d && d.tree) || [];
+  }
+
   /** 设置仓库的 topic（发布第三方书时用来打 al-book 标记） */
   async setTopics(owner, repo, names) {
     return this._req('PUT', `/repos/${owner}/${repo}/topics`, { names });

@@ -15,9 +15,13 @@
 const DevPlatform = (() => {
 
   const KEY = 'pytut:devBooks';
+  const CLOUD_KEY = 'pytut:devCloud';
+  const DRAFT_REPO = 'al-drafts';      // 固定仓库名：一个私有仓装所有草稿
   const $ = id => document.getElementById(id);
 
   let api = null;
+  let owner = '';          // 登录用户名，草稿仓库的 owner
+  let cloudReady = false;  // 私有草稿仓库是否已就绪
   let lang = 'zh';
   let cur = null;          // 当前正在编辑的书
   let curLesson = null;    // { chIdx, lsIdx }
@@ -76,6 +80,26 @@ const DevPlatform = (() => {
       repoPh: "owner/repo，例如 Cool-zimo/al-book-office-automation",
       testName: "本章测验",
       testEmpty: "（还没写）",
+      cloudPush: "存到云端",
+      cloudPushTitle: "把草稿存进你的私有仓库，换设备也能接着写",
+      cloudPushTitle2: "草稿存在你的私有仓库 {repo} 里（停止改动 3 秒后自动保存）",
+      cloudPushing: "上传中…",
+      cloudOk: "已存到云端",
+      cloudPull: "从云端拉取",
+      cloudPulling: "拉取中…",
+      cloudPulled: "拉到 {n} 本草稿",
+      cloudEmpty: "云端还没有草稿",
+      cloudFail: "云端操作失败",
+      cloudNeedLogin: "需要先登录 GitHub",
+      cloudHint: "草稿存在你的私有仓库 {repo} 里",
+      cloudSaved: "已在云端",
+      cloudLocal: "仅本设备",
+      cloudNotFound: "云端没有这本书",
+      cloudBadMeta: "云端 meta.json 读不出来",
+      justNow: "刚刚",
+      minAgo: "分钟前",
+      hourAgo: "小时前",
+      dayAgo: "天前",
       bookInfo: "书籍信息",
       fTitle: "书名",
       fSubtitle: "副标题",
@@ -138,6 +162,26 @@ const DevPlatform = (() => {
       repoPh: "owner/repo, e.g. Cool-zimo/al-book-office-automation",
       testName: "Chapter test",
       testEmpty: "(empty)",
+      cloudPush: "Save to cloud",
+      cloudPushTitle: "Store drafts in your private repo so you can continue on another device",
+      cloudPushTitle2: "Drafts live in your private repo {repo} (auto-saved 3s after you stop typing)",
+      cloudPushing: "Uploading…",
+      cloudOk: "Saved to cloud",
+      cloudPull: "Pull from cloud",
+      cloudPulling: "Pulling…",
+      cloudPulled: "Pulled {n} drafts",
+      cloudEmpty: "No drafts in the cloud yet",
+      cloudFail: "Cloud operation failed",
+      cloudNeedLogin: "Sign in to GitHub first",
+      cloudHint: "Drafts are stored in your private repo {repo}",
+      cloudSaved: "in cloud",
+      cloudLocal: "local only",
+      cloudNotFound: "Not found in the cloud",
+      cloudBadMeta: "Cloud meta.json is unreadable",
+      justNow: "just now",
+      minAgo: "min ago",
+      hourAgo: "h ago",
+      dayAgo: "d ago",
       bookInfo: "Book info",
       fTitle: "Title",
       fSubtitle: "Subtitle",
@@ -259,6 +303,193 @@ hint: ${zh ? '用加法' : 'Use addition'}
 `;
   }
 
+  /* ================= 云端草稿仓库 ================= */
+  /**
+   * 草稿存在用户自己的私有仓库 al-drafts 里。
+   *
+   * 为什么不用 localStorage：换台设备就没了，清理浏览器数据也没了。
+   * 私有仓库天然跨设备、天然备份，而且用户能在 GitHub 上直接看历史提交。
+   *
+   * 本地 localStorage 仍然是工作区 —— 离线也能写，联网了再推上去。
+   *
+   * 目录结构（按书分目录，不塞一个巨大 JSON）：
+   *   drafts/{id}/meta.json              书籍元数据 + 章节结构
+   *   drafts/{id}/lessons/{lid}.md       课文
+   *   drafts/{id}/lessons/{test}.md      章测
+   *   drafts/{id}/published.json         发布记录（可选）
+   */
+  function cloudInfo() {
+    try { return JSON.parse(localStorage.getItem(CLOUD_KEY) || 'null') || {}; }
+    catch (e) { return {}; }
+  }
+  function setCloudInfo(o) {
+    try { localStorage.setItem(CLOUD_KEY, JSON.stringify(o)); } catch (e) {}
+  }
+
+  /**
+   * 确保私有仓库存在。
+   * autoInit 之后 GitHub 需要一点时间才建好默认分支，
+   * 所以创建后轮询几次确认能拿到 ref，否则第一次提交会 404。
+   */
+  async function ensureCloud() {
+    if (!api) return false;
+    if (cloudReady && owner) return true;
+    if (!owner) {
+      try { owner = await api.getUsername(); }
+      catch (e) { return false; }
+    }
+    const info = cloudInfo();
+    let ok = false;
+    try {
+      await api.getRepository(owner, DRAFT_REPO);
+      ok = true;
+    } catch (e) {
+      try {
+        await api.createRepository(DRAFT_REPO, {
+          description: 'AnyLearn 教材草稿（私有）',
+          private: true, autoInit: true,
+        });
+        // 等仓库真的可用
+        for (let i = 0; i < 12; i++) {
+          await new Promise(r => setTimeout(r, 1200));
+          try { await api.getRepository(owner, DRAFT_REPO); ok = true; break; }
+          catch (e2) { /* 再等等 */ }
+        }
+      } catch (e2) { ok = false; }
+    }
+    if (ok) {
+      cloudReady = true;
+      setCloudInfo({ ...info, repo: DRAFT_REPO, owner });
+    }
+    return ok;
+  }
+
+  async function cloudBranch() {
+    try { return await api.getDefaultBranch(owner, DRAFT_REPO); }
+    catch (e) { return 'main'; }
+  }
+
+  /** 一本书要写哪些文件 */
+  function bookFiles(b) {
+    const out = [];
+    const meta = {
+      format: 'al-draft', version: 1,
+      id: b.id, repo: b.repo, title: b.title, subtitle: b.subtitle, desc: b.desc,
+      stage: b.stage, level: b.level, langs: b.langs, license: b.license,
+      author: b.author, tags: b.tags || [],
+      published: b.published || null,
+      importedFrom: b.importedFrom || null,
+      updatedAt: b.updatedAt || Date.now(),
+      chapters: (b.chapters || []).map(ch => ({
+        title: ch.title, test: ch.test || null,
+        lessons: (ch.lessons || []).map(ls => ({ id: ls.id, title: ls.title })),
+      })),
+    };
+    out.push({ path: `drafts/${b.id}/meta.json`, content: JSON.stringify(meta, null, 2) });
+    for (const ch of (b.chapters || [])) {
+      for (const ls of (ch.lessons || [])) {
+        out.push({ path: `drafts/${b.id}/lessons/${ls.id}.md`, content: ls.md || '' });
+      }
+      if (ch.test) {
+        out.push({ path: `drafts/${b.id}/lessons/${ch.test}.md`, content: ch.testMd || '' });
+      }
+    }
+    return out;
+  }
+
+  /** 把一本草稿推到云端（一次提交） */
+  async function pushBook(b) {
+    if (!await ensureCloud()) throw new Error(T('cloudNeedLogin'));
+    const branch = await cloudBranch();
+    const files = bookFiles(b);
+    await api.commitTree(owner, DRAFT_REPO, branch,
+      `draft: ${b.title} (${new Date().toISOString().slice(0, 16).replace('T', ' ')})`, files);
+    const shas = {};
+    shas[b.id] = Date.now();
+    const info = cloudInfo();
+    setCloudInfo({ ...info, shas: { ...(info.shas || {}), ...shas } });
+    b.cloudAt = Date.now();
+    putBook(b);
+    return true;
+  }
+
+  /** 列出云端有哪些草稿（读树，1 次请求） */
+  async function cloudList() {
+    if (!await ensureCloud()) return [];
+    const branch = await cloudBranch();
+    const tree = await api.getTree(owner, DRAFT_REPO, branch, true);
+    const ids = new Set();
+    for (const it of tree) {
+      const m = (it.path || '').match(/^drafts\/([^/]+)\/meta\.json$/);
+      if (m) ids.add(m[1]);
+    }
+    return [...ids];
+  }
+
+  /** 从云端拉一本草稿下来 */
+  async function pullBook(id) {
+    if (!await ensureCloud()) throw new Error(T('cloudNeedLogin'));
+    const branch = await cloudBranch();
+    const tree = await api.getTree(owner, DRAFT_REPO, branch, true);
+    const base = `drafts/${id}/`;
+    const paths = tree.filter(x => x.type === 'blob' && x.path.startsWith(base)).map(x => x.path);
+    if (!paths.length) throw new Error(T('cloudNotFound'));
+
+    // 必须走 API：草稿在私有仓库里，raw / jsDelivr 都读不到 ——
+    // 私有仓库的 raw 链接要带 token，CDN 更是只能读公开仓库。
+    // 这是和"读第三方书"最大的区别，那边可以走 CDN，这边不行。
+    const raw = await api.getManyFiles(owner, DRAFT_REPO, paths, branch);
+    const got = {};
+    for (const p of paths) if (raw[p]) got[p] = raw[p].text;
+
+    let meta = null;
+    try { meta = JSON.parse(got[base + 'meta.json'] || '{}'); }
+    catch (e) { throw new Error(T('cloudBadMeta')); }
+
+    const b = {
+      id, repo: meta.repo || ('al-book-' + id),
+      title: meta.title || id, subtitle: meta.subtitle || '', desc: meta.desc || '',
+      stage: meta.stage || '基础', level: meta.level || '入门',
+      langs: (meta.langs && meta.langs.length) ? meta.langs : ['zh'],
+      license: meta.license || 'CC BY-NC 4.0',
+      author: meta.author || { name: '' }, tags: meta.tags || [],
+      published: meta.published || null,
+      importedFrom: meta.importedFrom || null,
+      chapters: [], cloudAt: Date.now(),
+      createdAt: meta.createdAt || Date.now(), updatedAt: meta.updatedAt || Date.now(),
+    };
+    for (const ch of (meta.chapters || [])) {
+      const lessons = [];
+      for (const it of (ch.lessons || [])) {
+        const md = got[`${base}lessons/${it.id}.md`];
+        if (md == null) continue;
+        lessons.push({ id: String(it.id), title: it.title || String(it.id), md });
+      }
+      b.chapters.push({
+        title: ch.title, lessons, test: ch.test || null,
+        testMd: ch.test ? (got[`${base}lessons/${ch.test}.md`] || '') : '',
+      });
+    }
+    return b;
+  }
+
+  /** 删掉云端的一本草稿 */
+  async function removeBook(id) {
+    if (!await ensureCloud()) throw new Error(T('cloudNeedLogin'));
+    const branch = await cloudBranch();
+    const tree = await api.getTree(owner, DRAFT_REPO, branch, true);
+    const base = `drafts/${id}/`;
+    const dels = tree.filter(x => x.path.startsWith(base))
+      .map(x => ({ path: x.path, delete: true }));
+    if (dels.length) {
+      await api.commitTree(owner, DRAFT_REPO, branch, `draft: remove ${id}`, dels);
+    }
+    const info = cloudInfo();
+    const shas = { ...(info.shas || {}) };
+    delete shas[id];
+    setCloudInfo({ ...info, shas });
+  }
+
   /* ================= 统计 ================= */
 
   function stats(b) {
@@ -309,6 +540,27 @@ hint: ${zh ? '用加法' : 'Use addition'}
       }
     }
     return files;
+  }
+
+  function cloudHintText() {
+    if (!api) return T('cloudNeedLogin');
+    return tf('cloudHint', { repo: DRAFT_REPO });
+  }
+
+  function ago(t) {
+    const d = Math.floor((Date.now() - t) / 1000);
+    if (d < 60) return T('justNow');
+    if (d < 3600) return Math.floor(d / 60) + ' ' + T('minAgo');
+    if (d < 86400) return Math.floor(d / 3600) + ' ' + T('hourAgo');
+    return Math.floor(d / 86400) + ' ' + T('dayAgo');
+  }
+
+  function toast(msg) {
+    const el = document.createElement('div');
+    el.className = 'dev-toast';
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2600);
   }
 
   /* ================= 渲染：预览 ================= */
@@ -412,7 +664,8 @@ hint: ${zh ? '用加法' : 'Use addition'}
       <div class="dev-bar">
         <button class="dev-btn" id="dev-new">${T('newBook')}</button>
         <button class="dev-btn ghost" id="dev-import">${T('importBtn')}</button>
-        <span class="dev-hint">${T('topicsHint')}</span>
+        <button class="dev-btn ghost" id="dev-pull">${T('cloudPull')}</button>
+        <span class="dev-hint" id="dev-cloud">${cloudHintText()}</span>
       </div>
       <div class="dev-grid" id="dev-grid"></div>`;
 
@@ -431,6 +684,7 @@ hint: ${zh ? '用加法' : 'Use addition'}
           <div class="dev-card-sub">${esc(b.subtitle || b.repo)}</div>
           <div class="dev-card-meta">${tf('statsBar', { c: s.chapters, l: s.lessons, q: s.questions })}</div>
           <div class="dev-card-meta dim">${esc(b.repo)}${pub ? ' · ' + (pub.visibility === 'private' ? T('priv') : T('pub')) : ''}</div>
+          <div class="dev-card-meta dim">${b.cloudAt ? '☁ ' + T('cloudSaved') + ' · ' + ago(b.cloudAt) : '○ ' + T('cloudLocal')}</div>
           <div class="dev-card-actions">
             <button class="dev-btn sm" data-edit="${esc(b.id)}">${T('edit')}</button>
             <button class="dev-btn sm ghost" data-report="${esc(b.id)}">${T('report')}</button>
@@ -443,6 +697,26 @@ hint: ${zh ? '用加法' : 'Use addition'}
 
     $('dev-new').onclick = showNewDialog;
     $('dev-import').onclick = showImportDialog;
+    $('dev-pull').onclick = async () => {
+      const btn = $('dev-pull');
+      btn.disabled = true; btn.textContent = T('cloudPulling');
+      try {
+        const ok = await ensureCloud();
+        if (!ok) { alert(T('cloudNeedLogin')); return; }
+        const ids = await cloudList();
+        let n = 0;
+        for (const id of ids) {
+          try { const b = await pullBook(id); b.cloudAt = Date.now(); putBook(b); n++; }
+          catch (e) { /* 单本失败不阻断 */ }
+        }
+        toast(n ? tf('cloudPulled', { n }) : T('cloudEmpty'));
+      } catch (e) {
+        alert(T('cloudFail') + '：' + (e.message || e));
+      } finally {
+        btn.disabled = false; btn.textContent = T('cloudPull');
+        mountList(root);
+      }
+    };
     grid.querySelectorAll('[data-edit]').forEach(el => {
       el.onclick = () => { cur = getBook(el.dataset.edit); mountEditor(root); };
     });
@@ -457,6 +731,8 @@ hint: ${zh ? '用加法' : 'Use addition'}
         const b = getBook(el.dataset.del);
         if (!confirm(tf('delConfirm', { t: b.title }))) return;
         delBook(b.id);
+        // 云端那本也删掉，否则下次拉取又冒出来
+        removeBook(b.id).catch(() => {});
         mountList(root);
       };
     });
@@ -668,6 +944,7 @@ hint: ${zh ? '用加法' : 'Use addition'}
         <input type="text" class="de-title" id="de-booktitle" value="${esc(b.title)}" placeholder="${T('bookTitlePh')}">
         <span class="dev-state" id="de-state">${T('allSaved')}</span>
         <button class="dev-btn sm" id="de-save">${T('save')}</button>
+        <button class="dev-btn sm ghost" id="de-cloud" title="${T('cloudPushTitle')}">☁ ${T('cloudPush')}</button>
         <button class="dev-btn sm ghost" id="de-info">${T('bookInfo')}</button>
         <button class="dev-btn sm ghost" id="de-report">${T('report')}</button>
         <button class="dev-btn sm" id="de-publish">${T('publish')}</button>
@@ -691,9 +968,21 @@ hint: ${zh ? '用加法' : 'Use addition'}
 
     drawTree();
     drawLesson();
+    paintCloudState();
+    // 登录了就后台建好私有草稿仓，这样第一次自动保存不会卡住
+    ensureCloud().then(() => paintCloudState()).catch(() => {});
 
-    $('de-back').onclick = () => { flush(); mountList(root); };
+    $('de-back').onclick = () => { flush(); scheduleCloud(); mountList(root); };
     $('de-info').onclick = () => showBookInfo(b);
+    $('de-cloud').onclick = async () => {
+      const btn = $('de-cloud');
+      btn.disabled = true;
+      const old = btn.textContent;
+      btn.textContent = T('cloudPushing');
+      try { await pushBook(b); toast(T('cloudOk')); }
+      catch (e) { alert(T('cloudFail') + '：' + (e.message || e)); }
+      finally { btn.disabled = false; btn.textContent = old; paintCloudState(); }
+    };
     $('de-booktitle').oninput = () => { b.title = $('de-booktitle').value; markDirty(); };
     $('de-save').onclick = () => flush(true);
     $('de-report').onclick = () => { flush(); showReport(b); };
@@ -849,6 +1138,40 @@ hint: ${zh ? '用加法' : 'Use addition'}
   function markDirty() {
     const el = $('de-state');
     if (el) { el.textContent = T('dirty'); el.className = 'dev-state dirty'; }
+    scheduleCloud();
+  }
+
+  /**
+   * 停止改动 3 秒后自动推云端。
+   *
+   * 为什么不是每次改动都推：一次 commitTree 是好几笔 API（建 blob + 建 tree + 建 commit），
+   * 打字时每 400ms 触发一次的话，一节课没写完就能耗掉上百次请求。
+   */
+  let cloudTimer = null;
+  let cloudBusy = false;
+  function scheduleCloud() {
+    if (!api || cloudBusy) return;
+    clearTimeout(cloudTimer);
+    cloudTimer = setTimeout(async () => {
+      if (!cur || cloudBusy) return;
+      cloudBusy = true;
+      try {
+        await pushBook(cur);
+        paintCloudState();
+      } catch (e) {
+        console.warn('[dev] 云端保存失败', e.message);
+      } finally { cloudBusy = false; }
+    }, 3000);
+  }
+
+  function paintCloudState() {
+    const btn = $('de-cloud');
+    if (!btn) return;
+    if (!api) { btn.textContent = '☁ ' + T('cloudPush'); btn.title = T('cloudNeedLogin'); return; }
+    btn.textContent = cur && cur.cloudAt
+      ? '☁ ' + T('cloudSaved') + ' · ' + ago(cur.cloudAt)
+      : '☁ ' + T('cloudPush');
+    btn.title = tf('cloudPushTitle2', { repo: DRAFT_REPO });
   }
   function flush(show) {
     if (!cur) return;
@@ -1214,6 +1537,11 @@ hint: ${zh ? '用加法' : 'Use addition'}
     margin-left:8px;white-space:nowrap}
 
 
+  /* 轻提示 */
+  .dev-toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%);
+    background:var(--text);color:var(--panel);padding:10px 20px;border-radius:9px;
+    font-size:13.5px;z-index:2000;box-shadow:0 6px 24px rgba(0,0,0,.22)}
+
   /* 导入：候选书列表 */
   .dev-pick{margin:8px 0;max-height:190px;overflow:auto}
   .dev-pick-h{font-size:12px;color:var(--faint);font-weight:600;margin:8px 0 5px}
@@ -1270,6 +1598,12 @@ hint: ${zh ? '用加法' : 'Use addition'}
 
   function mount(root, view, opts) {
     opts = opts || {};
+    // 仅注入登录态、不渲染（供脚本/测试调用云端接口用）
+    if (!root) {
+      if (opts.api) api = opts.api;
+      if (opts.lang) lang = opts.lang;
+      return;
+    }
     if (opts.lang) lang = opts.lang;
     else lang = document.documentElement.lang === 'en' ? 'en' : 'zh';
     const st = document.createElement('style');
@@ -1283,8 +1617,12 @@ hint: ${zh ? '用加法' : 'Use addition'}
       const t = raw ? JSON.parse(raw) : '';
       if (t && typeof t === 'string' && t.trim()) api = new GitHubAPI(t.trim());
     } catch (e) {}
+    // 主站已登录时会直接把 api 传进来，省一次 /user 请求
+    if (opts.api) api = opts.api;
     if (view === 'editor') mountEditor(root); else mountList(root);
   }
 
-  return { mount, loadAll, stats, toFiles, blank, lessonTemplate, previewMd, fetchBookForImport, isLoggedIn: () => !!api };
+  return { mount, loadAll, stats, toFiles, blank, lessonTemplate, previewMd,
+           fetchBookForImport, bookFiles, cloudList, pullBook, pushBook,
+           isLoggedIn: () => !!api };
 })();
