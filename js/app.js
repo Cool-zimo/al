@@ -183,9 +183,13 @@
     const doneCount = Object.keys(progress).length;
     const H = T().home;
 
+    // 官方书按 stage 分组；第三方书单独一区（要懒加载 + 搜索）
+    const official = BOOKS.filter(b => !b.external);
+    const third = BOOKS.filter(b => b.external);
     const groups = {};
-    BOOKS.forEach(b => { (groups[b.stage] = groups[b.stage] || []).push(b); });
+    official.forEach(b => { (groups[b.stage] = groups[b.stage] || []).push(b); });
 
+    const HT = T().homeThird;
     let html = `
       <div class="home-hero">
         <h1>${escapeHtml(H.title)}</h1>
@@ -195,42 +199,137 @@
           <div class="stat"><b>${st.due}</b><span>${H.statDue}</span></div>
           <div class="stat"><b>${st.inProgress}</b><span>${H.statMem}</span></div>
         </div>
+        <div class="home-actions">
+          <a class="home-act-btn" href="#/dev">${escapeHtml(HT.devPlatform)}</a>
+          <a class="home-act-btn ghost" href="#/docs">${escapeHtml(HT.browseMore)}</a>
+        </div>
       </div>`;
 
+    html += `<h2 class="home-stage">${escapeHtml(HT.official)} <span class="stage-n">${official.length}</span></h2>`;
     for (const [stage, list] of Object.entries(groups)) {
-      html += `<h2 class="home-stage">${escapeHtml(stage)}</h2><div class="book-grid">`;
-      for (const b of list) {
-        html += `
-          <a class="book-card${b.ready ? '' : ' locked'}" href="#/book/${b.id}">
-            <div class="book-level">${escapeHtml(b.level)}${b.external ? ' · 第三方' : ''}</div>
-            <div class="book-title">${escapeHtml(b.title)}</div>
-            <div class="book-sub">${escapeHtml(b.subtitle)}</div>
-            <div class="book-desc">${escapeHtml(b.desc)}</div>
-            ${b.external && b.author && b.author.name
-              ? `<div class="book-desc" style="opacity:.75;font-size:12.5px">✍ ${escapeHtml(b.author.name)}${b.license ? ' · ' + escapeHtml(b.license) : ''}</div>`
-              : ''}
-            <div class="book-foot">${b.ready ? H.start : H.building}</div>
-          </a>`;
-      }
+      html += `<div class="home-substage">${escapeHtml(stage)}</div><div class="book-grid">`;
+      for (const b of list) html += bookCard(b, H);
       html += `</div>`;
     }
 
-    const n3p = Object.keys(EXTERNAL).length;
     html += `
+      <div class="third-head">
+        <h2 class="home-stage" style="margin:0">${escapeHtml(HT.third)}
+          <span class="stage-n">${third.length}</span></h2>
+        <div class="third-tools">
+          <input type="text" id="third-q" placeholder="${escapeHtml(HT.searchPh)}" autocomplete="off">
+          <button class="third-refresh" id="third-refresh" title="${escapeHtml(HT.refresh)}">↻</button>
+        </div>
+      </div>
+      <div class="third-note">${escapeHtml(HT.thirdNote)}</div>
+      <div class="book-grid" id="third-grid"></div>
+      <div id="third-sentinel" class="third-sentinel"></div>
       <div class="home-contrib">
-        <b>${n3p ? `已收录 ${n3p} 本第三方教材` : '还没有第三方教材'}</b>
-        <span>任何人都可以给 AnyLearn 写书：建一个符合格式的仓库，机器人自动校验并收录。</span>
+        <b>${escapeHtml(HT.writeOne)}</b>
+        <span>${escapeHtml(HT.writeDesc)}</span>
         <div class="home-contrib-links">
-          <a href="docs/index.html">浏览第三方书 →</a>
-          <a href="docs/check.html">自查我的仓库 →</a>
+          <a href="#/docs">${escapeHtml(HT.browseMore)} →</a>
+          <a href="#/dev">${escapeHtml(HT.devPlatform)} →</a>
         </div>
       </div>`;
 
     art.innerHTML = html;
+    mountThirdParty(third);
+
     $('lesson-nav').innerHTML = '';
     $('progress-label').textContent = `${doneCount} ${H.statDone}`;
     $('progress-fill').style.width = '0%';
     document.title = `${T().brand} · ${T().brandSub}`;
+  }
+
+  /** 单张书卡 */
+  function bookCard(b, H) {
+    return `
+      <a class="book-card${b.ready ? '' : ' locked'}" href="#/book/${b.id}">
+        <div class="book-level">${escapeHtml(b.level)}${b.external ? ' · ' + (T().homeThird.badge) : ''}</div>
+        <div class="book-title">${escapeHtml(b.title)}</div>
+        <div class="book-sub">${escapeHtml(b.subtitle)}</div>
+        <div class="book-desc">${escapeHtml(b.desc)}</div>
+        ${b.external && b.author && b.author.name
+          ? `<div class="book-desc" style="opacity:.75;font-size:12.5px">✍ ${escapeHtml(b.author.name)}${b.license ? ' · ' + escapeHtml(b.license) : ''}</div>`
+          : ''}
+        <div class="book-foot">${b.ready ? H.start : H.building}</div>
+      </a>`;
+  }
+
+  /**
+   * 第三方书区：搜索 + 懒加载。
+   *
+   * 以后书会很多，一次性渲染上百张卡会让首屏卡住，
+   * 所以用 IntersectionObserver 滚到底再加载下一批。
+   */
+  let thirdObserver = null;
+  function mountThirdParty(list) {
+    const PAGE = 12;
+    const grid = $('third-grid');
+    const sentinel = $('third-sentinel');
+    if (!grid) return;
+
+    let shown = 0;
+    let pool = list.slice();
+
+    if (thirdObserver) { thirdObserver.disconnect(); thirdObserver = null; }
+
+    const applyFilter = () => {
+      const q = ($('third-q').value || '').trim().toLowerCase();
+      pool = !q ? list.slice() : list.filter(b =>
+        [b.title, b.subtitle, b.desc, (b.author || {}).name, b.repo, (b.tags || []).join(' ')]
+          .filter(Boolean).join(' ').toLowerCase().includes(q));
+      shown = 0;
+      grid.innerHTML = '';
+      renderMore();
+    };
+
+    function renderMore() {
+      const slice = pool.slice(shown, shown + PAGE);
+      if (slice.length) {
+        grid.insertAdjacentHTML('beforeend', slice.map(b => bookCard(b, T().home)).join(''));
+        shown += slice.length;
+      }
+      if (sentinel) {
+        sentinel.textContent = shown < pool.length
+          ? T().homeThird.more.replace('{n}', pool.length - shown)
+          : (!pool.length ? T().homeThird.noMatch : (pool.length > PAGE ? T().homeThird.allShown : ''));
+      }
+    }
+
+    const qEl = $('third-q');
+    if (qEl) qEl.addEventListener('input', applyFilter);
+
+    const rb = $('third-refresh');
+    if (rb) rb.onclick = async () => {
+      rb.classList.add('spinning');
+      rb.disabled = true;
+      try { await refreshExternal(); }
+      finally { rb.classList.remove('spinning'); rb.disabled = false; }
+    };
+
+    renderMore();
+
+    if (sentinel && 'IntersectionObserver' in window) {
+      thirdObserver = new IntersectionObserver(entries => {
+        if (entries.some(e => e.isIntersecting) && shown < pool.length) renderMore();
+      }, { rootMargin: '200px' });
+      thirdObserver.observe(sentinel);
+    }
+  }
+
+  /** 重新拉第三方书（刷新按钮 / 发布新书后调用） */
+  async function refreshExternal() {
+    const before = new Set(Object.keys(EXTERNAL));
+    BOOKS = BOOKS.filter(b => !b.external);
+    for (const k of Object.keys(EXTERNAL)) delete EXTERNAL[k];
+    await loadExternal();
+    if (book == null && (location.hash === '' || location.hash === '#' || location.hash === '#/')) {
+      renderHome();
+    }
+    const added = Object.keys(EXTERNAL).filter(k => !before.has(k)).length;
+    toast(added ? T().homeThird.refreshed.replace('{n}', added) : T().homeThird.noNew);
   }
 
   /* ================= 目录 ================= */
@@ -1270,6 +1369,8 @@
 
     if (!parts.length) return renderHome();
     if (parts[0] === 'review') return renderReview();
+    if (parts[0] === 'docs') return renderDocs(parts[1]);
+    if (parts[0] === 'dev') return renderDev(parts[1]);
     if (parts[0] === 'book' && parts[1]) {
       const bid = parts[1];
       if (!book || book.id !== bid) {
@@ -1287,6 +1388,42 @@
     }
     return renderHome();
   }
+
+  /* ================= 开发者平台 / 文档（站内视图） ================= */
+  /**
+   * docs 与 dev 挂在主站路由里，共用侧边栏、主题和登录态。
+   * 切过去时把正文容器清空交给对应模块自己接管。
+   */
+  function enterModuleView() {
+    book = null; current = null; readingKey = null;
+    closeSidebar();
+    resetLab();
+    setNotesVisible(false);
+    $('toc').innerHTML = '';
+    $('lesson-nav').innerHTML = '';
+    $('lesson').innerHTML = '';
+  }
+
+  function renderDocs(sub) {
+    enterModuleView();
+    const host = document.createElement('div');
+    $('lesson').appendChild(host);
+    Docs.boot(api);                    // 复用主站已有的登录态
+    Docs.mount(host, sub === 'check' ? 'check' : 'index',
+               { embedded: true, lang: CFG.lang });
+    document.title = `${T().brand} · ${T().homeThird.browseMore}`;
+  }
+
+  function renderDev(sub) {
+    enterModuleView();
+    const host = document.createElement('div');
+    $('lesson').appendChild(host);
+    DevPlatform.mount(host, sub === 'editor' ? 'editor' : 'list', { lang: CFG.lang });
+    document.title = `${T().brand} · ${T().homeThird.devPlatform}`;
+  }
+
+  // 开发者平台发布成功后要能刷新首页的第三方书区
+  window.__refreshExternal = () => { refreshExternal(); };
 
   /* ================= 第三方书籍 ================= */
   /**

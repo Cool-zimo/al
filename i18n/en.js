@@ -38,6 +38,23 @@ window.I18N = {
     start: 'Start learning →',
     building: '🚧 Coming soon'
   },
+  homeThird: {
+    official: "Official",
+    third: "Community",
+    badge: "Community",
+    searchPh: "Search community books (title / author / repo)",
+    refresh: "Refresh",
+    thirdNote: "Community books are written by contributors and read straight from the author's repo. Listing only means the format is valid.",
+    more: "{n} more — scroll down to load",
+    allShown: "All shown",
+    noMatch: "No matches",
+    writeOne: "Write your own textbook",
+    writeDesc: "Write WYSIWYG in the developer platform, publish to your GitHub in one click.",
+    devPlatform: "Developer platform",
+    browseMore: "Browse all community books",
+    refreshed: "Refreshed — {n} new",
+    noNew: "Refreshed — nothing new"
+  },
 
   toc: { all: 'All tutorials', review: 'Review today', chapterTest: 'Chapter test' },
 

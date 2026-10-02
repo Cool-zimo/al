@@ -16,6 +16,10 @@ const Docs = (() => {
   const REGISTRY = 'https://cool-zimo.github.io/al-docs/registry.json';
   const $ = id => document.getElementById(id);
 
+  /** 站内（挂在 app.js 路由里）时为 true，链接走 hash；独立打开时走相对路径 */
+  let embedded = false;
+  const homeHref = () => (embedded ? '#/' : '../index.html');
+
   let api = null;
   let lang = 'zh';
 
@@ -34,7 +38,12 @@ const Docs = (() => {
     } catch (e) { return ''; }
   }
 
-  function boot() {
+  function boot(injected) {
+    if (injected) {
+      api = injected;
+      GhSrc.setApi(api);
+      return true;
+    }
     const t = readToken();
     if (t) {
       api = new GitHubAPI(t);
@@ -191,7 +200,7 @@ const Docs = (() => {
     const logged = boot();
     $('docs-state').innerHTML = logged
       ? `✅ ${esc(T('loggedAs'))} <b>${esc(await api.getUsername().catch(() => ''))}</b> · ${esc(T('loggedHint'))}`
-      : `⚠️ ${esc(T('notLogged'))} <a href="../index.html">${esc(T('goLogin'))}</a>`;
+      : `⚠️ ${esc(T('notLogged'))} <a href="${homeHref()}">${esc(T('goLogin'))}</a>`;
 
     let all = [];
     try {
@@ -231,7 +240,7 @@ const Docs = (() => {
           <div class="docs-links">
             <a href="${esc(b.url || 'https://github.com/' + b.repo)}" target="_blank" rel="noopener">${esc(T('repoLink'))} ↗</a>
             ${!(b.errors && b.errors.length) && b.id
-              ? `<a href="../index.html#/book/${esc(b.id)}:3p">${esc(T('read'))} →</a>` : ''}
+              ? `<a href="#/book/${esc(b.id)}">${esc(T('read'))} →</a>` : ''}
           </div>
         </div>`).join('');
     };
@@ -245,7 +254,7 @@ const Docs = (() => {
   async function mountCheck(root) {
     root.innerHTML = `
       <div class="docs-head">
-        <a class="docs-back" href="index.html">← ${esc(T('backList'))}</a>
+        <a class="docs-back" href="#/docs">← ${esc(T('backList'))}</a>
         <h1>${esc(T('checkTitle'))}</h1>
         <p class="docs-sub">${esc(T('checkSub'))}</p>
       </div>
@@ -399,8 +408,11 @@ const Docs = (() => {
 
   /* ================= 挂载 ================= */
 
-  function mount(root, view) {
-    lang = document.documentElement.lang === 'en' ? 'en' : 'zh';
+  function mount(root, view, opts) {
+    opts = opts || {};
+    embedded = !!opts.embedded;
+    if (opts.lang) lang = opts.lang;
+    else lang = document.documentElement.lang === 'en' ? 'en' : 'zh';
     const style = document.createElement('style');
     style.textContent = CSS;
     document.head.appendChild(style);

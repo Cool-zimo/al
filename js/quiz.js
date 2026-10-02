@@ -795,21 +795,35 @@ const Quiz = (() => {
 
   /* ================= 结果 ================= */
 
+  /**
+   * 预览题的 id 前缀（开发者平台里作者试自己出的题时用）。
+   *
+   * 为什么必须隔离：做题结果会写进 Store.K.QUIZ，而 quiz:done 事件
+   * 会被 exam.js（判定"这一课学完了"）和 guardian.js（学习时长守护）监听。
+   * 作者在编辑器里试一下自己出的题，不该被当成真实学习行为 ——
+   * 否则会把草稿题算进进度，还会触发休息提醒。
+   */
+  const PREVIEW_PREFIX = '__dev__:';
+  const isPreview = id => String(id).startsWith(PREVIEW_PREFIX);
+
   function getResult(id) {
+    if (isPreview(id)) return null;   // 预览态不读也不写真结果，每次都从干净状态开始
     const all = Store.get(Store.K.QUIZ, {}) || {};
     return all[id] || null;
   }
 
   function finish(id, ok, q, foot, decorate) {
-    Store.update(Store.K.QUIZ, {}, all => {
-      const prev = all[id];
-      all[id] = {
-        ok,
-        tries: (prev?.tries || 0) + 1,
-        at: new Date().toISOString()
-      };
-      return all;
-    });
+    if (!isPreview(id)) {
+      Store.update(Store.K.QUIZ, {}, all => {
+        const prev = all[id];
+        all[id] = {
+          ok,
+          tries: (prev?.tries || 0) + 1,
+          at: new Date().toISOString()
+        };
+        return all;
+      });
+    }
     if (decorate) decorate();
 
     // 解释文字
@@ -822,8 +836,10 @@ const Quiz = (() => {
     foot.parentElement.classList.remove('passed', 'attempted');
     foot.parentElement.classList.add(ok ? 'passed' : 'attempted');
 
-    // 通知外部：进度、复习调度
-    document.dispatchEvent(new CustomEvent('quiz:done', { detail: { id, ok } }));
+    // 通知外部：进度、复习调度。预览态不广播 —— 草稿题不算学习行为。
+    if (!isPreview(id)) {
+      document.dispatchEvent(new CustomEvent('quiz:done', { detail: { id, ok } }));
+    }
   }
 
   /* ================= 工具 ================= */
@@ -838,5 +854,5 @@ const Quiz = (() => {
   }
   function toast(m) { window.__toast && window.__toast(m); }
 
-  return { extractBlocks, render, getResult };
+  return { extractBlocks, render, getResult, PREVIEW_PREFIX };
 })();

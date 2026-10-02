@@ -126,6 +126,21 @@ class GitHubAPI {
     return this._req('PUT', `/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`, body);
   }
 
+  /** 设置仓库的 topic（发布第三方书时用来打 al-book 标记） */
+  async setTopics(owner, repo, names) {
+    return this._req('PUT', `/repos/${owner}/${repo}/topics`, { names });
+  }
+
+  /** 改仓库可见性：private true/false */
+  async setVisibility(owner, repo, isPrivate) {
+    return this._req('PATCH', `/repos/${owner}/${repo}`, { private: !!isPrivate });
+  }
+
+  /** 删仓库（谨慎：不可撤销） */
+  async deleteRepository(owner, repo) {
+    return this._req('DELETE', `/repos/${owner}/${repo}`);
+  }
+
   /** 仓库默认分支名（有的仓库是 master） */
   async getDefaultBranch(owner, repo) {
     const r = await this.getRepository(owner, repo);

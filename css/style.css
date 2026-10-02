@@ -1141,3 +1141,27 @@ body.no-notes .main { margin-right: 0; max-width: 1040px; }
   animation: bk-spin .8s linear infinite;
 }
 @keyframes bk-spin { to { transform: rotate(360deg); } }
+
+
+/* ===== 首页：官方 / 第三方分区 ===== */
+.home-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.home-act-btn{display:inline-flex;align-items:center;padding:8px 16px;border-radius:9px;
+  background:var(--accent);color:#fff;font-size:13.5px;font-weight:600;text-decoration:none}
+.home-act-btn:hover{filter:brightness(1.1);text-decoration:none}
+.home-act-btn.ghost{background:var(--panel);color:var(--text);border:1px solid var(--border)}
+.home-substage{font-size:13px;color:var(--faint);margin:14px 0 8px;font-weight:600}
+.home-stage .stage-n{display:inline-block;font-size:12px;font-weight:600;color:var(--faint);
+  background:var(--border-soft);border-radius:99px;padding:1px 9px;vertical-align:middle;margin-left:6px}
+.third-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:34px;
+  padding-top:22px;border-top:1px solid var(--border)}
+.third-tools{display:flex;gap:8px;margin-left:auto}
+.third-tools input[type=text]{padding:8px 13px;border:1px solid var(--border);border-radius:9px;
+  background:var(--panel);color:var(--text);font-size:13.5px;font-family:inherit;min-width:230px}
+.third-refresh{padding:8px 12px;border:1px solid var(--border);border-radius:9px;
+  background:var(--panel);color:var(--text);font-size:15px;cursor:pointer;line-height:1}
+.third-refresh:hover{border-color:var(--accent);color:var(--accent)}
+.third-refresh.spinning{animation:thirdspin .9s linear infinite}
+.third-refresh:disabled{opacity:.5}
+@keyframes thirdspin{to{transform:rotate(360deg)}}
+.third-note{font-size:12.5px;color:var(--faint);margin:2px 0 12px;line-height:1.6}
+.third-sentinel{padding:16px 0;text-align:center;font-size:12.5px;color:var(--faint);min-height:20px}

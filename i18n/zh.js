@@ -38,6 +38,23 @@ window.I18N = {
     start: '开始学习 →',
     building: '🚧 建设中'
   },
+  homeThird: {
+    official: "官方教材",
+    third: "第三方教材",
+    badge: "第三方",
+    searchPh: "搜索第三方书（书名 / 作者 / 仓库）",
+    refresh: "刷新",
+    thirdNote: "第三方书由社区作者提供，内容从原作者仓库直读。收录只代表格式合规。",
+    more: "还有 {n} 本，向下滚动加载",
+    allShown: "已全部显示",
+    noMatch: "没有匹配的书",
+    writeOne: "写一本你自己的教材",
+    writeDesc: "在开发者平台里所见即所得地写，一键发布到你的 GitHub。",
+    devPlatform: "开发者平台",
+    browseMore: "浏览全部第三方书",
+    refreshed: "刷新完成，新增 {n} 本",
+    noNew: "刷新完成，暂无新书"
+  },
 
   toc: { all: '全部教程', review: '今日复习', chapterTest: '本章大测验' },
 
