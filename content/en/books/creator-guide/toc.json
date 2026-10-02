@@ -1,71 +1,188 @@
-{
-  "book": "creator-guide",
-  "chapters": [
-    {
-      "title": "Chapter 1 · What a book is made of",
-      "test": "test-01",
-      "lessons": [
-        "01",
-        "02",
-        "03",
-        "04",
-        "05"
-      ]
-    },
-    {
-      "title": "Chapter 2 · Writing lessons",
-      "test": "test-02",
-      "lessons": [
-        "06",
-        "07",
-        "08",
-        "09",
-        "10"
-      ]
-    },
-    {
-      "title": "Chapter 3 · Questions I: basic types",
-      "test": "test-03",
-      "lessons": [
-        "11",
-        "12",
-        "13",
-        "14",
-        "15"
-      ]
-    },
-    {
-      "title": "Chapter 4 · Questions II: programming",
-      "test": "test-04",
-      "lessons": [
-        "16",
-        "17",
-        "18",
-        "19",
-        "20"
-      ]
-    },
-    {
-      "title": "Chapter 5 · Special types and beyond",
-      "test": "test-05",
-      "lessons": [
-        "21",
-        "22",
-        "23",
-        "24",
-        "25"
-      ]
-    },
-    {
-      "title": "Chapter 6 · Check, publish, maintain",
-      "test": "test-06",
-      "lessons": [
-        "26",
-        "27",
-        "28",
-        "29",
-        "30"
-      ]
-    }
-  ]
-}
+[
+ {
+  "title": "Chapter 1 · What a book is made of",
+  "items": [
+   {
+    "id": "01",
+    "title": "What a book is made of",
+    "summary": "A book is just a repo. The layout is simpler than you think."
+   },
+   {
+    "id": "02",
+    "title": "albook.json: the book identity card",
+    "summary": "Get this file wrong and the book never ships."
+   },
+   {
+    "id": "03",
+    "title": "toc.json: writing the contents",
+    "summary": "Get the contents wrong and the book will not open. This is the number one beginner problem."
+   },
+   {
+    "id": "04",
+    "title": "Lesson files and naming",
+    "summary": "Get a file name wrong and everything before it was wasted."
+   },
+   {
+    "id": "05",
+    "title": "Handling two languages",
+    "summary": "Start with one language. Do not let bilingual scare you off."
+   }
+  ],
+  "test": "test-01"
+ },
+ {
+  "title": "Chapter 2 · Writing lessons",
+  "items": [
+   {
+    "id": "06",
+    "title": "Markdown in five minutes",
+    "summary": "Writing lessons needs only a small slice of Markdown."
+   },
+   {
+    "id": "07",
+    "title": "Two conventions for headings and intros",
+    "summary": "Ignore these and both the contents and the library look bad."
+   },
+   {
+    "id": "08",
+    "title": "Care and feeding of code blocks",
+    "summary": "Runnable code and illustrative code are written differently."
+   },
+   {
+    "id": "09",
+    "title": "In-class exercise vs section quiz",
+    "summary": "Only the section quiz counts as \"done\" — this is the core design of the whole site."
+   },
+   {
+    "id": "10",
+    "title": "How long should a lesson be",
+    "summary": "Too short and it teaches nothing; too long and nobody finishes."
+   }
+  ],
+  "test": "test-02"
+ },
+ {
+  "title": "Chapter 3 · Questions I: basic types",
+  "items": [
+   {
+    "id": "11",
+    "title": "The quiz block skeleton",
+    "summary": "Every question is the same shell; only type changes."
+   },
+   {
+    "id": "12",
+    "title": "Choice questions",
+    "summary": "The most common type, and the easiest to get wrong on the answer index."
+   },
+   {
+    "id": "13",
+    "title": "Multiple-choice questions",
+    "summary": "Add one line: multi: true, and separate answers with commas."
+   },
+   {
+    "id": "14",
+    "title": "Fill-in-the-blank questions",
+    "summary": "Best for \"do you know this word\" facts."
+   },
+   {
+    "id": "15",
+    "title": "Putting code in the question text",
+    "summary": "Use the code: field, never a fence."
+   }
+  ],
+  "test": "test-03"
+ },
+ {
+  "title": "Chapter 4 · Questions II: programming",
+  "items": [
+   {
+    "id": "16",
+    "title": "Function questions: your function really gets called",
+    "summary": "The most valuable type — the page runs it for real."
+   },
+   {
+    "id": "17",
+    "title": "Two traps in cases",
+    "summary": "I fell into both of these. Learn from my mistakes."
+   },
+   {
+    "id": "18",
+    "title": "Questions with random results",
+    "summary": "Dice, shuffles — no exact value to compare, so use a range."
+   },
+   {
+    "id": "19",
+    "title": "Code questions: running a whole snippet",
+    "summary": "For print and control flow — graded with assert."
+   },
+   {
+    "id": "20",
+    "title": "The three web types: HTML, CSS, JS",
+    "summary": "They grade the effect, not what the code looks like."
+   }
+  ],
+  "test": "test-04"
+ },
+ {
+  "title": "Chapter 5 · Special types and beyond",
+  "items": [
+   {
+    "id": "21",
+    "title": "Local questions: things a browser cannot run",
+    "summary": "GUIs, files, subprocesses — the reader has to run these."
+   },
+   {
+    "id": "22",
+    "title": "Project questions",
+    "summary": "Use one to close a chapter and tie everything together."
+   },
+   {
+    "id": "23",
+    "title": "hint and explain",
+    "summary": "These two decide whether a stuck reader gives up or keeps going."
+   },
+   {
+    "id": "24",
+    "title": "Novels and notes: the kind field",
+    "summary": "Not every book needs questions."
+   },
+   {
+    "id": "25",
+    "title": "Custom snippets",
+    "summary": "Save the questions you reuse, then insert them in one click."
+   }
+  ],
+  "test": "test-05"
+ },
+ {
+  "title": "Chapter 6 · Check, publish, maintain",
+  "items": [
+   {
+    "id": "26",
+    "title": "Reading the review report",
+    "summary": "Click it before publishing and save yourself an embarrassing release."
+   },
+   {
+    "id": "27",
+    "title": "Publishing in one click",
+    "summary": "Four steps, all automatic. You only choose visibility."
+   },
+   {
+    "id": "28",
+    "title": "Visibility and being listed",
+    "summary": "You can change it all after publishing. No need to start over."
+   },
+   {
+    "id": "29",
+    "title": "Troubleshooting",
+    "summary": "These account for half of everything I have run into."
+   },
+   {
+    "id": "30",
+    "title": "After you publish",
+    "summary": "Shipping is not the end. It is the start."
+   }
+  ],
+  "test": "test-06"
+ }
+]
