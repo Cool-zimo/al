@@ -53,7 +53,8 @@ window.I18N = {
     devPlatform: "开发者平台",
     browseMore: "浏览全部第三方书",
     refreshed: "刷新完成，新增 {n} 本",
-    noNew: "刷新完成，暂无新书"
+    noNew: "刷新完成，暂无新书",
+    howTo: "怎么写书（创作者帮助）",
   },
 
   toc: { all: '全部教程', review: '今日复习', chapterTest: '本章大测验' },

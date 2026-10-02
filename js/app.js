@@ -228,8 +228,9 @@
         <b>${escapeHtml(HT.writeOne)}</b>
         <span>${escapeHtml(HT.writeDesc)}</span>
         <div class="home-contrib-links">
-          <a href="#/docs">${escapeHtml(HT.browseMore)} →</a>
+          <a href="#/book/creator-guide">${escapeHtml(HT.howTo)} →</a>
           <a href="#/dev">${escapeHtml(HT.devPlatform)} →</a>
+          <a href="#/docs">${escapeHtml(HT.browseMore)} →</a>
         </div>
       </div>`;
 

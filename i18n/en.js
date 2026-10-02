@@ -53,7 +53,8 @@ window.I18N = {
     devPlatform: "Developer platform",
     browseMore: "Browse all community books",
     refreshed: "Refreshed — {n} new",
-    noNew: "Refreshed — nothing new"
+    noNew: "Refreshed — nothing new",
+    howTo: "How to write a book (Creator Guide)",
   },
 
   toc: { all: 'All tutorials', review: 'Review today', chapterTest: 'Chapter test' },

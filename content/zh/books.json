@@ -1,241 +1,251 @@
 [
- {
-  "id": "py-basics-1",
-  "title": "Python 详细基础 1",
-  "subtitle": "从零开始，把每一行都讲透",
-  "desc": "面向完全零基础。不假设你懂任何编程概念，每个知识点都从「它解决什么问题」讲起，配可运行示例和即时练习。",
-  "stage": "基础",
-  "level": "入门",
-  "ready": true
- },
- {
-  "id": "py-basics-2",
-  "title": "Python 详细基础 2",
-  "subtitle": "数据结构与函数",
-  "desc": "列表、元组、字典、集合的用法与底层取舍；函数的参数、作用域、递归。",
-  "stage": "基础",
-  "level": "入门",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "py-basics-3",
-  "title": "Python 详细基础 3",
-  "subtitle": "文件、异常、模块与面向对象",
-  "desc": "读写文件、捕获异常、组织模块，以及类与对象的完整心智模型。",
-  "stage": "基础",
-  "level": "进阶",
-  "ready": true,
-  "note": "完整 5 章 25 课"
- },
- {
-  "id": "py-essentials",
-  "title": "精简基础 · 学习篇",
-  "subtitle": "两天过一遍 Python 全貌",
-  "desc": "给学过一次、需要快速捡起来的人。只讲主干，去掉所有铺垫。",
-  "stage": "基础",
-  "level": "复习",
-  "ready": true,
-  "note": "完整 5 章 25 课"
- },
- {
-  "id": "py-essentials-2",
-  "title": "精简基础 · 巩固篇",
-  "subtitle": "用题目把基础钉死",
-  "desc": "不重复讲概念，全部用题目驱动，把基础阶段的易错点一次性扫光。",
-  "stage": "基础",
-  "level": "复习",
-  "ready": true,
-  "note": "完整 5 章 25 课"
- },
- {
-  "id": "data-analysis-1",
-  "title": "Python 数据分析 1",
-  "subtitle": "NumPy 与数组思维",
-  "desc": "从 Python 列表到 ndarray 的思维转换：向量化、广播、索引技巧。",
-  "stage": "数据",
-  "level": "进阶",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "data-analysis-2",
-  "title": "Python 数据分析 2",
-  "subtitle": "pandas 与表格处理",
-  "desc": "DataFrame 的完整操作体系：清洗、分组、合并、时间序列。",
-  "stage": "数据",
-  "level": "进阶",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "data-analysis-3",
-  "title": "Python 数据分析 3",
-  "subtitle": "可视化与实战",
-  "desc": "matplotlib / seaborn 出图，以及一个端到端的真实数据分析项目。",
-  "stage": "数据",
-  "level": "实战",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "gui-beginner-1",
-  "title": "Python 窗口入门 1",
-  "subtitle": "tkinter 基础",
-  "desc": "窗口、控件、布局、事件绑定 —— 做出第一个能用的桌面程序。",
-  "stage": "桌面",
-  "level": "入门",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "gui-beginner-2",
-  "title": "Python 窗口入门 2",
-  "subtitle": "tkinter 进阶与 pygame",
-  "desc": "菜单、对话框、Canvas 绘图；pygame 的游戏循环与精灵。",
-  "stage": "桌面",
-  "level": "进阶",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "gui-beginner-3",
-  "title": "Python 窗口入门 3",
-  "subtitle": "完整桌面项目",
-  "desc": "做一个带数据存储的实用工具，从需求到打包发布走完整流程。",
-  "stage": "桌面",
-  "level": "实战",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "qt-1",
-  "title": "Python 窗口进阶 1",
-  "subtitle": "PyQt / PySide 核心",
-  "desc": "信号与槽、布局管理、常用控件、样式表 —— Qt 的心智模型。",
-  "stage": "桌面",
-  "level": "进阶",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "qt-2",
-  "title": "Python 窗口进阶 2",
-  "subtitle": "Qt 高级主题与发布",
-  "desc": "模型视图、多线程、自定义控件、国际化，以及打包成安装包。",
-  "stage": "桌面",
-  "level": "高级",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "engineering",
-  "title": "Python 工程实践",
-  "subtitle": "从会写到能交付",
-  "desc": "虚拟环境、项目结构、Git 协作、单元测试、日志、打包发布。",
-  "stage": "工程",
-  "level": "实战",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "algo-1",
-  "title": "Python 算法专攻 1",
-  "subtitle": "复杂度、数组与字符串",
-  "stage": "算法",
-  "level": "进阶",
-  "ready": true,
-  "desc": "从「怎么衡量快慢」讲起：时间复杂度与空间复杂度。再拿下数组、字符串这两块最常考的地基，每道都是网页真跑真判。",
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "algo-2",
-  "title": "Python 算法专攻 2",
-  "subtitle": "链表、栈队列、哈希与递归",
-  "stage": "算法",
-  "level": "进阶",
-  "ready": true,
-  "desc": "数据结构的第二层：链表、栈、队列、哈希表，以及递归这个「想明白就一通百通」的思维方式。",
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "algo-3",
-  "title": "Python 算法专攻 3",
-  "subtitle": "树、图、排序与动态规划",
-  "stage": "算法",
-  "level": "高级",
-  "ready": true,
-  "desc": "算法的主战场：二叉树与堆、图的遍历、十大排序，以及从暴力到优化的 DP 推导过程。",
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "stdlib-1",
-  "title": "Python 标准库 1",
-  "subtitle": "数据交换与持久化",
-  "desc": "系统讲标准库的第一本：json 打头，配 csv、configparser、pickle、base64、hashlib，再用 decimal / dataclasses / enum 解决精度与建模，最后做一个能跑的数据管道工具。",
-  "stage": "标准库",
-  "level": "进阶",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "stdlib-2",
-  "title": "Python 标准库 2",
-  "subtitle": "时间、文件与系统",
-  "desc": "datetime 怎么算时间差与时区、pathlib 怎么优雅地处理路径、os / shutil / glob 怎么批量操作文件，最后做一个文件整理与备份工具。",
-  "stage": "标准库",
-  "level": "进阶",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "stdlib-3",
-  "title": "Python 标准库 3",
-  "subtitle": "文本、工具与工程化",
-  "desc": "re 正则、collections / itertools / functools 这些效率工具、logging、argparse、subprocess、unittest，最后做一个带日志和测试的命令行工具。",
-  "stage": "标准库",
-  "level": "实战",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "web-1",
-  "title": "网页制作 1",
-  "subtitle": "HTML 与 CSS 基础",
-  "desc": "面向有编程基础的学习者。从浏览器如何把文本变成页面讲起，学完能做出一个好看的静态页面。",
-  "stage": "网页",
-  "level": "入门",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "web-2",
-  "title": "网页制作 2",
-  "subtitle": "JavaScript 与 DOM（快班）",
-  "desc": "面向已学过 Python 的学习者。重点讲 JS 与 Python 的差异，以及浏览器特有的 DOM 与事件。学完能做出交互式的待办清单。",
-  "stage": "网页",
-  "level": "入门",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "web-3",
-  "title": "网页制作 3",
-  "subtitle": "JavaScript 进阶（快班）",
-  "desc": "面向学过《网页制作 2》的学习者。讲异步、网络请求、现代 JS 特性与 Canvas，学完能做出能接真实 API 的应用。",
-  "stage": "网页",
-  "level": "进阶",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- },
- {
-  "id": "web-slow",
-  "title": "网页制作 · 零基础 JavaScript",
-  "subtitle": "慢班 · 没有编程经验？从这里开始",
-  "desc": "面向完全没有编程经验的学习者。从「变量是什么」讲到 DOM 操作，每一步都不跳。学完可继续《网页制作 2》。",
-  "stage": "网页",
-  "level": "入门",
-  "ready": true,
-  "note": "完整 6 章 30 课"
- }
+  {
+    "id": "py-basics-1",
+    "title": "Python 详细基础 1",
+    "subtitle": "从零开始，把每一行都讲透",
+    "desc": "面向完全零基础。不假设你懂任何编程概念，每个知识点都从「它解决什么问题」讲起，配可运行示例和即时练习。",
+    "stage": "基础",
+    "level": "入门",
+    "ready": true
+  },
+  {
+    "id": "py-basics-2",
+    "title": "Python 详细基础 2",
+    "subtitle": "数据结构与函数",
+    "desc": "列表、元组、字典、集合的用法与底层取舍；函数的参数、作用域、递归。",
+    "stage": "基础",
+    "level": "入门",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "py-basics-3",
+    "title": "Python 详细基础 3",
+    "subtitle": "文件、异常、模块与面向对象",
+    "desc": "读写文件、捕获异常、组织模块，以及类与对象的完整心智模型。",
+    "stage": "基础",
+    "level": "进阶",
+    "ready": true,
+    "note": "完整 5 章 25 课"
+  },
+  {
+    "id": "py-essentials",
+    "title": "精简基础 · 学习篇",
+    "subtitle": "两天过一遍 Python 全貌",
+    "desc": "给学过一次、需要快速捡起来的人。只讲主干，去掉所有铺垫。",
+    "stage": "基础",
+    "level": "复习",
+    "ready": true,
+    "note": "完整 5 章 25 课"
+  },
+  {
+    "id": "py-essentials-2",
+    "title": "精简基础 · 巩固篇",
+    "subtitle": "用题目把基础钉死",
+    "desc": "不重复讲概念，全部用题目驱动，把基础阶段的易错点一次性扫光。",
+    "stage": "基础",
+    "level": "复习",
+    "ready": true,
+    "note": "完整 5 章 25 课"
+  },
+  {
+    "id": "data-analysis-1",
+    "title": "Python 数据分析 1",
+    "subtitle": "NumPy 与数组思维",
+    "desc": "从 Python 列表到 ndarray 的思维转换：向量化、广播、索引技巧。",
+    "stage": "数据",
+    "level": "进阶",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "data-analysis-2",
+    "title": "Python 数据分析 2",
+    "subtitle": "pandas 与表格处理",
+    "desc": "DataFrame 的完整操作体系：清洗、分组、合并、时间序列。",
+    "stage": "数据",
+    "level": "进阶",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "data-analysis-3",
+    "title": "Python 数据分析 3",
+    "subtitle": "可视化与实战",
+    "desc": "matplotlib / seaborn 出图，以及一个端到端的真实数据分析项目。",
+    "stage": "数据",
+    "level": "实战",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "gui-beginner-1",
+    "title": "Python 窗口入门 1",
+    "subtitle": "tkinter 基础",
+    "desc": "窗口、控件、布局、事件绑定 —— 做出第一个能用的桌面程序。",
+    "stage": "桌面",
+    "level": "入门",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "gui-beginner-2",
+    "title": "Python 窗口入门 2",
+    "subtitle": "tkinter 进阶与 pygame",
+    "desc": "菜单、对话框、Canvas 绘图；pygame 的游戏循环与精灵。",
+    "stage": "桌面",
+    "level": "进阶",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "gui-beginner-3",
+    "title": "Python 窗口入门 3",
+    "subtitle": "完整桌面项目",
+    "desc": "做一个带数据存储的实用工具，从需求到打包发布走完整流程。",
+    "stage": "桌面",
+    "level": "实战",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "qt-1",
+    "title": "Python 窗口进阶 1",
+    "subtitle": "PyQt / PySide 核心",
+    "desc": "信号与槽、布局管理、常用控件、样式表 —— Qt 的心智模型。",
+    "stage": "桌面",
+    "level": "进阶",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "qt-2",
+    "title": "Python 窗口进阶 2",
+    "subtitle": "Qt 高级主题与发布",
+    "desc": "模型视图、多线程、自定义控件、国际化，以及打包成安装包。",
+    "stage": "桌面",
+    "level": "高级",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "engineering",
+    "title": "Python 工程实践",
+    "subtitle": "从会写到能交付",
+    "desc": "虚拟环境、项目结构、Git 协作、单元测试、日志、打包发布。",
+    "stage": "工程",
+    "level": "实战",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "algo-1",
+    "title": "Python 算法专攻 1",
+    "subtitle": "复杂度、数组与字符串",
+    "stage": "算法",
+    "level": "进阶",
+    "ready": true,
+    "desc": "从「怎么衡量快慢」讲起：时间复杂度与空间复杂度。再拿下数组、字符串这两块最常考的地基，每道都是网页真跑真判。",
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "algo-2",
+    "title": "Python 算法专攻 2",
+    "subtitle": "链表、栈队列、哈希与递归",
+    "stage": "算法",
+    "level": "进阶",
+    "ready": true,
+    "desc": "数据结构的第二层：链表、栈、队列、哈希表，以及递归这个「想明白就一通百通」的思维方式。",
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "algo-3",
+    "title": "Python 算法专攻 3",
+    "subtitle": "树、图、排序与动态规划",
+    "stage": "算法",
+    "level": "高级",
+    "ready": true,
+    "desc": "算法的主战场：二叉树与堆、图的遍历、十大排序，以及从暴力到优化的 DP 推导过程。",
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "stdlib-1",
+    "title": "Python 标准库 1",
+    "subtitle": "数据交换与持久化",
+    "desc": "系统讲标准库的第一本：json 打头，配 csv、configparser、pickle、base64、hashlib，再用 decimal / dataclasses / enum 解决精度与建模，最后做一个能跑的数据管道工具。",
+    "stage": "标准库",
+    "level": "进阶",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "stdlib-2",
+    "title": "Python 标准库 2",
+    "subtitle": "时间、文件与系统",
+    "desc": "datetime 怎么算时间差与时区、pathlib 怎么优雅地处理路径、os / shutil / glob 怎么批量操作文件，最后做一个文件整理与备份工具。",
+    "stage": "标准库",
+    "level": "进阶",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "stdlib-3",
+    "title": "Python 标准库 3",
+    "subtitle": "文本、工具与工程化",
+    "desc": "re 正则、collections / itertools / functools 这些效率工具、logging、argparse、subprocess、unittest，最后做一个带日志和测试的命令行工具。",
+    "stage": "标准库",
+    "level": "实战",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "web-1",
+    "title": "网页制作 1",
+    "subtitle": "HTML 与 CSS 基础",
+    "desc": "面向有编程基础的学习者。从浏览器如何把文本变成页面讲起，学完能做出一个好看的静态页面。",
+    "stage": "网页",
+    "level": "入门",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "web-2",
+    "title": "网页制作 2",
+    "subtitle": "JavaScript 与 DOM（快班）",
+    "desc": "面向已学过 Python 的学习者。重点讲 JS 与 Python 的差异，以及浏览器特有的 DOM 与事件。学完能做出交互式的待办清单。",
+    "stage": "网页",
+    "level": "入门",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "web-3",
+    "title": "网页制作 3",
+    "subtitle": "JavaScript 进阶（快班）",
+    "desc": "面向学过《网页制作 2》的学习者。讲异步、网络请求、现代 JS 特性与 Canvas，学完能做出能接真实 API 的应用。",
+    "stage": "网页",
+    "level": "进阶",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "web-slow",
+    "title": "网页制作 · 零基础 JavaScript",
+    "subtitle": "慢班 · 没有编程经验？从这里开始",
+    "desc": "面向完全没有编程经验的学习者。从「变量是什么」讲到 DOM 操作，每一步都不跳。学完可继续《网页制作 2》。",
+    "stage": "网页",
+    "level": "入门",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  },
+  {
+    "id": "creator-guide",
+    "title": "创作者帮助",
+    "subtitle": "从零写出一本 AnyLearn 教材",
+    "desc": "教你怎么写书：目录结构、课文写法、九种题型怎么写和怎么判分、校验与发布全流程。写教材的格式问题，这里都有答案。",
+    "stage": "创作",
+    "level": "入门",
+    "ready": true,
+    "note": "完整 6 章 30 课"
+  }
 ]

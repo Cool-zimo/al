@@ -318,5 +318,74 @@ const Snippets = (() => {
     ta.setSelectionRange(pos, pos);
   }
 
-  return { list: () => SNIPS, insert, placeCursor };
+  /**
+   * 给片段文本加上 exam 行。
+   *
+   * 自定义片段存的是原始 quiz 源（不带 exam），插入时按面板上的开关决定加不加。
+   * 这样同一个片段既能当随堂练习，也能当本节测验。
+   */
+  function applyExam(src, exam) {
+    if (!exam) return src;
+    if (/^exam\s*:/m.test(src)) return src;
+    const withExam = src.replace(/^type\s*:.*$/m, m => m + '\nexam: true');
+    return withExam === src ? src.replace(/^```quiz\s*$/m, '```quiz\nexam: true') : withExam;
+  }
+
+  /** 从 quiz 源里认出题型（用于给片段标个类型标签） */
+  function detectType(src) {
+    const m = /^type\s*:\s*(.+)$/m.exec(src || '');
+    return m ? m[1].trim() : (src.includes('```quiz') ? 'choice' : 'text');
+  }
+
+  /* ================= 自定义片段 ================= */
+  /**
+   * 作者自己的常用题。存在草稿私有仓库里（snippets.json），跨设备可用。
+   *
+   * 为什么存云端而不是 localStorage：和草稿一个道理 ——
+   * 换台设备或清了浏览器数据就没了。
+   *
+   * 本地缓存是为了打开面板时能立刻显示，不用等网络。
+   */
+  const CUSTOM_KEY = 'pytut:devSnippets';
+  let custom = null;
+
+  function loadCustom() {
+    if (custom) return custom;
+    try { custom = JSON.parse(localStorage.getItem(CUSTOM_KEY) || '[]') || []; }
+    catch (e) { custom = []; }
+    return custom;
+  }
+
+  function saveCustom(list, sync) {
+    custom = list || [];
+    try { localStorage.setItem(CUSTOM_KEY, JSON.stringify(custom)); } catch (e) {}
+    if (sync) sync();                    // 由 dev.js 注入：推到云端
+  }
+
+  /** 去掉可能存在的 ```quiz 围栏，保证存的是纯净的字段区 */
+  function stripFence(src) {
+    return String(src || '').replace(/^\s*```quiz\s*\n?/, '').replace(/\n?```\s*$/, '').replace(/\s+$/, '');
+  }
+
+  /** 转成和内置片段一样的形状，好一起渲染 */
+  function customAsSnips() {
+    return loadCustom().map(c => ({
+      id: 'custom-' + c.id,
+      type: c.type || 'choice',
+      icon: '✦',
+      name: { zh: c.name, en: c.name },
+      desc: { zh: c.desc || '', en: c.desc || '' },
+      custom: true,
+      // 存的时候剥掉了 ```quiz 围栏（只存内部字段），插回来时必须补上 ——
+      // 不然插进去的是裸 YAML，渲染和解析都认不出这是道题。
+      body: (L, exam) => '```quiz\n' + applyExam(stripFence(c.src || ''), exam) + '\n```',
+    }));
+  }
+
+  return {
+    list: () => SNIPS,
+    insert, placeCursor,
+    applyExam, detectType, stripFence,
+    loadCustom, saveCustom, customAsSnips, CUSTOM_KEY,
+  };
 })();

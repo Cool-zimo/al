@@ -105,6 +105,8 @@ const DevPlatform = (() => {
       focusTitle: "收起章节树，只留编辑和预览（Ctrl/Cmd+B，Esc 退出）",
       snipLib: "题目库",
       snipTitle: "插入一道题的模板（字段齐全，插进来就能判分）",
+      fKind: "这本书的类型",
+      fKindHint: "教材要求每课有题；小说、笔记不要求题目。写了的题照常校验是否合法。",
       bookInfo: "书籍信息",
       fTitle: "书名",
       fSubtitle: "副标题",
@@ -192,6 +194,8 @@ const DevPlatform = (() => {
       focusTitle: "Hide the chapter tree, keep editor + preview (Ctrl/Cmd+B, Esc to exit)",
       snipLib: "Snippets",
       snipTitle: "Insert a question template (complete fields, gradeable as-is)",
+      fKind: "Book kind",
+      fKindHint: "Textbooks require questions per lesson; novels and notes do not. Any questions you do write are still checked.",
       bookInfo: "Book info",
       fTitle: "Title",
       fSubtitle: "Subtitle",
@@ -241,6 +245,7 @@ const DevPlatform = (() => {
       desc: lang === 'zh' ? '在这里写几句介绍，说明这本书讲什么、适合谁。'
                           : 'Describe what this book covers and who it is for.',
       stage: '基础', level: '入门',
+      kind: 'textbook',          // 决定要不要卡题目数量；小说/笔记不卡
       langs: ['zh'], license: 'CC BY-NC 4.0',
       author: { name: lang === 'zh' ? '你的名字' : 'Your name' },
       chapters: [{
@@ -379,6 +384,39 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
     catch (e) { return 'main'; }
   }
 
+  /* ================= 自定义片段（存在草稿仓库里，跨设备） ================= */
+  const SNIP_PATH = 'snippets.json';
+
+  /** 打开面板时后台拉一次，拉到就覆盖本地缓存 */
+  async function pullSnippets() {
+    if (!await ensureCloud()) return;
+    try {
+      const branch = await cloudBranch();
+      const f = await api.getFileContents(owner, DRAFT_REPO, SNIP_PATH, branch);
+      if (!f || !f.content) return;
+      const d = JSON.parse(f.content);
+      if (!d || !Array.isArray(d.items)) return;
+      Snippets.saveCustom(d.items, null);       // 不回推，否则会和云端互相追
+    } catch (e) {
+      if (String(e.message || e).indexOf('404') < 0) console.warn('[dev] 拉自定义片段失败', e.message);
+    }
+  }
+
+  /** 改完立刻推一次。一次提交就一个文件，很快。 */
+  async function pushSnippets() {
+    if (!await ensureCloud()) return;
+    try {
+      const branch = await cloudBranch();
+      const payload = JSON.stringify({
+        format: 'al-snippets', version: 1,
+        updatedAt: Date.now(), items: Snippets.loadCustom(),
+      }, null, 2);
+      await api.createOrUpdateFile(owner, DRAFT_REPO, SNIP_PATH, payload,
+        'snippets: update', branch,
+        (await api.getFileContents(owner, DRAFT_REPO, SNIP_PATH, branch) || {}).sha || null);
+    } catch (e) { console.warn('[dev] 存自定义片段失败', e.message); }
+  }
+
   /** 一本书要写哪些文件 */
   function bookFiles(b) {
     const out = [];
@@ -386,6 +424,7 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
       format: 'al-draft', version: 1,
       id: b.id, repo: b.repo, title: b.title, subtitle: b.subtitle, desc: b.desc,
       stage: b.stage, level: b.level, langs: b.langs, license: b.license,
+      kind: b.kind || 'textbook',
       author: b.author, tags: b.tags || [],
       published: b.published || null,
       importedFrom: b.importedFrom || null,
@@ -465,6 +504,7 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
       title: meta.title || id, subtitle: meta.subtitle || '', desc: meta.desc || '',
       stage: meta.stage || '基础', level: meta.level || '入门',
       langs: (meta.langs && meta.langs.length) ? meta.langs : ['zh'],
+      kind: meta.kind || 'textbook',
       license: meta.license || 'CC BY-NC 4.0',
       author: meta.author || { name: '' }, tags: meta.tags || [],
       published: meta.published || null,
@@ -525,6 +565,9 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
       format: 'al-book', version: 1,
       id: b.id, title: b.title, subtitle: b.subtitle, desc: b.desc,
       stage: b.stage, level: b.level, langs: b.langs, license: b.license,
+      // kind 决定机器人要不要卡题目数量。小说 / 笔记必须真的写进文件里 ——
+      // 丢了它，发布出去会被当成教材，因为"一道题都没有"而不予收录。
+      ...(b.kind && b.kind !== 'textbook' ? { kind: b.kind } : {}),
       author: b.author, tags: b.tags || [],
     }, null, 2);
 
@@ -948,6 +991,7 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
           stage: r.meta.stage || '基础',
           level: r.meta.level || '入门',
           langs: [r.L],
+          kind: (r.meta.kind === 'textbook' || !r.meta.kind) ? 'textbook' : r.meta.kind,
           license: r.meta.license || 'CC BY-NC 4.0',
           author: { name: (r.meta.author && r.meta.author.name) || '' },
           tags: r.meta.tags || [],
@@ -1274,7 +1318,11 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
     toggleBtn(false);
   }
 
-  function openSnips(box) {
+  function openSnips(box, skipPull) {
+    // 只在首次打开时拉云端。重画时必须跳过，否则 openSnips → pull → openSnips 无限递归。
+    if (!skipPull) {
+      pullSnippets().then(() => { if (!box.hidden) openSnipsQuiet(box); }).catch(() => {});
+    }
     const ta = $('de-md');
     if (ta) snipRange = { start: ta.selectionStart, end: ta.selectionEnd };
     const zh = lang === 'zh';
@@ -1292,6 +1340,25 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
         <button class="dev-x" id="snip-close" title="${zh ? '关闭' : 'Close'}">×</button>
       </div>
       <div class="dev-snip-grid">
+        ${Snippets.customAsSnips().map(sp => `
+          <button class="dev-snip mine" data-snip="${esc(sp.id)}">
+            <span class="si">✦</span>
+            <span class="sn">${esc(sp.name[lang] || sp.name.zh)}</span>
+            <span class="sd">${esc(sp.desc[lang] || '')}</span>
+            <span class="st">${esc(sp.type)}</span>
+            <span class="dev-snip-x" data-del="${esc(sp.id)}" title="${zh ? '删除' : 'Delete'}">×</span>
+          </button>`).join('')}
+        <button class="dev-snip add" id="snip-new">
+          <span class="si">＋</span>
+          <span class="sn">${zh ? '存成自定义片段' : 'Save as snippet'}</span>
+          <span class="sd">${zh ? '把选中的 quiz 存起来，以后一键插入'
+                          : 'Store the selected quiz for one-click insert'}</span>
+        </button>
+      </div>
+      ${zh ? '<div class="dev-snip-note">自定义片段存在你的私有草稿仓库里，换设备也能用。</div>'
+           : '<div class="dev-snip-note">Custom snippets live in your private drafts repo — available on any device.</div>'}
+      <div class="dev-snip-sec">${zh ? '内置模板' : 'Built-in'}</div>
+      <div class="dev-snip-grid">
         ${Snippets.list().map(sp => `
           <button class="dev-snip" data-snip="${esc(sp.id)}">
             <span class="si">${esc(sp.icon)}</span>
@@ -1302,6 +1369,39 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
       </div>`;
 
     $('snip-close').onclick = closeSnips;
+
+    // 存成自定义片段：优先用选中的文本，没有就取光标所在的那个 quiz 块
+    $('snip-new').onclick = () => {
+      const t = $('de-md');
+      if (!t) return;
+      const sel = t.value.slice(t.selectionStart, t.selectionEnd);
+      const src = sel.trim() || quizBlockAt(t.value, t.selectionStart);
+      if (!src || !src.includes('```quiz')) {
+        alert(zh ? '先选中一段 quiz 代码，或把光标放在某道题里'
+                 : 'Select a quiz block first, or put the cursor inside one');
+        return;
+      }
+      const clean = src.replace(/^```quiz\s*\n?/, '').replace(/\n?```\s*$/, '').replace(/\s+$/, '');
+      const name = (zh ? '我的题 ' : 'Snippet ') + (Snippets.loadCustom().length + 1);
+      const type = Snippets.detectType(clean);
+      const items = Snippets.loadCustom().concat([{
+        id: 'c' + Date.now().toString(36), name, desc: '',
+        type, src: clean, updatedAt: Date.now(),
+      }]);
+      Snippets.saveCustom(items, pushSnippets);
+      openSnips(box);            // 重画，让新片段出现
+    };
+
+    box.querySelectorAll('[data-del]').forEach(el => {
+      el.onclick = ev => {
+        ev.stopPropagation();          // 别触发外层"插入"
+        const id = el.dataset.del.replace(/^custom-/, '');
+        const items = Snippets.loadCustom().filter(c => c.id !== id);
+        Snippets.saveCustom(items, pushSnippets);
+        openSnips(box);
+      };
+    });
+
     box.querySelectorAll('[data-snip]').forEach(el => {
       el.onclick = () => {
         const sp = Snippets.list().find(x => x.id === el.dataset.snip);
@@ -1323,6 +1423,29 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
         drawPreview();
       };
     });
+  }
+
+  /** 只重画面板，不重新拉云端（避免递归）；保留滚动位置和 exam 勾选 */
+  function openSnipsQuiet(box) {
+    const keepExam = $('snip-exam') && $('snip-exam').checked;
+    const keepScroll = box.scrollTop;
+    openSnips(box, true);
+    const cb = $('snip-exam');
+    if (cb && keepExam !== cb.checked) cb.checked = keepExam;
+    box.scrollTop = keepScroll;
+  }
+
+  /**
+   * 找出光标所在的那道 quiz 块。
+   * 作者没选中文本时，用这个"取当前这道题"，比要求他精确选中友好得多。
+   */
+  function quizBlockAt(md, pos) {
+    const re = /```quiz\n[\s\S]*?^```\s*$/gm;
+    let m;
+    while ((m = re.exec(md)) !== null) {
+      if (pos >= m.index && pos <= m.index + m[0].length) return m[0];
+    }
+    return '';
   }
 
   /** Esc 关面板（在 onDevKey 里统一处理） */
@@ -1448,6 +1571,14 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
           <label>${T('fStage')}<input type="text" id="bi-stage" value="${esc(b.stage || '')}"></label>
           <label>${T('fLevel')}<input type="text" id="bi-level" value="${esc(b.level || '')}"></label>
         </div>
+        <label class="dev-form-wide">${T('fKind')}
+          <select id="bi-kind">
+            ${(BookCheck.KINDS || ['textbook','novel','notes','other']).map(k =>
+              `<option value="${esc(k)}"${(b.kind || 'textbook') === k ? ' selected' : ''}>${
+                esc((BookCheck.KINDS_ZH && BookCheck.KINDS_ZH[k]) || k)}</option>`).join('')}
+          </select>
+          <i class="dim" style="font-size:11.5px;font-weight:400">${T('fKindHint')}</i>
+        </label>
         <label>${T('fLangs')}
           <div class="dev-checks">
             <label class="dev-radio"><input type="checkbox" id="bi-zh" ${(b.langs || []).includes('zh') ? 'checked' : ''}> 中文</label>
@@ -1473,6 +1604,7 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
       b.license = $('bi-license').value.trim();
       b.stage = $('bi-stage').value.trim();
       b.level = $('bi-level').value.trim();
+      b.kind = $('bi-kind').value;
       const L = [];
       if ($('bi-zh').checked) L.push('zh');
       if ($('bi-en').checked) L.push('en');
@@ -1807,6 +1939,17 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
   .dev-snip .sd{font-size:11.5px;color:var(--faint);line-height:1.45}
   .dev-snip .st{font-size:10px;font-weight:650;padding:1px 7px;border-radius:99px;
     background:var(--border-soft);color:var(--faint);margin-top:4px}
+  .dev-snip{position:relative}
+  .dev-snip.mine{border-color:color-mix(in srgb,var(--accent) 40%,var(--border))}
+  .dev-snip.mine .si{color:var(--amber)}
+  .dev-snip-x{position:absolute;top:5px;right:7px;font-size:14px;color:var(--faint);
+    padding:0 4px;border-radius:5px;line-height:1}
+  .dev-snip-x:hover{background:var(--red-soft);color:var(--red)}
+  .dev-snip.add{border-style:dashed;align-items:center;text-align:center}
+  .dev-snip.add .sn{color:var(--accent)}
+  .dev-snip-sec{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--faint);margin:14px 0 8px}
+  .dev-snip-note{font-size:11.5px;color:var(--faint);margin-top:9px;line-height:1.5}
 
   /* 专注模式：收起章节树 */
   .dev-ed.focused{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
@@ -1848,6 +1991,9 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
   .dev-form-row{display:flex;gap:10px}
   .dev-form-row label{flex:1}
   .dev-checks{display:flex;gap:14px;padding-top:3px}
+  .dev-form-wide select{padding:8px 11px;border:1px solid var(--border);border-radius:8px;
+    background:transparent;color:var(--text);font-size:13.5px;font-family:inherit}
+  .dev-form-wide .dim{display:block;margin-top:5px;line-height:1.5}
   .dev-checks label{flex-direction:row;align-items:center;font-size:13px;color:var(--text)}
 
   /* 弹窗 */

@@ -15,6 +15,27 @@ const BookCheck = (() => {
   const REQUIRED = ['id','title','subtitle','desc','stage','level','langs','author','license'];
   const ID_RE = /^[a-z0-9][a-z0-9-]*$/;
 
+  /**
+   * 书的种类。
+   *
+   * 为什么要有这个：最初只想着"教材"，于是强制每课 1 随堂 + 2 测验、
+   * 一道题都没有就报错。但有人想用这套格式写小说、写笔记 ——
+   * 那些东西本来就没有题，硬卡着就写不了。
+   *
+   *   textbook  教材（默认）：要求题目数量，中英题数要一致
+   *   novel     小说：不要求题目
+   *   notes     笔记 / 随笔：不要求题目
+   *   other     其它
+   *
+   * 非教材只是"不强制数量"，题目本身写错了照样报错 ——
+   * 有题就得是能判分的题。
+   */
+  const KINDS = ['textbook', 'novel', 'notes', 'other'];
+  const KINDS_ZH = {
+    textbook: '教材', novel: '小说', notes: '笔记 / 随笔', other: '其它',
+  };
+  const isTextbook = kind => String(kind || 'textbook').trim() === 'textbook';
+
   /* ---- quiz 块解析：与 validate.py 一致的「结束围栏必须独占一行且顶格」 ---- */
   function blocks(md) {
     const out = [];
@@ -55,7 +76,7 @@ const BookCheck = (() => {
 
   const truthy = v => String(v || '').trim().toLowerCase() === 'true';
 
-  function checkLesson(name, md, isTest, lang, errors, warnings, stats) {
+  function checkLesson(name, md, isTest, lang, errors, warnings, stats, strict) {
     const tag = `[${lang}] ${name}.md`;
     const lines = md.split('\n').length;
     stats.lines += lines;
@@ -65,18 +86,19 @@ const BookCheck = (() => {
     if (opens !== qs.length) {
       errors.push(`${tag}: 有 ${opens - qs.length} 个 quiz 块没有闭合（末尾缺 \`\`\` 独占一行）`);
     }
-    if (!qs.length) {
-      errors.push(`${tag}: 一道题都没有`);
-      return 0;
-    }
     if (lines < 60) warnings.push(`${tag}: 只有 ${lines} 行，可能是占位内容`);
 
-    if (isTest) {
-      if (qs.length < 5) warnings.push(`${tag}: 章测只有 ${qs.length} 题，建议 8 题`);
-    } else {
-      const exam = qs.filter(q => truthy(q.exam));
-      if (exam.length !== 2) errors.push(`${tag}: 带 exam: true 的题 ${exam.length} 道（应为 2）`);
-      if (qs.length < 3) warnings.push(`${tag}: 只有 ${qs.length} 道题（建议 3 道：1 随堂 + 2 测验）`);
+    // 非教材：题目是可选的。没题就过，有题就照常校验合法性。
+    if (!qs.length) return strict ? (errors.push(`${tag}: 一道题都没有`), 0) : 0;
+
+    if (strict) {
+      if (isTest) {
+        if (qs.length < 5) warnings.push(`${tag}: 章测只有 ${qs.length} 题，建议 8 题`);
+      } else {
+        const exam = qs.filter(q => truthy(q.exam));
+        if (exam.length !== 2) errors.push(`${tag}: 带 exam: true 的题 ${exam.length} 道（应为 2）`);
+        if (qs.length < 3) warnings.push(`${tag}: 只有 ${qs.length} 道题（建议 3 道：1 随堂 + 2 测验）`);
+      }
     }
 
     for (const q of qs) {
@@ -145,6 +167,14 @@ const BookCheck = (() => {
     }
 
     for (const k of REQUIRED) if (!meta[k]) errors.push(`albook.json 缺必需字段：${k}`);
+
+    // kind 决定要不要卡题目数量。未知值按宽松处理：
+    // 宁可放过一本合法的另类书，也别因为拼错就拦住一本正经教材。
+    const kind = String(meta.kind || 'textbook').trim();
+    const strict = isTextbook(kind);
+    if (kind && !KINDS.includes(kind)) {
+      warnings.push(`kind "${kind}" 不在推荐取值里（${KINDS.join(' / ')}），已按"不要求题目"处理`);
+    }
 
     const bid = String(meta.id || '').trim();
     if (bid && !ID_RE.test(bid)) {
@@ -217,8 +247,8 @@ const BookCheck = (() => {
       }
 
       let nq = 0;
-      for (const n of Object.keys(lessons).sort()) nq += checkLesson(n, lessons[n], false, L, errors, warnings, stats);
-      for (const t of Object.keys(tests).sort()) nq += checkLesson(t, tests[t], true, L, errors, warnings, stats);
+      for (const n of Object.keys(lessons).sort()) nq += checkLesson(n, lessons[n], false, L, errors, warnings, stats, strict);
+      for (const t of Object.keys(tests).sort()) nq += checkLesson(t, tests[t], true, L, errors, warnings, stats, strict);
 
       stats.lessons += Object.keys(lessons).length;
       stats.tests += Object.keys(tests).length;
@@ -227,7 +257,8 @@ const BookCheck = (() => {
     }
 
     if (perLang.zh && perLang.en) {
-      if (perLang.zh.questions !== perLang.en.questions) {
+      // 只有教材才要求中英题数一致：小说/笔记先写完一边很正常
+      if (strict && perLang.zh.questions !== perLang.en.questions) {
         errors.push(`中英题数不一致：中文 ${perLang.zh.questions} 道，英文 ${perLang.en.questions} 道`);
       }
       if (perLang.zh.lessons !== perLang.en.lessons) {
@@ -239,7 +270,7 @@ const BookCheck = (() => {
       ok: errors.length === 0,
       errors, warnings,
       stats: { ...stats, languages: present.length },
-      perLang, meta,
+      perLang, meta, kind, strict,
     };
   }
 
@@ -275,5 +306,5 @@ const BookCheck = (() => {
     return null;
   }
 
-  return { validate, blocks, badCaseLine };
+  return { validate, blocks, badCaseLine, KINDS, KINDS_ZH, isTextbook };
 })();
