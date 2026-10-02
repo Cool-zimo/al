@@ -87,6 +87,17 @@ const BookCheck = (() => {
         if (opts.length < 2) errors.push(`${tag}: 选择题只有 ${opts.length} 个选项`);
         else if (!(ans >= 0 && ans < opts.length)) errors.push(`${tag}: 选择题 answer=${q.answer} 越界（共 ${opts.length} 个选项）`);
         if (!String(q.q || '').trim()) errors.push(`${tag}: 选择题缺题干 q`);
+        // 多选题的 answer 是逗号分隔的下标列表，逐个检查越界
+        if (String(q.multi || '').toLowerCase() === 'true') {
+          const picks = String(q.answer ?? '').split(',').map(x => parseInt(x.trim(), 10));
+          if (!picks.length || picks.some(n => !(n >= 0 && n < opts.length))) {
+            errors.push(`${tag}: 多选题 answer="${q.answer}" 有越界下标（共 ${opts.length} 个选项）`);
+          }
+        }
+      } else if (t === 'fill') {
+        // 填空题：answer 是关键词，可用 | 分隔多个可接受写法
+        if (!String(q.answer || '').trim()) errors.push(`${tag}: 填空题缺 answer`);
+        if (!String(q.q || '').trim()) errors.push(`${tag}: 填空题缺题干 q`);
       } else if (['code','function','project','local','js','css','html'].includes(t)) {
         stats.code++;
         if (t === 'function') {

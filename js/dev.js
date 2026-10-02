@@ -103,6 +103,8 @@ const DevPlatform = (() => {
       focus: "专注",
       focusExit: "退出专注",
       focusTitle: "收起章节树，只留编辑和预览（Ctrl/Cmd+B，Esc 退出）",
+      snipLib: "题目库",
+      snipTitle: "插入一道题的模板（字段齐全，插进来就能判分）",
       bookInfo: "书籍信息",
       fTitle: "书名",
       fSubtitle: "副标题",
@@ -188,6 +190,8 @@ const DevPlatform = (() => {
       focus: "Focus",
       focusExit: "Exit focus",
       focusTitle: "Hide the chapter tree, keep editor + preview (Ctrl/Cmd+B, Esc to exit)",
+      snipLib: "Snippets",
+      snipTitle: "Insert a question template (complete fields, gradeable as-is)",
       bookInfo: "Book info",
       fTitle: "Title",
       fSubtitle: "Subtitle",
@@ -992,6 +996,7 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
         <span class="dev-state" id="de-state">${T('allSaved')}</span>
         <button class="dev-btn sm" id="de-save">${T('save')}</button>
         <button class="dev-btn sm ghost" id="de-cloud" title="${T('cloudPushTitle')}">☁ ${T('cloudPush')}</button>
+        <button class="dev-btn sm ghost" id="de-snip" title="${T('snipTitle')}">⊞ ${T('snipLib')}</button>
         <button class="dev-btn sm ghost" id="de-focus" title="${T('focusTitle')}">⤢ ${T('focus')}</button>
         <button class="dev-btn sm ghost" id="de-info">${T('bookInfo')}</button>
         <button class="dev-btn sm ghost" id="de-report">${T('report')}</button>
@@ -1005,6 +1010,7 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
         </aside>
         <section class="dev-edit">
           <div class="dev-pane-head" id="de-lshead"></div>
+          <div class="dev-snips" id="de-snips" hidden></div>
           <textarea id="de-md" spellcheck="false"></textarea>
         </section>
         <section class="dev-view">
@@ -1028,6 +1034,7 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
     };
     $('de-info').onclick = () => showBookInfo(b);
     $('de-focus').onclick = () => toggleFocus();
+    $('de-snip').onclick = () => toggleSnips();
     document.addEventListener('keydown', onDevKey);
 
     $('de-cloud').onclick = async () => {
@@ -1245,6 +1252,85 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
       <span class="dim">${T('writeHint')}</span>`;
   }
 
+  /* ================= 题目库面板 ================= */
+  /**
+   * 打开面板前先记住光标位置：点到面板上时 textarea 已经失焦，
+   * 不记的话片段会被插到开头，而不是作者正在写的地方。
+   */
+  let snipRange = null;
+
+  function toggleSnips() {
+    const box = $('de-snips');
+    if (!box) return;
+    if (box.hidden) openSnips(box); else { box.hidden = true; toggleBtn(false); }
+  }
+  function toggleBtn(on) {
+    const b = $('de-snip');
+    if (b) b.classList.toggle('on', on);
+  }
+  function closeSnips() {
+    const box = $('de-snips');
+    if (box) box.hidden = true;
+    toggleBtn(false);
+  }
+
+  function openSnips(box) {
+    const ta = $('de-md');
+    if (ta) snipRange = { start: ta.selectionStart, end: ta.selectionEnd };
+    const zh = lang === 'zh';
+
+    box.hidden = false;
+    toggleBtn(true);
+    box.innerHTML = `
+      <div class="dev-snip-top">
+        <span class="dev-snip-h">${T('snipLib')}</span>
+        <label class="dev-radio"><input type="checkbox" id="snip-exam">
+          ${zh ? '带 exam: true（计入学完）' : 'with exam: true (counts as done)'}</label>
+        <span class="dim" style="font-size:12px">${zh
+          ? '一课要 1 道随堂 + 2 道本节测验'
+          : 'Each lesson needs 1 in-class + 2 section-quiz questions'}</span>
+        <button class="dev-x" id="snip-close" title="${zh ? '关闭' : 'Close'}">×</button>
+      </div>
+      <div class="dev-snip-grid">
+        ${Snippets.list().map(sp => `
+          <button class="dev-snip" data-snip="${esc(sp.id)}">
+            <span class="si">${esc(sp.icon)}</span>
+            <span class="sn">${esc(sp.name[lang] || sp.name.zh)}</span>
+            <span class="sd">${esc(sp.desc[lang] || sp.desc.zh)}</span>
+            <span class="st">${esc(sp.type)}</span>
+          </button>`).join('')}
+      </div>`;
+
+    $('snip-close').onclick = closeSnips;
+    box.querySelectorAll('[data-snip]').forEach(el => {
+      el.onclick = () => {
+        const sp = Snippets.list().find(x => x.id === el.dataset.snip);
+        if (!sp) return;
+        const exam = $('snip-exam') && $('snip-exam').checked;
+        const text = '\n\n' + sp.body(lang, exam) + '\n';
+        const t = $('de-md');
+        if (!t || t.disabled) return;
+        if (snipRange) { t.focus(); t.setSelectionRange(snipRange.start, snipRange.end); }
+        Snippets.insert(t, text);
+        Snippets.placeCursor(t, text);
+        // 走一遍 oninput 的逻辑：存草稿 + 重画预览 + 排云端
+        const ls = lessonAt();
+        if (ls) ls.md = t.value;
+        snipRange = null;
+        closeSnips();
+        markDirty();
+        lastQuizSig = null;
+        drawPreview();
+      };
+    });
+  }
+
+  /** Esc 关面板（在 onDevKey 里统一处理） */
+  function snipsOpen() {
+    const b = $('de-snips');
+    return !!(b && !b.hidden);
+  }
+
   /**
    * 专注模式：收起章节树，只留编辑 + 预览两栏。
    *
@@ -1281,7 +1367,11 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
       if (cur) pushBook(cur).then(() => paintCloudState()).catch(() => {});
       return;
     }
-    if (e.key === 'Escape' && focused) { toggleFocus(); return; }
+    if (e.key === 'Escape') {
+      if (snipsOpen()) { closeSnips(); return; }   // 面板先关，别一按 Esc 就退出专注模式
+      if (focused) toggleFocus();
+      return;
+    }
     // Ctrl/Cmd+B 切换专注（在输入框里也能用）
     if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B') && inField) {
       e.preventDefault();
@@ -1699,6 +1789,25 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
   /* 整页模式下三栏要撑满，不再受 900px 的正文宽度限制 */
   body.wide-view .dev-wrap{max-width:1560px;padding:26px 30px 70px}
   body.wide-view .dev-ed{grid-template-columns:260px minmax(0,1fr) minmax(0,1fr)}
+
+  /* 题目库面板 */
+  .dev-snips{border-bottom:1px solid var(--border);background:var(--bg-soft);
+    padding:12px 14px;max-height:340px;overflow:auto}
+  .dev-snip-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+  .dev-snip-h{font-size:13px;font-weight:700}
+  .dev-snip-top .dev-radio{font-size:12.5px;color:var(--text)}
+  .dev-snip-top .dev-x{margin-left:auto;font-size:17px}
+  .dev-snip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:9px}
+  .dev-snip{display:flex;flex-direction:column;align-items:flex-start;gap:2px;
+    padding:10px 12px;border:1px solid var(--border);border-radius:9px;background:var(--panel);
+    color:var(--text);cursor:pointer;text-align:left;font-family:inherit;transition:.14s}
+  .dev-snip:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .dev-snip .si{font-size:15px;color:var(--accent);font-weight:700;line-height:1}
+  .dev-snip .sn{font-size:13.5px;font-weight:660;margin-top:2px}
+  .dev-snip .sd{font-size:11.5px;color:var(--faint);line-height:1.45}
+  .dev-snip .st{font-size:10px;font-weight:650;padding:1px 7px;border-radius:99px;
+    background:var(--border-soft);color:var(--faint);margin-top:4px}
+
   /* 专注模式：收起章节树 */
   .dev-ed.focused{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .dev-ed.focused .dev-tree{display:none}
