@@ -28,6 +28,7 @@
       secBooks: '教材',
       groupTip: '每本书最多显示 8 条',
       badgeExt: '第三方',
+      badgeDraft: '我的草稿',
       extLoading: '正在并入第三方教材…',
       openBook: '打开这本书 →',
       err: '目录加载失败，请刷新重试',
@@ -44,6 +45,7 @@
       secBooks: 'Books',
       groupTip: 'up to 8 per book',
       badgeExt: 'Community',
+      badgeDraft: 'My draft',
       extLoading: 'Adding community books…',
       openBook: 'Open this book →',
       err: 'Failed to load index, please refresh',
@@ -110,7 +112,7 @@
     'https://cdn.jsdelivr.net/gh/Cool-zimo/al-docs@main/registry.json',
     'https://raw.githubusercontent.com/Cool-zimo/al-docs/main/registry.json',
   ];
-  var EXT_TTL = 30 * 60 * 1000;       // 半小时看一次就够了，机器人 6 小时才扫一次
+  var EXT_TTL = 5 * 60 * 1000;        // 登录时用 token 实时搜，不用等机器人
 
   function extSources(repo, branch, path) {
     var b = branch || 'main';
@@ -151,13 +153,65 @@
     });
   }
 
+  /**
+   * 登录了就直接用 token 搜 GitHub —— 这是实时的。
+   * 构建时内联的索引会滞后一个构建周期，registry 又是机器人 6 小时扫一次，
+   * 两层滞后叠起来，作者刚发布的书自己都搜不到。
+   * 只有未登录时才退回去读 registry。
+   */
+  function token() {
+    try {
+      var v = localStorage.getItem('pytut:token');
+      if (!v) return '';
+      return JSON.parse(v) || '';
+    } catch (e) { return ''; }
+  }
+
+  async function discoverBooks() {
+    var tok = token();
+    if (!tok) {
+      var reg = await fetchJSON(REGISTRY);
+      return (reg.books || []).slice();
+    }
+    return fetch('https://api.github.com/search/repositories?q=topic:al-book&per_page=100', {
+      headers: { Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json' },
+    }).then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      return r.json();
+    }).then(function (d) {
+      // 搜索 API 只给仓库信息，书的元数据还得读 albook.json
+      return Promise.all((d.items || []).map(function (it) {
+        return fetch('https://api.github.com/repos/' + it.full_name + '/contents/albook.json', {
+          headers: { Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json' },
+        }).then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (f) {
+            if (!f || !f.content) return null;
+            try {
+              var m = JSON.parse(atob(f.content.replace(/\s/g, '')));
+              if (m.format !== 'al-book') return null;   // format 必须精确，这条不能松
+              m.repo = it.full_name;
+              m.branch = it.default_branch || 'main';
+              m.ok = true;                                // 没跑完整校验，能读就能搜
+              return m;
+            } catch (e) { return null; }
+          }).catch(function () { return null; });
+      }));
+    }).then(function (list) {
+      return list.filter(Boolean);
+    }).catch(function () {
+      return fetchJSON(REGISTRY).then(function (r) { return (r.books || []).slice(); });
+    });
+  }
+
   async function loadExternal() {
     var have = {};
     idx.books.forEach(function (b) { if (b.ext) have[b.id] = 1; });
 
-    var reg = await fetchJSON(REGISTRY);
+    var reg = { books: await discoverBooks() };
     var fresh = (reg.books || []).filter(function (b) {
-      return b.ok && !have[b.id] && (!b.langs || !b.langs.length || b.langs.indexOf(LANG) >= 0);
+      if (!b.ok || have[b.id]) return false;
+      var ls = b.langs || [];
+      return !ls.length || ls.indexOf(LANG) >= 0;
     }).slice(0, 12);
     if (!fresh.length) return;
 
@@ -190,6 +244,99 @@
         render();
       } catch (err) { /* 某本抓不到就跳过 */ }
     }
+  }
+
+  /* ---------- 自己的草稿 ----------
+   * 草稿在私有仓库 al-drafts 里，构建时扫不到（别人的仓库、需要本人 token），
+   * 所以索引里没有 —— 搜自己刚写的书会 0 条，很莫名其妙。
+   *
+   * 私有仓库必须走 API：raw 链接要带 token，jsDelivr / CDN 只能读公开仓库。
+   * 没登录就跳过（草稿本来就只属于本人）。
+   */
+  var DRAFT_REPO = 'al-drafts';
+
+  function myCredential() {
+    try {
+      var rawTok = localStorage.getItem('pytut:token');
+      var rawOwn = localStorage.getItem('pytut:owner');
+      if (rawTok) { try { rawTok = JSON.parse(rawTok); } catch (e) { /* 有些值是裸字符串 */ } }
+      if (rawOwn) { try { rawOwn = JSON.parse(rawOwn); } catch (e) { /* 同上 */ } }
+      var tok = typeof rawTok === 'string' ? rawTok : (rawTok && rawTok.value);
+      var own = typeof rawOwn === 'string' ? rawOwn : (rawOwn && rawOwn.value);
+      if (tok && own) return { token: tok, owner: own };
+    } catch (e) { /* 隐私模式下 localStorage 可能不可用 */ }
+    return null;
+  }
+
+  function gh(path, cred) {
+    return fetch('https://api.github.com' + path, {
+      headers: { Authorization: 'Bearer ' + cred.token,
+                 Accept: 'application/vnd.github+json',
+                 'X-GitHub-Api-Version': '2022-11-28' },
+    }).then(function (r) { return r.ok ? r.json() : Promise.reject(new Error(r.status)); });
+  }
+
+  function applyDraft(meta) {
+    var bi = idx.books.length;
+    var chs = (meta.chapters || []).map(function (c) { return c.title || ''; });
+    idx.books.push({
+      id: meta.id, title: meta.title || meta.id, sub: meta.subtitle || '',
+      stage: LANG === 'zh' ? '草稿' : 'Draft', chs: chs, ext: true, draft: true,
+      x: [meta.desc, (meta.tags || []).join(' '), (meta.author || {}).name,
+          (meta.repo || '')].filter(Boolean).join(' '),
+    });
+    (meta.chapters || []).forEach(function (ch, ci) {
+      (ch.lessons || []).forEach(function (ls) {
+        idx.items.push({
+          b: bi, c: ci, id: String(ls.id),
+          t: ls.title || String(ls.id), s: '',
+        });
+      });
+    });
+  }
+
+  async function loadMyDrafts() {
+    if (!idx) return;
+    var cred = myCredential();
+    if (!cred) return;
+
+    // 先探测仓库在不在（没写过书的人根本没这个仓，别硬报错）
+    var repo;
+    try {
+      repo = await gh('/repos/' + cred.owner + '/' + DRAFT_REPO, cred);
+    } catch (e) { return; }
+    var branch = repo.default_branch || 'main';
+
+    var tree;
+    try {
+      tree = await gh('/repos/' + cred.owner + '/' + DRAFT_REPO +
+                      '/git/trees/' + branch + '?recursive=1', cred);
+    } catch (e) { return; }
+
+    var ids = [];
+    (tree.tree || []).forEach(function (it) {
+      var m = (it.path || '').match(/^drafts\/([^/]+)\/meta\.json$/);
+      if (m) ids.push(m[1]);
+    });
+    if (!ids.length) return;
+
+    // 一次并发拉全部 meta —— 草稿一般没几本，不值得写成分批
+    await Promise.all(ids.map(function (id) {
+      return gh('/repos/' + cred.owner + '/' + DRAFT_REPO +
+                '/contents/drafts/' + encodeURIComponent(id) + '/meta.json?ref=' + branch, cred)
+        .then(function (d) {
+          var txt = '';
+          if (d.content && d.encoding === 'base64') {
+            try { txt = decodeURIComponent(escape(atob(d.content.replace(/\s/g, '')))); }
+            catch (e) { txt = atob(d.content.replace(/\s/g, '')); }
+          }
+          var meta = JSON.parse(txt || '{}');
+          if (meta && meta.id) applyDraft(meta);
+        })
+        .catch(function () { /* 某本坏了就跳过 */ });
+    }));
+
+    render();
   }
 
   /* ---------- 状态 ---------- */
@@ -331,7 +478,8 @@
         var bk = idx.books[r.b];
         html += '<div class="s-bkitem">'
           + '<a href="' + HOME + '#/book/' + esc(bk.id) + '">' + hl(bk.title, ts) + '</a>'
-          + (bk.ext ? '<span class="s-badge">' + esc(T.badgeExt) + '</span>' : '')
+          + (bk.draft ? '<span class="s-badge s-badge-draft">' + esc(T.badgeDraft) + '</span>'
+             : (bk.ext ? '<span class="s-badge">' + esc(T.badgeExt) + '</span>' : ''))
           + '<span class="s-stage">' + esc(bk.stage) + '</span>'
           + (bk.sub ? '<p class="s-snip">' + hl(bk.sub, ts) + '</p>' : '')
           + '</div>';
@@ -346,7 +494,8 @@
       var head = list.slice(0, PER_BOOK), rest = list.length - head.length;
       html += '<section class="s-book"><h2>'
         + '<a href="' + HOME + '#/book/' + esc(bk.id) + '">' + hl(bk.title, ts) + '</a>'
-        + (bk.ext ? '<span class="s-badge">' + esc(T.badgeExt) + '</span>' : '')
+        + (bk.draft ? '<span class="s-badge s-badge-draft">' + esc(T.badgeDraft) + '</span>'
+           : (bk.ext ? '<span class="s-badge">' + esc(T.badgeExt) + '</span>' : ''))
         + '<span class="s-stage">' + esc(bk.stage) + '</span></h2><ul>';
       head.forEach(function (r) {
         html += '<li class="s-item">'
@@ -399,6 +548,9 @@
           loadExternal().catch(function () {});
         }
       } catch (e) { /* 隐私模式下 localStorage 不可用 */ }
+
+      // 自己的草稿：私有仓库，构建时扫不到，登录了就并进来
+      loadMyDrafts().catch(function () {});
     }).catch(function () {
       $('#state').textContent = T.err;
     });
