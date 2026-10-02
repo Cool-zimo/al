@@ -44,7 +44,7 @@ window.I18N = {
     third: "第三方教材",
     badge: "第三方",
     searchPh: "搜索书（书名 / 作者 / 仓库）",
-    searchAllPh: "搜索全部教材：书名、课文、正文",
+    searchAllPh: "搜索教材名与目录",
     searchAllBtn: "搜索",
     refresh: "刷新",
     thirdNote: "第三方书由社区作者提供，内容从原作者仓库直读。收录只代表格式合规。",

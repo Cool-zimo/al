@@ -44,7 +44,7 @@ window.I18N = {
     third: "Community",
     badge: "Community",
     searchPh: "Search community books (title / author / repo)",
-    searchAllPh: "Search all textbooks: title, lesson, body",
+    searchAllPh: "Search book titles and contents",
     searchAllBtn: "Search",
     refresh: "Refresh",
     thirdNote: "Community books are written by contributors and read straight from the author's repo. Listing only means the format is valid.",

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Third-party books · AnyLearn</title>
+<link rel="stylesheet" href="../../css/style.css">
+</head>
+<body class="">
+<div id="app"></div>
+
+<!--
+  挂在 al 站点下而不是单独开站：token 是同源共享的，
+  于是搜索能用 5000 次/小时的登录额度，取内容也能走 API 拿实时版本。
+-->
+<script src="../../js/github-api.js?v=50"></script>
+<script src="../../js/ghsrc.js?v=50"></script>
+<script src="../../js/storage.js?v=50"></script>
+<script src="../../js/bookshelf.js?v=50"></script>
+<script src="../../js/bookcheck.js?v=50"></script>
+<script src="../../js/docs.js?v=50"></script>
+<script>Docs.mount(document.getElementById('app'), 'index');</script>
+</body>
+</html>

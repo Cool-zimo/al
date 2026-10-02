@@ -2,13 +2,12 @@
  * 全站搜索页（/zh/search/ 与 /en/search/ 共用）
  *
  * 为什么是独立页面而不是 #/search：
- *   用户要的入口是 https://…/al/zh/search?keyword=xxx —— 真实路径能被搜到、
- *   能收藏、能在新标签打开。hash 路由做不到。
+ *   用户要的入口是 https://…/al/zh/search?keyword=xxx —— 真实路径能被收藏、
+ *   能在新标签打开、分享出去别人直接看到结果。hash 路由做不到。
  *
- * 两段式加载：
- *   1. search-index.json（书名 + 课标题 + 引言，约 170KB）先到，立刻出结果
- *   2. search-full.json（正文，1MB 级）后台拉，到了再补一轮正文匹配
- *   直接等 1MB 的话，首屏要白等好几秒。
+ * 只搜「教材名 + 目录」：书名、副标题、简介、标签、作者、章标题、课标题、引言。
+ * 不搜正文 —— 试过，噪音太大：任何词都能命中几十篇课文，真正要找的那篇
+ * 反而被淹没了，而且索引要大十倍。找内容先找书/找课，比全文模糊匹配靠谱。
  */
 (function () {
   'use strict';
@@ -18,42 +17,36 @@
 
   var T = {
     zh: {
-      ph: '搜索全部教材（书名 / 课文 / 正文）',
+      ph: '搜索教材名与目录',
       btn: '搜索',
       home: '← 返回首页',
-      loading: '正在加载索引…',
-      deep: '正在全文搜索…',
-      none: '没有找到相关内容',
+      loading: '正在加载目录…',
+      none: '没有找到相关的教材或课文',
       noneTip: '换个词试试，或者少输入几个字。',
       empty: '输入关键词开始搜索',
       hit: '共 {n} 条',
-      hitBook: '{n} 本教材',
-      err: '索引加载失败，请刷新重试',
-      inBook: '正文命中',
-      looseNote: '没有全部命中，下面是部分匹配的结果',
-      groupTip: '每本书最多显示 6 条',
       secBooks: '教材',
-      goLesson: '打开这一课 →',
-      moreInBook: '这本书里还有 {n} 条',
+      groupTip: '每本书最多显示 8 条',
+      badgeExt: '第三方',
+      extLoading: '正在并入第三方教材…',
+      openBook: '打开这本书 →',
+      err: '目录加载失败，请刷新重试',
     },
     en: {
-      ph: 'Search all textbooks (title / lesson / body)',
+      ph: 'Search book titles and contents',
       btn: 'Search',
       home: '← Back home',
       loading: 'Loading index…',
-      deep: 'Searching full text…',
-      none: 'No results',
+      none: 'No matching book or lesson',
       noneTip: 'Try another keyword, or fewer words.',
       empty: 'Type a keyword to start',
       hit: '{n} results',
-      hitBook: '{n} books',
-      err: 'Failed to load index, please refresh',
-      inBook: 'match in body',
-      looseNote: 'no exact match — showing partial results',
-      groupTip: 'up to 6 per book',
       secBooks: 'Books',
-      goLesson: 'Open lesson →',
-      moreInBook: '{n} more in this book',
+      groupTip: 'up to 8 per book',
+      badgeExt: 'Community',
+      extLoading: 'Adding community books…',
+      openBook: 'Open this book →',
+      err: 'Failed to load index, please refresh',
     },
   }[LANG];
 
@@ -67,45 +60,183 @@
   /* ---------- 取文件 ----------
    * 首选同源相对路径：页面和索引是同一次部署，不存在 CDN 缓存滞后 ——
    * 刚推上去的索引立刻就能搜到，jsDelivr @main 要等好几分钟才更新。
-   * 后面两个源只是兜底（比如有人把 search/ 单独拷到别处用）。
    */
   var LOCAL = '../../content/';
   var BASE = 'https://cdn.jsdelivr.net/gh/Cool-zimo/al@main/content/';
   var RAW = 'https://raw.githubusercontent.com/Cool-zimo/al/main/content/';
   var picked = null;
 
-  function get(path) {
-    var urls = picked ? [picked + path] : [LOCAL + path, BASE + path, RAW + path];
+  function fetchJSON(urls) {
     var i = 0;
     function next() {
-      if (i >= urls.length) return Promise.reject(new Error('all sources failed'));
-      var u = urls[i++];
-      return fetch(u, { cache: 'force-cache' }).then(function (r) {
+      if (i >= urls.length) return Promise.reject(new Error('all failed'));
+      return fetch(urls[i++], { cache: 'force-cache' }).then(function (r) {
         if (!r.ok) throw new Error(r.status);
-        picked = u.slice(0, u.lastIndexOf(path));   // 记住哪个源通，后面都用它
         return r.json();
-      }).catch(function () {
-        return next();
-      });
+      }).catch(function () { return next(); });
     }
     return next();
   }
 
+  function get(path) {
+    var urls = picked ? [picked + path]
+      : [LOCAL + path, BASE + path, RAW + path];
+    return fetchJSON(urls).then(function (d) {
+      picked = null;   // 只记这一次用的源即可，后续都走同一个
+      return d;
+    });
+  }
+
+  function fetchText(urls) {
+    var i = 0;
+    function next() {
+      if (i >= urls.length) return Promise.reject(new Error('all failed'));
+      return fetch(urls[i++], { cache: 'force-cache' }).then(function (r) {
+        if (!r.ok) throw new Error(r.status);
+        return r.text();
+      }).catch(function () { return next(); });
+    }
+    return next();
+  }
+
+  /* ---------- 第三方教材 ----------
+   * 站内索引只覆盖 content/ 下的官方教材。第三方书在作者自己的仓库里，
+   * 构建时拿不到，只能运行时去 al-docs 的 registry 里认领。
+   * 不做这一步的话，搜「Python 自动化办公」永远 0 条 —— 书明明就在首页。
+   * 只抓 toc + 课标题，不抓正文，所以请求量很小。
+   */
+  var REGISTRY = [
+    'https://cdn.jsdelivr.net/gh/Cool-zimo/al-docs@main/registry.json',
+    'https://raw.githubusercontent.com/Cool-zimo/al-docs/main/registry.json',
+    'https://cool-zimo.github.io/al-docs/registry.json',
+  ];
+  var EXT_CACHE = 'al.search.ext.' + LANG;
+  var EXT_TTL = 6 * 3600 * 1000;      // registry 机器人 6 小时扫一次，缓存对齐
+  var MAX_EXT_BOOKS = 24;
+
+  function extSources(repo, branch, path) {
+    var b = branch || 'main';
+    return [
+      'https://cdn.jsdelivr.net/gh/' + repo + '@' + b + '/' + path,
+      'https://raw.githubusercontent.com/' + repo + '/' + b + '/' + path,
+    ];
+  }
+
+  /** 官方式 toc：[{title, items:[{id,title,summary}]}]；第三方简写：{chapters:[{title, lessons:[id]}]} */
+  function tocEntries(toc) {
+    var out = [];
+    var chs = Array.isArray(toc) ? toc : (toc && toc.chapters) || [];
+    chs.forEach(function (ch, ci) {
+      (ch.items || []).forEach(function (it) {
+        out.push({ c: ci, id: String(it.id), t: it.title || String(it.id), s: it.summary || '', md: false });
+      });
+      // 简写格式只有课号，标题得去课文里抓（md: true 标记待抓）
+      (ch.lessons || []).forEach(function (lid) {
+        if (typeof lid === 'string') out.push({ c: ci, id: lid, t: lid, s: '', md: true });
+      });
+    });
+    return { chs: chs.map(function (c) { return c.title || ''; }), items: out };
+  }
+
+  function firstLine(md, re) {
+    var line = String(md || '').split('\n').find(function (l) { return re.test(l); });
+    return line ? line.replace(re, '').trim() : '';
+  }
+
+  /** 并发抓课文首行补标题。并发上限 6，别把 CDN 打挂 */
+  function fillTitles(entries, repo, branch) {
+    var queue = entries.filter(function (e) { return e.md; });
+    var running = 0;
+    return new Promise(function (resolve) {
+      function pump() {
+        if (!queue.length) { if (!running) resolve(); return; }
+        while (running < 6 && queue.length) {
+          running++;
+          var e = queue.shift();
+          fetchText(extSources(repo, branch, 'content/' + LANG + '/lessons/' + e.id + '.md'))
+            .then(function (t) {
+              e.t = firstLine(t, /^#\s+/) || e.id;
+              e.s = firstLine(t, /^>\s+/);
+            })
+            .catch(function () { /* 抓不到就留课号，目录照样可点 */ })
+            .then(function () { running--; pump(); });
+        }
+      }
+      pump();
+    });
+  }
+
+  function applyExternal(one) {
+    var bi = idx.books.length;
+    idx.books.push({
+      id: one.id, title: one.title, sub: one.sub || '',
+      stage: one.stage || (LANG === 'zh' ? '第三方' : 'Community'),
+      chs: one.chs, ext: true,
+      // 简介 / 标签 / 作者 / 章标题都进可搜字段 —— 搜「openpyxl」命中的就是它们
+      x: [one.desc, (one.tags || []).join(' '), (one.author || {}).name,
+          (one.chs || []).join(' ')].filter(Boolean).join(' '),
+    });
+    one.items.forEach(function (it) {
+      idx.items.push({ b: bi, c: it.c, id: it.id, t: it.t, s: it.s });
+    });
+  }
+
+  async function loadExternal() {
+    var cached = null;
+    try {
+      var raw = localStorage.getItem(EXT_CACHE);
+      if (raw) {
+        var o = JSON.parse(raw);
+        if (o && Date.now() - o.t < EXT_TTL) cached = o.list;
+      }
+    } catch (e) { /* 缓存坏了就重新拉 */ }
+
+    if (cached) {
+      cached.forEach(applyExternal);
+      render();
+      return;
+    }
+
+    var reg = await fetchJSON(REGISTRY);
+    var books = (reg.books || []).filter(function (b) {
+      return b.ok && (!b.langs || !b.langs.length || b.langs.indexOf(LANG) >= 0);
+    }).slice(0, MAX_EXT_BOOKS);
+
+    var list = [];
+    for (const b of books) {
+      try {
+        var toc = await fetchJSON(extSources(b.repo, b.branch, 'content/' + LANG + '/toc.json'));
+        var e = tocEntries(toc);
+        await fillTitles(e.items, b.repo, b.branch);
+        var one = { id: b.id, title: b.title, sub: b.subtitle, stage: b.stage,
+                    desc: b.desc, tags: b.tags, author: b.author,
+                    chs: e.chs, items: e.items };
+        list.push(one);
+        applyExternal(one);     // 抓一本就上一本，别等全部抓完
+        render();
+      } catch (err) { /* 某本抓不到就跳过，不影响其它书 */ }
+    }
+    try { localStorage.setItem(EXT_CACHE, JSON.stringify({ t: Date.now(), list: list })); }
+    catch (e) { /* 存不下就算了，下次重新拉 */ }
+  }
+
   /* ---------- 状态 ---------- */
-  var idx = null;          // 轻量索引
-  var fullItems = null;    // 正文数组，与 idx.items 一一对应
+  var idx = null;
   var cur = '';
 
-  /* ---------- 匹配 ---------- */
-  // 中文查询里常带「关于」「怎么」这类词，全部要求命中会让结果归零
-  var STOP = { zh: ['关于', '怎么', '如何', '什么', '为什么', '的', '了', '吗', '教程', '学习', '讲', '一下', '请问'],
-               en: ['how', 'what', 'why', 'the', 'a', 'an', 'to', 'of', 'in', 'about', 'tutorial'] }[LANG];
-
-  /**
-   * 中文没有空格，「关于爬虫」会被当成一个词，而正文里这两个字从不连着出现 ——
-   * 直接搜必然 0 条。所以先剥掉「关于 / 怎么 / 如何」这类口水词再搜。
-   * 这是 query rewriting 的极简版，但能救回一大半自然语句查询。
+  /* ---------- 匹配 ----------
+   * 中文没有空格，「python自动化办公」会被当成一个词，
+   * 而书名里带空格 —— 两边都压平再比，才能对上。
    */
+  var STOP = {
+    zh: ['关于', '怎么', '如何', '什么', '为什么', '的', '了', '吗', '教程', '学习', '讲', '一下', '请问'],
+    en: ['how', 'what', 'why', 'the', 'a', 'an', 'to', 'of', 'in', 'about', 'tutorial'],
+  }[LANG];
+
+  function hasCJK(s) { return /[\u4e00-\u9fff]/.test(s); }
+  function compact(s) { return String(s || '').toLowerCase().replace(/\s+/g, ''); }
+
+  /** 剥掉「关于 / 怎么 / 如何」这类口水词 —— 「关于爬虫」不处理就是 0 条 */
   function cleanQuery(q) {
     var t = String(q || '').trim().toLowerCase();
     STOP.forEach(function (w) {
@@ -114,51 +245,39 @@
     return t.trim();
   }
 
-  function terms(q) {
-    return cleanQuery(q).split(/\s+/).filter(Boolean);
-  }
+  function terms(q) { return cleanQuery(q).split(/\s+/).filter(Boolean); }
 
-  /** 高亮用词：已经剥过停用词了，这里只再挡一道空数组 */
-  function meaningful(ts) {
-    return ts.filter(Boolean);
-  }
-
-  function score(text, ts, any) {
+  /** 命中几个词。minHit=ts.length 是全中（AND） */
+  function score(text, ts, minHit, ctext) {
     var t = String(text || '').toLowerCase(), n = 0;
-    for (var i = 0; i < ts.length; i++) if (t.indexOf(ts[i]) >= 0) n++;
-    return any ? n : (n === ts.length ? n : 0);
-  }
-
-  /** 抓一段包含关键词的上下文，用于结果里显示 */
-  function snippet(text, ts) {
-    var t = String(text || '');
-    var low = t.toLowerCase();
-    var at = -1;
     for (var i = 0; i < ts.length; i++) {
-      var p = low.indexOf(ts[i]);
-      if (p >= 0 && (at < 0 || p < at)) at = p;
+      var w = ts[i];
+      if (t.indexOf(w) >= 0) { n++; continue; }
+      if (ctext && hasCJK(w) && ctext.indexOf(compact(w)) >= 0) n++;
     }
-    if (at < 0) return t.slice(0, 90);
-    var s = Math.max(0, at - 45);
-    return (s > 0 ? '…' : '') + t.slice(s, s + 150) + (s + 150 < t.length ? '…' : '');
+    return n >= minHit ? n : 0;
   }
 
-  /**
-   * any=true 时是「命中任一词也算」的兜底模式。
-   * 全 AND 太严：「关于爬虫」这种自然语句会一条都搜不到。
-   */
-  function search(q, any) {
-    var ts0 = terms(q);
-    if (!ts0.length || !idx) return { books: [], lessons: [] };
-    var ts = any ? ts0 : (meaningful(ts0).length ? meaningful(ts0) : ts0);
-    if (!ts.length) return { books: [], lessons: [] };
+  /** 惰性算一份压平文本，供中文连写查询兜底 */
+  function cachedCompact(o, key) {
+    var k = '_c_' + key;
+    if (o[k] === undefined) o[k] = compact(o[key] || '');
+    return o[k];
+  }
 
-    // 书名命中单独成一类。不这么做的话，「递归」命中某本书的副标题，
-    // 那本书 30 课会全部灌进结果 —— 全是噪音。
+  function search(q, loose) {
+    var ts = terms(q);
+    if (!ts.length || !idx) return { books: [], lessons: [] };
+    var minHit = loose ? Math.max(1, ts.length - 1) : ts.length;
+
+    // 书名命中单独成一类 —— 它是「你要找的东西」本身，比任何单课都靠前
     var books = [];
     for (var bi = 0; bi < idx.books.length; bi++) {
       var bk = idx.books[bi];
-      var bs = score(bk.title, ts, any) * 2 + score(bk.sub, ts, any);
+      var bc = compact(bk.title + ' ' + bk.sub + ' ' + (bk.x || ''));
+      var bs = score(bk.title, ts, minHit, bc) * 3
+        + score(bk.sub, ts, minHit, bc) * 2
+        + score(bk.x, ts, minHit, bc);
       if (bs) books.push({ b: bi, sc: bs });
     }
     books.sort(function (a, b) { return b.sc - a.sc; });
@@ -166,32 +285,25 @@
     var lessons = [];
     for (var i = 0; i < idx.items.length; i++) {
       var it = idx.items[i];
-      var s = 0, where = '';
-      var st = score(it.t, ts, any);
-      if (st) { s = 100; where = 'title'; }
-      else {
-        st = score(it.s, ts, any);
-        if (st) { s = 60; where = 'intro'; }
-        else if (fullItems && score(fullItems[i], ts, any)) { s = 20; where = 'body'; }
+      var ic = compact(it.t + ' ' + it.s);
+      var st = score(it.t, ts, minHit, ic);
+      var s = st ? 100 : 0;
+      if (!s) {
+        st = score(it.s, ts, minHit, ic);
+        if (st) s = 60;
       }
       if (!s) continue;
-      lessons.push({
-        b: it.b, id: it.id, c: it.c, t: it.t, s: it.s, w: where, sc: s + st,
-        snip: where === 'body' ? snippet(fullItems[i], ts) : (it.s || ''),
-      });
+      lessons.push({ b: it.b, id: it.id, c: it.c, t: it.t, s: it.s, sc: s + st });
     }
     lessons.sort(function (a, b) { return b.sc - a.sc; });
     return { books: books, lessons: lessons };
   }
 
-  /** AND 搜不到几条就降级成 OR，别让人搜个「关于爬虫」结果 0 条 */
+  /** 严格模式一条都没有时才放宽。有好结果时绝不放宽 —— 噪音比 0 条更糟 */
   function searchBest(q) {
     var strict = search(q, false);
-    var n = strict.books.length + strict.lessons.length;
-    if (n >= 3) return { r: strict, loose: false };
-    var loose = search(q, true);
-    var n2 = loose.books.length + loose.lessons.length;
-    return { r: n2 > n ? loose : strict, loose: n2 > n };
+    if (strict.books.length + strict.lessons.length) return { r: strict, loose: false };
+    return { r: search(q, true), loose: true };
   }
 
   function hl(text, ts) {
@@ -211,6 +323,8 @@
     return g;
   }
 
+  var PER_BOOK = 8;
+
   /* ---------- 渲染 ---------- */
   function render() {
     var box = $('#results'), state = $('#state');
@@ -220,18 +334,13 @@
     if (!q) { box.innerHTML = '<div class="s-empty">' + esc(T.empty) + '</div>'; state.textContent = ''; return; }
 
     var best = searchBest(q);
-    var res = best.r;
-    var ts = meaningful(terms(q));
-    if (!ts.length) ts = terms(q);
-
+    var res = best.r, ts = terms(q);
     var total = res.books.length + res.lessons.length;
-    state.textContent = (fullItems ? '' : T.deep + ' · ')
-      + T.hit.replace('{n}', total) + (best.loose ? ' · ' + T.looseNote : '');
-    var shownBooks = Object.keys(byBookFor(res.lessons)).length;
-    if (res.lessons.length && shownBooks) {
-      var shown = 0;
-      var g = byBookFor(res.lessons);
-      Object.keys(g).forEach(function (k) { shown += Math.min(6, g[k].length); });
+
+    state.textContent = T.hit.replace('{n}', total);
+    if (res.lessons.length) {
+      var g = byBookFor(res.lessons), shown = 0;
+      Object.keys(g).forEach(function (k) { shown += Math.min(PER_BOOK, g[k].length); });
       if (shown < res.lessons.length) state.textContent += ' · ' + T.groupTip;
     }
 
@@ -242,41 +351,47 @@
 
     var html = '';
 
-    // 1) 书名命中的书，单独一块 —— 它比任何单课都更像「你要找的东西」
+    // 1) 书名命中的教材
     if (res.books.length) {
-      html += '<section class="s-book s-books"><h2 class="s-sec">' + esc(T.secBooks) + '</h2>';
+      html += '<section class="s-book s-books"><h2 class="s-sec">' + esc(T.secBooks)
+        + '<span class="s-stage">' + res.books.length + '</span></h2>';
       res.books.forEach(function (r) {
         var bk = idx.books[r.b];
-        html += '<div class="s-bkitem"><a href="' + HOME + '#/book/' + esc(bk.id) + '">'
-          + hl(bk.title, ts) + '</a><span class="s-stage">' + esc(bk.stage) + '</span>'
-          + '<p class="s-snip">' + hl(bk.sub, ts) + '</p></div>';
+        html += '<div class="s-bkitem">'
+          + '<a href="' + HOME + '#/book/' + esc(bk.id) + '">' + hl(bk.title, ts) + '</a>'
+          + (bk.ext ? '<span class="s-badge">' + esc(T.badgeExt) + '</span>' : '')
+          + '<span class="s-stage">' + esc(bk.stage) + '</span>'
+          + (bk.sub ? '<p class="s-snip">' + hl(bk.sub, ts) + '</p>' : '')
+          + '</div>';
       });
       html += '</section>';
     }
 
-    // 2) 课级结果按书分组，每组最多 6 条 —— 不然一本书能占满整页
+    // 2) 课级结果按书分组，每组最多 PER_BOOK 条
     var byBook = byBookFor(res.lessons);
-
     Object.keys(byBook).forEach(function (bi) {
       var bk = idx.books[bi], list = byBook[bi];
-      var head = list.slice(0, 6), rest = list.length - head.length;
-      html += '<section class="s-book"><h2><a href="' + HOME + '#/book/' + esc(bk.id) + '">'
-        + hl(bk.title, ts) + '</a><span class="s-stage">' + esc(bk.stage) + '</span></h2><ul>';
+      var head = list.slice(0, PER_BOOK), rest = list.length - head.length;
+      html += '<section class="s-book"><h2>'
+        + '<a href="' + HOME + '#/book/' + esc(bk.id) + '">' + hl(bk.title, ts) + '</a>'
+        + (bk.ext ? '<span class="s-badge">' + esc(T.badgeExt) + '</span>' : '')
+        + '<span class="s-stage">' + esc(bk.stage) + '</span></h2><ul>';
       head.forEach(function (r) {
-        var url = HOME + '#/book/' + encodeURIComponent(bk.id) + '/' + encodeURIComponent(r.id);
         html += '<li class="s-item">'
-          + '<a class="s-t" href="' + url + '">' + hl(r.t, ts) + '</a>'
+          + '<a class="s-t" href="' + HOME + '#/book/' + encodeURIComponent(bk.id)
+          + '/' + encodeURIComponent(r.id) + '">' + hl(r.t, ts) + '</a>'
           + '<div class="s-c">' + esc(idx.books[r.b].chs[r.c] || '') + '</div>'
-          + (r.snip ? '<p class="s-snip">' + hl(r.snip, ts) + '</p>' : '')
           + '</li>';
       });
       html += '</ul>';
       if (rest > 0) {
-        html += '<div class="s-more">' + esc(T.moreInBook.replace('{n}', rest))
-          + ' · <a href="' + HOME + '#/book/' + esc(bk.id) + '">' + esc(T.goLesson) + '</a></div>';
+        html += '<div class="s-more">' + rest + ' '
+          + esc(LANG === 'zh' ? '条未显示' : 'more')
+          + ' · <a href="' + HOME + '#/book/' + esc(bk.id) + '">' + esc(T.openBook) + '</a></div>';
       }
       html += '</section>';
     });
+
     box.innerHTML = html;
   }
 
@@ -289,7 +404,6 @@
     $('#btn').textContent = T.btn;
     $('#back').textContent = T.home;
     $('#back').href = HOME;
-
     document.title = (kw ? kw + ' · ' : '') + 'AnyLearn';
 
     $('#form').addEventListener('submit', function (e) {
@@ -305,13 +419,8 @@
     get(LANG + '/search-index.json').then(function (d) {
       idx = d;
       render();
-      if (!cur.trim()) return;
-      // 正文索引后台拉，拉到就补一轮 —— 不阻塞首屏
-      return get(LANG + '/search-full.json').then(function (f) {
-        if (!f || !f.items || f.items.length !== idx.items.length) return;
-        fullItems = f.items;
-        render();
-      });
+      // 第三方教材后台并入，不阻塞首屏
+      loadExternal().catch(function () { /* 拿不到就算了，官方书照搜 */ });
     }).catch(function () {
       $('#state').textContent = T.err;
     });
