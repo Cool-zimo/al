@@ -60,6 +60,22 @@ const DevPlatform = (() => {
       statsBar: '{c} 章 · {l} 课 · {q} 题',
       langLabel: '语言', topicsHint: '会自动打上 topic: al-book，机器人靠它发现你的书。',
       refreshIndex: '刷新索引',
+      importBtn: "从已有书导入",
+      importTitle: "从仓库导入",
+      importDesc: "把任意符合格式的书导入成新草稿，之后随便改。原作者信息会保留，记得按许可证署名。",
+      importBtn2: "导入",
+      importPick: "或者直接选一本已收录的：",
+      impReading: "正在读取…",
+      impReady: "《{t}》读到了 {n} 个文件，可以导入了",
+      impNotFound: "仓库不存在或没有公开",
+      impReadFail: "读不到这个仓库",
+      impBadMeta: "albook.json 不是合法 JSON",
+      impNotAlBook: "format 不是 al-book，不是 AnyLearn 书籍",
+      impBadToc: "toc.json 读不到或不是合法 JSON",
+      impEmpty: "这本书没有任何课文",
+      repoPh: "owner/repo，例如 Cool-zimo/al-book-office-automation",
+      testName: "本章测验",
+      testEmpty: "（还没写）",
       bookInfo: "书籍信息",
       fTitle: "书名",
       fSubtitle: "副标题",
@@ -106,6 +122,22 @@ const DevPlatform = (() => {
       statsBar: '{c} chapters · {l} lessons · {q} questions',
       langLabel: 'Languages', topicsHint: 'topic: al-book is added automatically — that is how the bot finds your book.',
       refreshIndex: 'Refresh index',
+      importBtn: "Import a book",
+      importTitle: "Import from repo",
+      importDesc: "Import any conforming book as a new draft, then edit freely. Author info is kept — credit them per the license.",
+      importBtn2: "Import",
+      importPick: "Or pick an already-listed book:",
+      impReading: "Reading…",
+      impReady: "Got {n} files from \"{t}\" — ready to import",
+      impNotFound: "Repo not found or not public",
+      impReadFail: "Could not read this repo",
+      impBadMeta: "albook.json is not valid JSON",
+      impNotAlBook: "format is not al-book, not an AnyLearn book",
+      impBadToc: "toc.json missing or not valid JSON",
+      impEmpty: "This book has no lessons",
+      repoPh: "owner/repo, e.g. Cool-zimo/al-book-office-automation",
+      testName: "Chapter test",
+      testEmpty: "(empty)",
       bookInfo: "Book info",
       fTitle: "Title",
       fSubtitle: "Subtitle",
@@ -270,6 +302,11 @@ hint: ${zh ? '用加法' : 'Use addition'}
       for (const ls of lessons) {
         files[`content/${L}/lessons/${ls.id}.md`] = ls.md || '';
       }
+      // 章测内容。不输出的话 toc 会声明 test-01 却没有对应文件，
+      // 读者点章测直接 404 —— 而且校验器查不出来（它只看实际存在的文件）。
+      for (const ch of (b.chapters || [])) {
+        if (ch.test && ch.testMd) files[`content/${L}/lessons/${ch.test}.md`] = ch.testMd;
+      }
     }
     return files;
   }
@@ -374,6 +411,7 @@ hint: ${zh ? '用加法' : 'Use addition'}
       </div>
       <div class="dev-bar">
         <button class="dev-btn" id="dev-new">${T('newBook')}</button>
+        <button class="dev-btn ghost" id="dev-import">${T('importBtn')}</button>
         <span class="dev-hint">${T('topicsHint')}</span>
       </div>
       <div class="dev-grid" id="dev-grid"></div>`;
@@ -404,6 +442,7 @@ hint: ${zh ? '用加法' : 'Use addition'}
     }
 
     $('dev-new').onclick = showNewDialog;
+    $('dev-import').onclick = showImportDialog;
     grid.querySelectorAll('[data-edit]').forEach(el => {
       el.onclick = () => { cur = getBook(el.dataset.edit); mountEditor(root); };
     });
@@ -460,6 +499,160 @@ hint: ${zh ? '用加法' : 'Use addition'}
     $('nb-id').addEventListener('keydown', e => { if (e.key === 'Enter') $('nb-title').focus(); });
     $('nb-title').addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
     $('nb-id').focus();
+  }
+
+  /* ================= 从已有书导入 ================= */
+
+  /**
+   * 从任意符合格式的仓库导入内容，作为新草稿。
+   *
+   * 为什么做这个：从空白开始写一本 30 课的书很劝退，
+   * 而 fork 别人的书再改是最自然的起步方式。
+   *
+   * 只导入当前语言那一份 —— 草稿结构是一份课文对应所有 langs，
+   * 塞两种语言进来没法编辑。
+   */
+  async function fetchBookForImport(full) {
+    let repo = null, branch = 'main';
+    try {
+      const r = await fetch(`https://api.github.com/repos/${full}`);
+      if (r.status === 404) throw new Error(T('impNotFound'));
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      repo = await r.json();
+      branch = repo.default_branch || 'main';
+    } catch (e) {
+      throw new Error(T('impReadFail') + '：' + e.message);
+    }
+
+    const [owner, name] = full.split('/');
+    // 先拿元信息和目录
+    const metaRaw = await GhSrc.text(owner, name, branch, 'albook.json');
+    let meta;
+    try { meta = JSON.parse(metaRaw); }
+    catch (e) { throw new Error(T('impBadMeta')); }
+    if (String(meta.format || '').trim() !== 'al-book') throw new Error(T('impNotAlBook'));
+
+    // 语言：优先当前界面语言，没有就取书声明的第一个
+    let L = lang;
+    if (!(meta.langs || []).includes(L)) L = (meta.langs || [])[0] || 'zh';
+
+    const tocRaw = await GhSrc.text(owner, name, branch, `content/${L}/toc.json`);
+    let toc;
+    try { toc = JSON.parse(tocRaw); }
+    catch (e) { throw new Error(T('impBadToc')); }
+
+    // 官方 toc 是 [{title, items:[{id,title,summary}], test}]，
+    // 第三方 toc 是 {chapters:[{title, lessons:["01"...], test}]}，两种都要认
+    const rawChapters = toc.chapters || [];
+    const paths = [];
+    const shape = [];
+    for (const ch of rawChapters) {
+      const items = (ch.items || ch.lessons || []).map(x =>
+        (typeof x === 'string' ? { id: x } : { id: String(x.id), title: x.title }));
+      for (const it of items) paths.push(`content/${L}/lessons/${it.id}.md`);
+      if (ch.test) paths.push(`content/${L}/lessons/${ch.test}.md`);
+      shape.push({ title: ch.title || '', items, test: ch.test || null });
+    }
+    if (!paths.length) throw new Error(T('impEmpty'));
+
+    const got = await GhSrc.many(owner, name, branch, paths);
+    return { meta, toc, shape, got, L, branch, full, owner, name };
+  }
+
+  function showImportDialog() {
+    const root = $('dev-root') || document.querySelector('.dev-wrap');
+    const box = document.createElement('div');
+    box.className = 'dev-modal';
+    box.innerHTML = `<div class="dev-modal-box wide">
+      <h3>${T('importTitle')}</h3>
+      <p class="dim" style="font-size:12.5px">${T('importDesc')}</p>
+      <input type="text" id="im-repo" placeholder="${T('repoPh')}" autocomplete="off" spellcheck="false">
+      <div id="im-pick" class="dev-pick"></div>
+      <div id="im-out" class="dev-out"></div>
+      <div class="dev-modal-actions">
+        <button class="dev-btn" id="im-go">${T('importBtn2')}</button>
+        <button class="dev-btn ghost" id="im-cancel">${T('cancel')}</button>
+      </div>
+    </div>`;
+    document.body.appendChild(box);
+    const close = () => box.remove();
+    $('im-cancel').onclick = close;
+    box.onclick = e => { if (e.target === box) close(); };
+
+    // 把已收录的第三方书列出来，点一下就填进去
+    const known = (window.__thirdBooks || []).filter(b => b.repo);
+    if (known.length) {
+      $('im-pick').innerHTML = `<div class="dev-pick-h">${T('importPick')}</div>` +
+        known.slice(0, 20).map(b =>
+          `<button class="dev-pick-i" data-r="${esc(b.repo)}">
+             <b>${esc(b.title)}</b><span>${esc(b.repo)}</span></button>`).join('');
+      $('im-pick').querySelectorAll('[data-r]').forEach(el => {
+        el.onclick = () => { $('im-repo').value = el.dataset.r; };
+      });
+    }
+
+    $('im-go').onclick = async () => {
+      const full = $('im-repo').value.trim()
+        .replace(/^https?:\/\/github\.com\//, '').replace(/\/$/, '');
+      if (!full.includes('/')) { alert(T('repoFmt')); return; }
+      const out = $('im-out');
+      $('im-go').disabled = true;
+      out.innerHTML = `<div class="dev-step run"><span>◐</span>${T('impReading')}</div>`;
+      try {
+        const r = await fetchBookForImport(full);
+        out.innerHTML = `<div class="dev-step done"><span>✓</span>${
+          T('impReady').replace('{t}', r.meta.title || full)
+            .replace('{n}', Object.keys(r.got).length)}</div>`;
+
+        // 生成不冲突的 id
+        let id = String(r.meta.id || r.name.replace(/^al-book-/, '') || 'imported')
+          .trim().replace(/[^a-z0-9-]/gi, '-').toLowerCase().replace(/^-+/, '');
+        if (!/^[a-z0-9]/.test(id)) id = 'b-' + id;
+        const all = loadAll();
+        let nid = id, k = 2;
+        while (all[nid]) { nid = id + '-' + k; k++; }
+
+        const b = {
+          id: nid,
+          repo: 'al-book-' + nid,
+          title: r.meta.title || nid,
+          subtitle: r.meta.subtitle || '',
+          desc: r.meta.desc || '',
+          stage: r.meta.stage || '基础',
+          level: r.meta.level || '入门',
+          langs: [r.L],
+          license: r.meta.license || 'CC BY-NC 4.0',
+          author: { name: (r.meta.author && r.meta.author.name) || '' },
+          tags: r.meta.tags || [],
+          chapters: [],
+          importedFrom: { repo: r.full, branch: r.branch, lang: r.L, at: Date.now() },
+          published: null,
+          createdAt: Date.now(), updatedAt: Date.now(),
+        };
+
+        for (const sh of r.shape) {
+          const lessons = [];
+          for (const it of sh.items) {
+            const md = r.got[`content/${r.L}/lessons/${it.id}.md`];
+            if (md == null) continue;
+            lessons.push({ id: String(it.id), title: it.title || String(it.id), md });
+          }
+          if (!lessons.length) continue;
+          const testMd = sh.test ? r.got[`content/${r.L}/lessons/${sh.test}.md`] : null;
+          b.chapters.push({ title: sh.title, lessons, test: sh.test || null, testMd: testMd || '' });
+        }
+        if (!b.chapters.length) throw new Error(T('impEmpty'));
+
+        putBook(b);
+        close();
+        cur = b;
+        curLesson = { chIdx: 0, lsIdx: 0 };
+        mountEditor(root);
+      } catch (e) {
+        out.innerHTML = `<div class="dev-step fail"><span>✗</span>${esc(e.message || e)}</div>`;
+        $('im-go').disabled = false;
+      }
+    };
   }
 
   /* ================= 视图：编辑器 ================= */
@@ -526,7 +719,13 @@ hint: ${zh ? '用加法' : 'Use addition'}
   function lessonAt() {
     if (!cur || !curLesson) return null;
     const ch = (cur.chapters || [])[curLesson.chIdx];
-    return ch ? (ch.lessons || [])[curLesson.lsIdx] : null;
+    if (!ch) return null;
+    if (curLesson.isTest) {
+      // 章测也当作一"课"来编辑，只是内容存在 chapter.testMd 上
+      return { id: ch.test || 'test', title: T('testName'), get md() { return ch.testMd || ''; },
+               set md(v) { ch.testMd = v; } };
+    }
+    return (ch.lessons || [])[curLesson.lsIdx] || null;
   }
 
   function drawTree() {
@@ -540,12 +739,18 @@ hint: ${zh ? '用加法' : 'Use addition'}
       </div>
       <div class="dev-lss">
         ${(ch.lessons || []).map((ls, li) => `
-          <div class="dev-ls ${curLesson && curLesson.chIdx === ci && curLesson.lsIdx === li ? 'on' : ''}"
+          <div class="dev-ls ${curLesson && !curLesson.isTest && curLesson.chIdx === ci && curLesson.lsIdx === li ? 'on' : ''}"
                data-go="${ci},${li}">
             <span class="n">${esc(ls.id)}</span>
             <span class="t">${esc(ls.title || ls.id)}</span>
             <button class="dev-x" data-dells="${ci},${li}" title="${T('delLesson')}">×</button>
           </div>`).join('')}
+        ${ch.test ? `
+          <div class="dev-ls test ${curLesson && curLesson.isTest && curLesson.chIdx === ci ? 'on' : ''}"
+               data-gotest="${ci}">
+            <span class="n">测</span>
+            <span class="t">${esc(ch.test)}.md${ch.testMd ? '' : ` <i class="dim">${T('testEmpty')}</i>`}</span>
+          </div>` : ''}
         <button class="dev-btn xs ghost wide" data-addls="${ci}">${T('addLesson')}</button>
       </div>`).join('');
 
@@ -582,6 +787,13 @@ hint: ${zh ? '用加法' : 'Use addition'}
         putBook(cur);
         curLesson = { chIdx: ci, lsIdx: ch.lessons.length - 1 };
         drawTree(); drawLesson(); markDirty();
+      };
+    });
+    box.querySelectorAll('[data-gotest]').forEach(el => {
+      el.onclick = () => {
+        flush();
+        curLesson = { chIdx: +el.dataset.gotest, isTest: true };
+        drawTree(); drawLesson();
       };
     });
     box.querySelectorAll('[data-go]').forEach(el => {
@@ -961,6 +1173,7 @@ hint: ${zh ? '用加法' : 'Use addition'}
   .dev-ls.on{background:color-mix(in srgb,var(--accent) 18%,transparent)}
   .dev-ls .n{color:var(--faint);font-variant-numeric:tabular-nums;min-width:22px;font-size:12px}
   .dev-ls .t{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dev-ls.test{border-top:1px dashed var(--border);margin-top:3px;padding-top:6px}
   .dev-edit,.dev-view{display:flex;flex-direction:column}
   .dev-edit textarea{flex:1;min-height:460px;border:none;outline:none;resize:vertical;
     padding:12px 16px;background:transparent;color:var(--text);font-size:13.5px;line-height:1.75;
@@ -999,6 +1212,17 @@ hint: ${zh ? '用加法' : 'Use addition'}
   .dev-tag{font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:99px;
     background:color-mix(in srgb,var(--accent) 20%,transparent);color:var(--accent);
     margin-left:8px;white-space:nowrap}
+
+
+  /* 导入：候选书列表 */
+  .dev-pick{margin:8px 0;max-height:190px;overflow:auto}
+  .dev-pick-h{font-size:12px;color:var(--faint);font-weight:600;margin:8px 0 5px}
+  .dev-pick-i{display:flex;flex-direction:column;gap:1px;align-items:flex-start;width:100%;
+    padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;
+    color:var(--text);font-size:13px;cursor:pointer;text-align:left;font-family:inherit;margin-bottom:5px}
+  .dev-pick-i:hover{border-color:var(--accent)}
+  .dev-pick-i span{font-size:11.5px;color:var(--faint)}
+  .dev-out{margin:6px 0}
 
   /* 书籍信息表单 */
   .dev-form{display:flex;flex-direction:column;gap:9px;margin:4px 0}
@@ -1062,5 +1286,5 @@ hint: ${zh ? '用加法' : 'Use addition'}
     if (view === 'editor') mountEditor(root); else mountList(root);
   }
 
-  return { mount, loadAll, stats, toFiles, blank, lessonTemplate, previewMd, isLoggedIn: () => !!api };
+  return { mount, loadAll, stats, toFiles, blank, lessonTemplate, previewMd, fetchBookForImport, isLoggedIn: () => !!api };
 })();

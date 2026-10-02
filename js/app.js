@@ -242,6 +242,13 @@
     document.title = `${T().brand} · ${T().brandSub}`;
   }
 
+  /** 让开发者平台的「导入」能列出已收录的书 */
+  function publishThirdList() {
+    window.__thirdBooks = BOOKS.filter(b => b.external).map(b => ({
+      id: b.id, title: b.title, repo: b.repo, branch: b.branch || 'main',
+    }));
+  }
+
   /** 单张书卡 */
   function bookCard(b, H) {
     return `
@@ -325,6 +332,7 @@
     BOOKS = BOOKS.filter(b => !b.external);
     for (const k of Object.keys(EXTERNAL)) delete EXTERNAL[k];
     await loadExternal();
+    publishThirdList();
     if (book == null && (location.hash === '' || location.hash === '#' || location.hash === '#/')) {
       renderHome();
     }
@@ -1483,6 +1491,7 @@
       if (addExternal(b, null)) added++;
     }
     if (added) console.log(`[al] 从索引站并入第三方书籍 ${added} 本`);
+    publishThirdList();
   }
 
   /** 第三方书是在登录后并入的，可能晚于首页渲染 —— 这里补一次 */
