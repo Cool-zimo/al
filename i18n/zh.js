@@ -61,7 +61,12 @@ window.I18N = {
   },
 
 
-  toc: { all: '全部教程', review: '今日复习', chapterTest: '本章大测验' },
+  toc: {
+    all: '全部教程', review: '今日复习', chapterTest: '本章大测验',
+    official: '官方教材', third: '第三方教材',
+    thirdEmpty: '暂无第三方教材', thirdLoading: '加载中…',
+    thirdMore: '加载更多', thirdAll: '已全部加载',
+  },
 
   lesson: {
     done: '✅ 已完成这一节', undone: '⭕ 学完这一节？', markDone: '标记完成', unmark: '取消标记',

@@ -233,6 +233,19 @@
     window.__thirdBooks = BOOKS.filter(b => b.external).map(b => ({
       id: b.id, title: b.title, repo: b.repo, branch: b.branch || 'main',
     }));
+    // 第三方书是异步并入的，可能晚于侧边栏渲染 —— 这里补一次，
+    // 否则侧边栏永远显示"暂无"，要刷新才看得到
+    if (thirdOpen) {
+      const old = document.querySelector('.toc-third-body');
+      if (old) renderThirdBody(old);
+      const n = document.querySelector('.toc-third .g-n');
+      const cnt = thirdBooks().length;
+      if (n && cnt) n.textContent = cnt;
+      else if (!n && cnt) {
+        const h = document.querySelector('.toc-third .toc-group-btn');
+        if (h) { const sp = document.createElement('span'); sp.className='g-n'; sp.textContent=cnt; h.appendChild(sp); }
+      }
+    }
   }
 
   /** 单张书卡 */
@@ -399,6 +412,21 @@
       nav.appendChild(q);
     }
 
+    // 官方教材：当前这本书的目录，结构不动，只加一个分组标题
+    const offHead = document.createElement('div');
+    offHead.className = 'toc-group';
+    offHead.innerHTML =
+      `<span class="g-t">${escapeHtml(T().toc.official)}</span>`;
+    nav.appendChild(offHead);
+
+    if (book) {
+      const bn = document.createElement('button');
+      bn.className = 'toc-item toc-book';
+      bn.innerHTML = `<span class="n">📖</span><span class="t">${escapeHtml(book.title)}</span>`;
+      bn.onclick = () => { location.hash = `#/book/${book.id}`; closeSidebar(); };
+      nav.appendChild(bn);
+    }
+
     TOC.forEach(ch => {
       const h = document.createElement('div');
       h.className = 'toc-chapter';
@@ -426,9 +454,107 @@
       }
     });
 
+    nav.appendChild(buildThirdSection());
+
     const pct = flat.length ? Math.round(done / flat.length * 100) : 0;
     $('progress-fill').style.width = pct + '%';
     $('progress-label').textContent = `${done} / ${flat.length} · ${pct}%`;
+  }
+
+  /* ---------- 侧边栏：第三方教材（懒加载） ----------
+   * 第三方书全在作者自己的仓库里，一开始并不知道有多少本，
+   * 而且以后会越来越多。所以侧边栏不一次性全列：
+   *   · 折叠状态只挂一个占位，不拉取任何东西
+   *   · 展开后先出 8 本，滚到底（哨兵进视口）再补 8 本
+   *   · 不分类 —— 按入库顺序摊平就行，分类反而要再拉一次元数据
+   */
+  let thirdOpen = false;
+  let thirdShown = 0;
+  let thirdObserver = null;
+  const THIRD_STEP = 8;
+
+  function thirdBooks() {
+    return BOOKS.filter(b => b.external);
+  }
+
+  function buildThirdSection() {
+    const wrap = document.createElement('div');
+    wrap.className = 'toc-third';
+    const list = thirdBooks();
+    const T_ = T().toc;
+
+    const head = document.createElement('button');
+    head.className = 'toc-group toc-group-btn' + (thirdOpen ? ' open' : '');
+    head.innerHTML =
+      `<span class="g-arrow">▸</span><span class="g-t">${escapeHtml(T_.third)}</span>` +
+      (list.length ? `<span class="g-n">${list.length}</span>` : '');
+    wrap.appendChild(head);
+
+    const body = document.createElement('div');
+    body.className = 'toc-third-body';
+    body.hidden = !thirdOpen;
+    wrap.appendChild(body);
+
+    head.onclick = () => {
+      thirdOpen = !thirdOpen;
+      head.classList.toggle('open', thirdOpen);
+      body.hidden = !thirdOpen;
+      if (thirdOpen) renderThirdBody(body);
+    };
+    // 挂载时如果是展开状态（比如刷新后），直接渲染
+    if (thirdOpen) renderThirdBody(body);
+    return wrap;
+  }
+
+  function renderThirdBody(body) {
+    const T_ = T().toc;
+    const list = thirdBooks();
+    body.innerHTML = '';
+
+    if (!list.length) {
+      const e = document.createElement('div');
+      e.className = 'toc-third-empty';
+      e.textContent = T_.thirdEmpty;
+      body.appendChild(e);
+      return;
+    }
+
+    const show = Math.min(thirdShown || THIRD_STEP, list.length);
+    thirdShown = show;
+
+    for (const b of list.slice(0, show)) {
+      const btn = document.createElement('button');
+      btn.className = 'toc-item toc-third-item';
+      const sub = b.subtitle || '';
+      btn.innerHTML =
+        `<span class="n">🌐</span><span class="t">${escapeHtml(b.title)}</span>` +
+        (sub ? `<span class="sub">${escapeHtml(sub)}</span>` : '');
+      btn.title = sub || b.title;
+      btn.onclick = () => { location.hash = `#/book/${b.id}`; closeSidebar(); };
+      body.appendChild(btn);
+    }
+
+    // 哨兵：滚进视口就补一批，不用点"加载更多"
+    if (show < list.length) {
+      const sentinel = document.createElement('div');
+      sentinel.className = 'toc-third-more';
+      sentinel.textContent = T_.thirdMore;
+      body.appendChild(sentinel);
+      sentinel.onclick = () => { thirdShown += THIRD_STEP; renderThirdBody(body); };
+      if (thirdObserver) thirdObserver.disconnect();
+      thirdObserver = new IntersectionObserver(entries => {
+        if (entries.some(e => e.isIntersecting)) {
+          thirdShown += THIRD_STEP;
+          renderThirdBody(body);
+        }
+      }, { root: null, rootMargin: '120px' });
+      thirdObserver.observe(sentinel);
+    } else if (list.length > THIRD_STEP) {
+      const end = document.createElement('div');
+      end.className = 'toc-third-end';
+      end.textContent = T_.thirdAll;
+      body.appendChild(end);
+    }
   }
 
   /* ================= 课文 ================= */

@@ -23,8 +23,11 @@
       loading: '正在加载目录…',
       none: '没有找到相关的教材或课文',
       noneTip: '换个词试试，或者少输入几个字。',
-      empty: '输入关键词开始搜索',
-      hit: '共 {n} 条',
+      empty: '搜点什么？',
+      emptyTip: '支持书名、副标题、章标题、课标题。中文连写也能搜。',
+      hintsTitle: '试试这些',
+      hints: ['Python', '算法', '文件', '网页', 'openpyxl', '递归'],
+      hitU: '条结果',
       secBooks: '教材',
       groupTip: '每本书最多显示 8 条',
       badgeExt: '第三方',
@@ -40,8 +43,11 @@
       loading: 'Loading index…',
       none: 'No matching book or lesson',
       noneTip: 'Try another keyword, or fewer words.',
-      empty: 'Type a keyword to start',
-      hit: '{n} results',
+      empty: 'Search something?',
+      emptyTip: 'Matches book titles, subtitles, chapters and lessons.',
+      hintsTitle: 'Try these',
+      hints: ['Python', 'algorithm', 'file', 'web', 'openpyxl', 'recursion'],
+      hitU: 'results',
       secBooks: 'Books',
       groupTip: 'up to 8 per book',
       badgeExt: 'Community',
@@ -445,18 +451,39 @@
   var PER_BOOK = 8;
 
   /* ---------- 渲染 ---------- */
+  /** 空状态卡片 */
+  function emptyBlock(icon, title, desc) {
+    return '<div class="s-empty">' +
+      '<div class="e-ico">' + icon + '</div>' +
+      '<b>' + esc(title) + '</b>' +
+      '<p>' + esc(desc) + '</p></div>';
+  }
+
+  /** 热门词引导：空状态/无结果时给几个能点的例子，比干等着强 */
+  function hintsHTML() {
+    if (!T.hints || !T.hints.length) return '';
+    return '<div class="s-hints"><div class="s-hints-t">' + esc(T.hintsTitle) + '</div>' +
+      '<div class="s-chips">' + T.hints.map(function (w) {
+        return '<a class="s-chip" href="?keyword=' + encodeURIComponent(w) + '">' + esc(w) + '</a>';
+      }).join('') + '</div></div>';
+  }
+
   function render() {
     var box = $('#results'), state = $('#state');
     var q = cur.trim();
 
-    if (!idx) { box.innerHTML = ''; state.textContent = T.loading; return; }
-    if (!q) { box.innerHTML = '<div class="s-empty">' + esc(T.empty) + '</div>'; state.textContent = ''; return; }
+    if (!idx) { box.innerHTML = ''; state.innerHTML = esc(T.loading); return; }
+    if (!q) {
+      box.innerHTML = emptyBlock('🔍', T.empty, T.emptyTip) + hintsHTML();
+      state.textContent = '';
+      return;
+    }
 
     var best = searchBest(q);
     var res = best.r, ts = terms(q);
     var total = res.books.length + res.lessons.length;
 
-    state.textContent = T.hit.replace('{n}', total);
+    state.innerHTML = '<b>' + total + '</b> ' + esc(T.hitU);
     if (res.lessons.length) {
       var g = byBookFor(res.lessons), shown = 0;
       Object.keys(g).forEach(function (k) { shown += Math.min(PER_BOOK, g[k].length); });
@@ -464,7 +491,7 @@
     }
 
     if (!total) {
-      box.innerHTML = '<div class="s-empty"><b>' + esc(T.none) + '</b><p>' + esc(T.noneTip) + '</p></div>';
+      box.innerHTML = emptyBlock('🫥', T.none, T.noneTip) + hintsHTML();
       return;
     }
 
@@ -536,6 +563,19 @@
       document.title = v + ' · AnyLearn';
       render();
     });
+
+    // 清空：回到引导态，顺便把 URL 上的 keyword 去掉
+    var clr = $('#clear');
+    if (clr) {
+      $('#q').addEventListener('input', function () { clr.hidden = !$('#q').value; });
+      clr.addEventListener('click', function () {
+        $('#q').value = ''; clr.hidden = true; cur = '';
+        history.replaceState(null, '', location.pathname);
+        document.title = 'AnyLearn';
+        render();
+        $('#q').focus();
+      });
+    }
 
     get(LANG + '/search-index.json').then(function (d) {
       idx = d;

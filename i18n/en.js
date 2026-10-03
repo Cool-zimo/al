@@ -60,7 +60,12 @@ window.I18N = {
     howTo: "How to write a book (Creator Guide)",
   },
 
-  toc: { all: 'All tutorials', review: 'Review today', chapterTest: 'Chapter test' },
+  toc: {
+    all: 'All tutorials', review: 'Review today', chapterTest: 'Chapter test',
+    official: 'Official', third: 'Community',
+    thirdEmpty: 'No community books yet', thirdLoading: 'Loading…',
+    thirdMore: 'Load more', thirdAll: 'All loaded',
+  },
 
   lesson: {
     done: '✅ Lesson complete', undone: '⭕ Finished this lesson?', markDone: 'Mark done', unmark: 'Undo',

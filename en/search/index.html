@@ -4,21 +4,33 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Search · AnyLearn</title>
-<meta name="description" content="Search titles and contents of 25 textbooks">
+<meta name="description" content="Search book titles and contents">
 <meta name="theme-color" content="#0a0c11">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>🦉</text></svg>">
-<link rel="stylesheet" href="../../css/style.css?v=54">
-<link rel="stylesheet" href="../../css/search.css?v=54">
+<link rel="stylesheet" href="../../css/style.css?v=55">
+<link rel="stylesheet" href="../../css/search.css?v=55">
 </head>
 <body class="search-page">
 
+<div class="s-glow" aria-hidden="true"></div>
+
 <header class="s-top">
-  <a class="s-back" id="back" href="../">← 返回首页</a>
-  <form class="s-form" id="form">
+  <a class="s-back" id="back" href="../" title="Back home">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+  </a>
+
+  <form class="s-form" id="form" autocomplete="off">
+    <svg class="s-ico" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/>
+    </svg>
     <input type="text" id="q" autocomplete="off" spellcheck="false" placeholder="Search book titles and contents">
-    <button type="submit" id="btn">搜索</button>
+    <button type="button" class="s-clear" id="clear" hidden aria-label="清空">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <button type="submit" class="s-go" id="btn">Search</button>
   </form>
-  <a class="s-lang" href="../../zh/search/">中文 →</a>
+
+  <a class="s-lang" href="../../zh/search/" title="中文">中</a>
 </header>
 
 <main class="s-main">
@@ -26,6 +38,6 @@
   <div id="results"></div>
 </main>
 
-<script src="../../js/search.js?v=54"></script>
+<script src="../../js/search.js?v=55"></script>
 </body>
 </html>
