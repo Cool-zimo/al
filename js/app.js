@@ -173,9 +173,15 @@
     resetLab();
     setNotesVisible(false);
     Notes.reset(T().notes.noLesson || '');
+    // 首页侧边栏：全部教程 / 今日复习 + 两组教材（都可折叠，懒加载）
     $('toc').innerHTML = `<div class="toc-chapter">${T().toc.all}</div>` +
       `<button class="toc-item" data-go-review><span class="n">🔁</span><span class="t">${T().toc.review}</span></button>`;
     $('toc').querySelector('[data-go-review]').onclick = () => { location.hash = '#/review'; };
+    {
+      const nav = $('toc');
+      nav.appendChild(buildBookGroup('official', T().toc.official, officialBooks, '📘'));
+      nav.appendChild(buildBookGroup('third', T().toc.third, thirdBooks, '🌐'));
+    }
 
     const art = $('lesson');
     const st = Review.stats();
@@ -235,17 +241,7 @@
     }));
     // 第三方书是异步并入的，可能晚于侧边栏渲染 —— 这里补一次，
     // 否则侧边栏永远显示"暂无"，要刷新才看得到
-    if (thirdOpen) {
-      const old = document.querySelector('.toc-third-body');
-      if (old) renderThirdBody(old);
-      const n = document.querySelector('.toc-third .g-n');
-      const cnt = thirdBooks().length;
-      if (n && cnt) n.textContent = cnt;
-      else if (!n && cnt) {
-        const h = document.querySelector('.toc-third .toc-group-btn');
-        if (h) { const sp = document.createElement('span'); sp.className='g-n'; sp.textContent=cnt; h.appendChild(sp); }
-      }
-    }
+    refreshBookGroups();
   }
 
   /** 单张书卡 */
@@ -454,108 +450,150 @@
       }
     });
 
-    nav.appendChild(buildThirdSection());
+    nav.appendChild(buildBookGroup('third', T().toc.third, thirdBooks, '🌐'));
 
     const pct = flat.length ? Math.round(done / flat.length * 100) : 0;
     $('progress-fill').style.width = pct + '%';
     $('progress-label').textContent = `${done} / ${flat.length} · ${pct}%`;
   }
 
-  /* ---------- 侧边栏：第三方教材（懒加载） ----------
-   * 第三方书全在作者自己的仓库里，一开始并不知道有多少本，
-   * 而且以后会越来越多。所以侧边栏不一次性全列：
-   *   · 折叠状态只挂一个占位，不拉取任何东西
-   *   · 展开后先出 8 本，滚到底（哨兵进视口）再补 8 本
-   *   · 不分类 —— 按入库顺序摊平就行，分类反而要再拉一次元数据
+  /* ---------- 侧边栏：教材分组（懒加载） ----------
+   * 首页和课文页共用这套。第三方书全在作者自己的仓库里，数量未知且会越来越多，
+   * 所以不一次性全列：
+   *   · 折叠状态只挂一个占位，不渲染任何条目
+   *   · 展开后先出 GROUP_STEP 本，哨兵滚进视口再补一批
+   *   · 不分类 —— 按入库顺序摊平，分类反而要再拉一次元数据
    */
-  let thirdOpen = false;
-  let thirdShown = 0;
-  let thirdObserver = null;
-  const THIRD_STEP = 8;
+  const GROUP_STEP = 8;
+  const groupState = {};        // { [key]: { open, shown } }
+  const groupNodes = new Map(); // key -> { wrap, head, body }，供异步并入后重渲染
 
-  function thirdBooks() {
-    return BOOKS.filter(b => b.external);
+  function stateOf(key) {
+    return groupState[key] || (groupState[key] = { open: false, shown: 0 });
   }
 
-  function buildThirdSection() {
-    const wrap = document.createElement('div');
-    wrap.className = 'toc-third';
-    const list = thirdBooks();
+  /**
+   * @param {string} key   内部标识
+   * @param {string} title 分组标题
+   * @param {()=>Array} getBooks 取书列表
+   * @param {string} icon  条目图标
+   */
+  function buildBookGroup(key, title, getBooks, icon) {
+    const st = stateOf(key);
     const T_ = T().toc;
 
+    const wrap = document.createElement('div');
+    wrap.className = 'toc-grp';
+
     const head = document.createElement('button');
-    head.className = 'toc-group toc-group-btn' + (thirdOpen ? ' open' : '');
+    head.className = 'toc-group toc-group-btn' + (st.open ? ' open' : '');
     head.innerHTML =
-      `<span class="g-arrow">▸</span><span class="g-t">${escapeHtml(T_.third)}</span>` +
-      (list.length ? `<span class="g-n">${list.length}</span>` : '');
+      `<span class="g-arrow">▸</span><span class="g-t">${escapeHtml(title)}</span>`;
     wrap.appendChild(head);
 
     const body = document.createElement('div');
-    body.className = 'toc-third-body';
-    body.hidden = !thirdOpen;
+    body.className = 'toc-grp-body';
+    body.hidden = !st.open;
     wrap.appendChild(body);
 
+    const node = { wrap, head, body, key, title, getBooks, icon };
+    groupNodes.set(key, node);
+
     head.onclick = () => {
-      thirdOpen = !thirdOpen;
-      head.classList.toggle('open', thirdOpen);
-      body.hidden = !thirdOpen;
-      if (thirdOpen) renderThirdBody(body);
+      st.open = !st.open;
+      head.classList.toggle('open', st.open);
+      body.hidden = !st.open;
+      if (st.open) renderBookGroup(node);
     };
-    // 挂载时如果是展开状态（比如刷新后），直接渲染
-    if (thirdOpen) renderThirdBody(body);
+    if (st.open) renderBookGroup(node);
     return wrap;
   }
 
-  function renderThirdBody(body) {
+  function renderBookGroup(node) {
+    const st = stateOf(node.key);
     const T_ = T().toc;
-    const list = thirdBooks();
+    const body = node.body;
+    const list = node.getBooks();
     body.innerHTML = '';
+
+    // 计数角标：书是异步并入的，每次渲染都要刷新
+    let badge = node.head.querySelector('.g-n');
+    if (list.length) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'g-n';
+        node.head.appendChild(badge);
+      }
+      badge.textContent = list.length;
+    } else if (badge) {
+      badge.remove();
+    }
 
     if (!list.length) {
       const e = document.createElement('div');
-      e.className = 'toc-third-empty';
+      e.className = 'toc-grp-empty';
       e.textContent = T_.thirdEmpty;
       body.appendChild(e);
       return;
     }
 
-    const show = Math.min(thirdShown || THIRD_STEP, list.length);
-    thirdShown = show;
+    const show = Math.min(st.shown || GROUP_STEP, list.length);
+    st.shown = show;
 
     for (const b of list.slice(0, show)) {
       const btn = document.createElement('button');
-      btn.className = 'toc-item toc-third-item';
+      btn.className = 'toc-item toc-grp-item';
       const sub = b.subtitle || '';
       btn.innerHTML =
-        `<span class="n">🌐</span><span class="t">${escapeHtml(b.title)}</span>` +
+        `<span class="n">${node.icon}</span><span class="t">${escapeHtml(b.title)}</span>` +
         (sub ? `<span class="sub">${escapeHtml(sub)}</span>` : '');
       btn.title = sub || b.title;
       btn.onclick = () => { location.hash = `#/book/${b.id}`; closeSidebar(); };
       body.appendChild(btn);
     }
 
-    // 哨兵：滚进视口就补一批，不用点"加载更多"
     if (show < list.length) {
-      const sentinel = document.createElement('div');
-      sentinel.className = 'toc-third-more';
-      sentinel.textContent = T_.thirdMore;
-      body.appendChild(sentinel);
-      sentinel.onclick = () => { thirdShown += THIRD_STEP; renderThirdBody(body); };
-      if (thirdObserver) thirdObserver.disconnect();
-      thirdObserver = new IntersectionObserver(entries => {
+      const more = document.createElement('div');
+      more.className = 'toc-grp-more';
+      more.textContent = T_.thirdMore;
+      body.appendChild(more);
+      // 哨兵：滚进视口自动补一批，不用手动点
+      if (node.io) node.io.disconnect();
+      node.io = new IntersectionObserver(entries => {
         if (entries.some(e => e.isIntersecting)) {
-          thirdShown += THIRD_STEP;
-          renderThirdBody(body);
+          st.shown += GROUP_STEP;
+          renderBookGroup(node);
         }
       }, { root: null, rootMargin: '120px' });
-      thirdObserver.observe(sentinel);
-    } else if (list.length > THIRD_STEP) {
+      node.io.observe(more);
+      more.onclick = () => { st.shown += GROUP_STEP; renderBookGroup(node); };
+    } else if (list.length > GROUP_STEP) {
       const end = document.createElement('div');
-      end.className = 'toc-third-end';
+      end.className = 'toc-grp-end';
       end.textContent = T_.thirdAll;
       body.appendChild(end);
     }
   }
+
+  /** 第三方书是异步并入的，可能晚于侧边栏渲染 —— 并入后把已展开的组刷新一遍 */
+  function refreshBookGroups() {
+    for (const node of groupNodes.values()) {
+      if (stateOf(node.key).open) renderBookGroup(node);
+      else {
+        const list = node.getBooks();
+        let badge = node.head.querySelector('.g-n');
+        if (list.length && !badge) {
+          badge = document.createElement('span');
+          badge.className = 'g-n';
+          badge.textContent = list.length;
+          node.head.appendChild(badge);
+        }
+      }
+    }
+  }
+
+  const officialBooks = () => BOOKS.filter(b => !b.external);
+  const thirdBooks = () => BOOKS.filter(b => b.external);
 
   /* ================= 课文 ================= */
   async function renderLesson(bookId, lessonId) {
