@@ -57,6 +57,9 @@ window.I18N = {
     browseMore: "浏览全部第三方书",
     refreshed: "刷新完成，新增 {n} 本",
     noNew: "刷新完成，暂无新书",
+    pullDown: "下拉刷新",
+    release: "松手刷新",
+    refreshing: "正在刷新…",
     howTo: "怎么写书（创作者帮助）",
   },
 

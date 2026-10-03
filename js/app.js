@@ -167,6 +167,22 @@
   }
 
   /* ================= 书单首页 ================= */
+  /* ---------- 首页书架 ----------
+   * 首页只显示一个书架：官方 or 第三方。
+   * 进了一本书就切到它所属的书架 —— 看第三方书时回首页想找别的第三方书，
+   * 而不是被几十本官方教材淹回去。手动点标签也能切，选择会被记住。
+   */
+  let homeTab = Store.get(Store.K.HOMETAB, 'official') || 'official';
+  const HOME_THIRD_STEP = 12;
+  let homeThirdShown = 0;
+
+  function setHomeTab(t) {
+    if (homeTab === t) return;
+    homeTab = t;
+    Store.set(Store.K.HOMETAB, t);
+    homeThirdShown = 0;
+  }
+
   async function renderHome() {
     book = null; current = null; readingKey = null;
     closeSidebar();
@@ -189,11 +205,8 @@
     const doneCount = Object.keys(progress).length;
     const H = T().home;
 
-    // 全部书按 stage 分组。第三方书不再单独占一区 —— 书多了会淹没官方教材，
-    // 它混在书单里、卡上标「第三方」，靠顶部搜索框找。
-    const official = BOOKS.slice();
-    const groups = {};
-    official.forEach(b => { (groups[b.stage] = groups[b.stage] || []).push(b); });
+    const official = BOOKS.filter(b => !b.external);
+    const third = BOOKS.filter(b => b.external);
 
     const HT = T().homeThird;
     let html = `
@@ -207,15 +220,29 @@
         </div>
       </div>`;
 
-    html += `<h2 class="home-stage">${escapeHtml(HT.allBooks)} <span class="stage-n">${official.length}</span></h2>`;
-    for (const [stage, list] of Object.entries(groups)) {
-      html += `<div class="home-substage">${escapeHtml(stage)}</div><div class="book-grid">`;
-      for (const b of list) html += bookCard(b, H);
-      html += `</div>`;
+    // 书架切换：默认跟着你当前看的书走，也可以手动点
+    const tabBtn = (id, label, n) =>
+      `<button class="home-tab${homeTab === id ? ' active' : ''}" data-tab="${id}">` +
+      `${escapeHtml(label)}<span class="tab-n">${n}</span></button>`;
+    html += `<div class="home-tabs">${
+      tabBtn('official', HT.official, official.length)
+    }${tabBtn('third', HT.third, third.length)
+    }<button class="home-refresh" data-refresh title="${escapeHtml(HT.refresh)}">↻</button></div>`;
+
+    if (homeTab === 'third') {
+      html += renderThirdShelf(third, H, HT);
+    } else {
+      // 官方书架：按 stage 分组，不掺第三方
+      const groups = {};
+      official.forEach(b => { (groups[b.stage] = groups[b.stage] || []).push(b); });
+      html += `<h2 class="home-stage">${escapeHtml(HT.allBooks)} <span class="stage-n">${official.length}</span></h2>`;
+      for (const [stage, list] of Object.entries(groups)) {
+        html += `<div class="home-substage">${escapeHtml(stage)}</div><div class="book-grid">`;
+        for (const b of list) html += bookCard(b, H);
+        html += `</div>`;
+      }
     }
 
-    // 第三方书不再占首页一整区（书多了会淹没官方教材），只在书卡上标「第三方」。
-    // 想找书用顶部搜索框，进 /zh/search/ 全站搜。
     html += `
       <div class="home-contrib">
         <b>${escapeHtml(HT.writeOne)}</b>
@@ -228,10 +255,123 @@
 
     art.innerHTML = html;
 
+    // 切书架
+    art.querySelectorAll('.home-tab').forEach(btn => {
+      btn.onclick = () => {
+        setHomeTab(btn.dataset.tab);
+        renderHome();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+    });
+
+    const rbtn = art.querySelector('[data-refresh]');
+    if (rbtn) rbtn.onclick = () => doRefresh();
+
+    // 第三方书架：滚到底自动补一批
+    if (homeTab === 'third') {
+      const more = art.querySelector('[data-more-third]');
+      if (more) {
+        more.onclick = () => { homeThirdShown += HOME_THIRD_STEP; renderHome(); };
+        if (window.IntersectionObserver) {
+          const io = new IntersectionObserver(es => {
+            if (es.some(e => e.isIntersecting)) {
+              io.disconnect();
+              homeThirdShown += HOME_THIRD_STEP;
+              renderHome();
+            }
+          }, { rootMargin: '160px' });
+          io.observe(more);
+        }
+      }
+    }
+
     $('lesson-nav').innerHTML = '';
     $('progress-label').textContent = `${doneCount} ${H.statDone}`;
     $('progress-fill').style.width = '0%';
     document.title = `${T().brand} · ${T().brandSub}`;
+  }
+
+  /** 刷新：重新发现第三方书（官方书是内置的，不用刷） */
+  async function doRefresh() {
+    try { await refreshExternal(); } catch (e) { /* 索引站挂了不影响官方书 */ }
+    if (!book && (location.hash === '' || location.hash === '#' || location.hash === '#/')) {
+      renderHome();
+    }
+  }
+
+  /* ---------- 下拉刷新 ----------
+   * 只在首页、且已经滚到顶时生效 —— 否则在课文里往下滑会误触发。
+   * 手势本身只是触发 doRefresh()，数据来源和点刷新按钮一样。
+   */
+  function initPullRefresh() {
+    const ind = document.createElement('div');
+    ind.className = 'pull-ind';
+    ind.innerHTML = '<span class="pi-ico">↓</span><span class="pi-t"></span>';
+    document.body.appendChild(ind);
+
+    const THRESH = 68, MAX = 112;
+    let startY = 0, dist = 0, active = false, busy = false;
+
+    const onHome = () => !book &&
+      (location.hash === '' || location.hash === '#' || location.hash === '#/');
+    const canPull = () => onHome() && !busy && window.scrollY <= 0;
+
+    window.addEventListener('touchstart', e => {
+      if (!canPull() || e.touches.length !== 1) return;
+      startY = e.touches[0].clientY; dist = 0; active = true;
+      ind.classList.remove('release', 'busy', 'on');
+    }, { passive: true });
+
+    window.addEventListener('touchmove', e => {
+      if (!active) return;
+      if (!canPull()) { active = false; ind.classList.remove('on'); return; }
+      const dy = e.touches[0].clientY - startY;
+      if (dy <= 0) { dist = 0; ind.classList.remove('on'); ind.style.transform = ''; return; }
+      dist = Math.min(dy * 0.5, MAX);
+      ind.classList.add('on');
+      ind.style.transform = `translate(-50%, calc(-140% + ${dist}px))`;
+      ind.classList.toggle('release', dist >= THRESH);
+      ind.querySelector('.pi-t').textContent =
+        dist >= THRESH ? T().homeThird.release : T().homeThird.pullDown;
+      if (dist > 10 && e.cancelable) e.preventDefault();   // 别让页面跟着一起弹
+    }, { passive: false });
+
+    window.addEventListener('touchend', async () => {
+      if (!active) return;
+      active = false;
+      const fired = dist >= THRESH;
+      ind.style.transform = '';
+      ind.classList.remove('on');
+      dist = 0;
+      if (!fired) return;
+      busy = true;
+      ind.classList.add('busy');
+      ind.querySelector('.pi-t').textContent = T().homeThird.refreshing;
+      try { await doRefresh(); } catch (e) { /* 出错也把指示器收回去 */ }
+      busy = false;
+      ind.classList.remove('busy', 'release');
+    });
+  }
+
+  /** 第三方书架：摊平排列，不分类，滚到底补一批 */
+  function renderThirdShelf(list, H, HT) {
+    if (!list.length) {
+      return `<div class="third-empty"><b>${escapeHtml(HT.noMatch)}</b>` +
+        `<p>${escapeHtml(HT.thirdNote)}</p></div>`;
+    }
+    const show = Math.min(homeThirdShown || HOME_THIRD_STEP, list.length);
+    homeThirdShown = show;
+    let h = `<h2 class="home-stage">${escapeHtml(HT.third)} <span class="stage-n">${list.length}</span></h2>` +
+      `<div class="home-note">${escapeHtml(HT.thirdNote)}</div><div class="book-grid">`;
+    for (const b of list.slice(0, show)) h += bookCard(b, H);
+    h += `</div>`;
+    if (show < list.length) {
+      h += `<button class="third-more" data-more-third>${
+        escapeHtml(HT.more.replace('{n}', list.length - show))}</button>`;
+    } else if (list.length > HOME_THIRD_STEP) {
+      h += `<div class="third-end">${escapeHtml(HT.allShown)}</div>`;
+    }
+    return h;
   }
 
   /** 让开发者平台的「导入」能列出已收录的书 */
@@ -1499,6 +1639,8 @@
       if (!book || book.id !== bid) {
         book = BOOKS.find(b => b.id === bid);
         if (!book) { location.hash = '#/'; return; }
+        // 进哪类书，首页就默认待在哪个书架
+        setHomeTab(book.external ? 'third' : 'official');
         try { await loadTOC(bid); }
         catch (e) { toast(T().toast.noContent); location.hash = '#/'; return; }
       }
@@ -1641,6 +1783,7 @@
     if (book) renderHomeOrPending();
 
     Guardian.start(showBreakPanel);
+    initPullRefresh();
     await route();
     if (book) renderTOC(); else {
       const progress = Store.get(Store.K.PROGRESS, {}) || {};

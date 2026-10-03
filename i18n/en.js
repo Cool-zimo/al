@@ -57,6 +57,9 @@ window.I18N = {
     browseMore: "Browse all community books",
     refreshed: "Refreshed — {n} new",
     noNew: "Refreshed — nothing new",
+    pullDown: "Pull to refresh",
+    release: "Release to refresh",
+    refreshing: "Refreshing…",
     howTo: "How to write a book (Creator Guide)",
   },
 
