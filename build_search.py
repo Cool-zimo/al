@@ -18,15 +18,34 @@ CONTENT = os.path.join(ROOT, 'content')
 # GitHub Pages 403），一挂就搜不到第三方书。
 # 改成构建时拉一次写进索引，运行时零依赖：一定能搜到。
 # 新收录的书靠下次构建进来（机器人本来就是 6 小时扫一次，够用）。
+# API 最快最稳且能读私有仓；jsDelivr 作为无 token 时的兜底。
 REGISTRY_URLS = [
-    'https://raw.githubusercontent.com/Cool-zimo/al-docs/main/registry.json',
+    '/repos/Cool-zimo/al-docs/contents/registry.json?ref=main',
     'https://cdn.jsdelivr.net/gh/Cool-zimo/al-docs@main/registry.json',
 ]
 TOKFILE = os.path.join(os.path.dirname(ROOT), '.tokens')
 
 
+def _api(path, tok, timeout=30):
+    """走 GitHub API 读文件（contents 接口返回 base64）。
+
+    为什么不用 raw.githubusercontent.com：实测在本机不通（多次超时 0 成功），
+    而 build_search 要给每篇课文各发一次请求，一次 30 秒超时 × 几十课 = 卡死。
+    API 带 token 是 0.57s 且稳定，jsDelivr 也能用但要等 CDN 缓存。
+    """
+    url = 'https://api.github.com' + path
+    h = {'Accept': 'application/vnd.github.raw', 'User-Agent': 'al-build'}
+    if tok:
+        h['Authorization'] = 'Bearer ' + tok
+    r = urllib.request.Request(url, headers=h)
+    with urllib.request.urlopen(r, timeout=timeout) as resp:
+        return resp.read().decode('utf-8', 'replace')
+
+
 def _http(url, tok=None, timeout=60):
-    """带 token 走 GitHub API / raw。token 只是提高限流额度，没有也能读公开文件。"""
+    """读一个 URL。以 / 开头视为 GitHub API 路径（走 _api）。"""
+    if url.startswith('/'):
+        return _api(url, tok, timeout)
     h = {'User-Agent': 'al-build'}
     if tok:
         h['Authorization'] = 'Bearer ' + tok
@@ -53,7 +72,7 @@ def load_registry():
     return None
 
 
-def fetch_lessons(repo, branch, lang, toc):
+def fetch_lessons(repo, branch, lang, toc, tok0=None):
     """第三方书：从原作者仓库抓课标题和引言。只抓这两个，不抓正文。"""
     chs, items = [], []
     for ci, ch in enumerate(toc.get('chapters', []) if isinstance(toc, dict) else []):
@@ -62,9 +81,9 @@ def fetch_lessons(repo, branch, lang, toc):
             lid = str(lid)
             t, sm = lid, ''
             try:
-                u = ('https://raw.githubusercontent.com/%s/%s/content/%s/lessons/%s.md'
-                     % (repo, branch or 'main', lang, lid))
-                md = _http(u, timeout=30)
+                u = ('/repos/%s/contents/content/%s/lessons/%s.md?ref=%s'
+                     % (repo, lang, lid, branch or 'main'))
+                md = _http(u, tok0, timeout=30)
                 m = re.search(r'^#\s+(.+)$', md, re.M)
                 if m:
                     t = re.sub(r'^\d+\s*', '', m.group(1).strip())
@@ -99,7 +118,7 @@ def build_external(lang):
         toc = None
         for tok in (toks + [None]):
             try:
-                u = 'https://raw.githubusercontent.com/%s/%s/content/%s/toc.json' % (repo, branch, lang)
+                u = '/repos/%s/contents/content/%s/toc.json?ref=%s' % (repo, lang, branch)
                 toc = json.loads(_http(u, tok, timeout=30))
                 break
             except Exception:
@@ -107,7 +126,7 @@ def build_external(lang):
         if not toc:
             print('  ! 跳过 %s（toc 拉取失败）' % repo)
             continue
-        chs, items = fetch_lessons(repo, branch, lang, toc)
+        chs, items = fetch_lessons(repo, branch, lang, toc, toks[0] if toks else None)
         for it in items:
             it['b'] = len(out)          # 占位，下面统一改成真实下标
         out.append({
