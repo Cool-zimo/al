@@ -66,6 +66,23 @@ const DevPlatform = (() => {
       langLabel: '语言', topicsHint: '会自动打上 topic: al-book，机器人靠它发现你的书。',
       refreshIndex: '刷新索引',
       importBtn: "从已有书导入",
+      artBtn: "从文章导入",
+      artTitle: "从一篇文章导入",
+      artDesc: "手上有一篇现成的 Markdown？贴进来，自动拆成章和课。不用先懂 al-book 格式。",
+      artName: "书名",
+      artNamePh: "不填就用文章的第一个标题",
+      artPh: "把 Markdown 贴到这里，或者把 .md 文件直接拖进来…",
+      artGo: "拆成书并打开",
+      artBadFile: "只支持 .md / .markdown / .txt 文件",
+      artEmpty: "先贴点内容进来",
+      artNoSplit: "没能拆出任何一节，检查一下内容",
+      artPreview: "会拆成 {c} 章 {l} 课",
+      artMore: "还有 {n} 章没显示",
+      artNoChapter: "（未命名章）",
+      artChapter: "第 {n} 章",
+      artSubtitle: "由一篇文章导入",
+      artDefaultTitle: "未命名",
+      artDone: "已拆成 {c} 章 {l} 课，可以开始改了",
       importTitle: "从仓库导入",
       importDesc: "把任意符合格式的书导入成新草稿，之后随便改。原作者信息会保留，记得按许可证署名。",
       importBtn2: "导入",
@@ -156,6 +173,23 @@ const DevPlatform = (() => {
       langLabel: 'Languages', topicsHint: 'topic: al-book is added automatically — that is how the bot finds your book.',
       refreshIndex: 'Refresh index',
       importBtn: "Import a book",
+      artBtn: "From an article",
+      artTitle: "Import from an article",
+      artDesc: "Already have a Markdown file? Paste it and we split it into chapters and lessons. No need to learn the al-book format first.",
+      artName: "Book title",
+      artNamePh: "Defaults to the article's first heading",
+      artPh: "Paste Markdown here, or drop a .md file…",
+      artGo: "Split into a book",
+      artBadFile: "Only .md / .markdown / .txt files",
+      artEmpty: "Paste something first",
+      artNoSplit: "Could not split anything — check the content",
+      artPreview: "Will split into {c} chapters, {l} lessons",
+      artMore: "{n} more chapters not shown",
+      artNoChapter: "(untitled chapter)",
+      artChapter: "Chapter {n}",
+      artSubtitle: "Imported from an article",
+      artDefaultTitle: "Untitled",
+      artDone: "Split into {c} chapters, {l} lessons — start editing",
       importTitle: "Import from repo",
       importDesc: "Import any conforming book as a new draft, then edit freely. Author info is kept — credit them per the license.",
       importBtn2: "Import",
@@ -799,6 +833,7 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
       <div class="dev-bar">
         <button class="dev-btn" id="dev-new">${T('newBook')}</button>
         <button class="dev-btn ghost" id="dev-import">${T('importBtn')}</button>
+        <button class="dev-btn ghost" id="dev-artimport">${T('artBtn')}</button>
         <button class="dev-btn ghost" id="dev-pull">${T('cloudPull')}</button>
         <span class="dev-hint" id="dev-cloud">${cloudHintText()}</span>
       </div>
@@ -832,6 +867,7 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
 
     $('dev-new').onclick = showNewDialog;
     $('dev-import').onclick = showImportDialog;
+    $('dev-artimport').onclick = showImportArticleDialog;
     $('dev-pull').onclick = async () => {
       const btn = $('dev-pull');
       btn.disabled = true; btn.textContent = T('cloudPulling');
@@ -968,6 +1004,180 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
 
     const got = await GhSrc.many(owner, name, branch, paths);
     return { meta, toc, shape, got, L, branch, full, owner, name };
+  }
+
+  /* ================= 从一篇文章导入 =================
+   *
+   * 为什么要有这条路：al-book 最小可收录要 3 个文件 + 九个必填字段，
+   * 对一个"我写了篇笔记想变成教材"的人来说，门槛高到根本不会开始。
+   * 而绝大多数人手上已经有一篇现成的 Markdown —— 那就从这篇出发。
+   *
+   * 拆分的头号陷阱：代码块里的 # 是 Python 注释，不是 Markdown 标题。
+   * 不先把围栏剥掉再扫标题，一篇带代码注释的文章会被切成几十个"课"，
+   * 每个注释行一课。所以第一步就是标记哪些行在代码块里。
+   */
+  /**
+   * 从文章里摘一句当简介。
+   * 不能简单删掉 # > * - 了事 —— 代码块、列表符号会混进来，
+   * 摘出来的东西读不通，还会把标题文字当成正文。
+   */
+  function artSummary(md) {
+    const body = String(md || '')
+      .replace(/```[\s\S]*?```/g, ' ')      // 先去掉代码块
+      .split(/\n{2,}/);                        // 再按段落取
+    for (const para of body) {
+      const t = para
+        .split('\n')
+        .filter(l => !/^\s{0,3}#{1,6}\s/.test(l))   // 去标题行
+        .filter(l => !/^\s{0,3}>/.test(l))           // 去引用
+        .filter(l => !/^\s*([-*+]|\d+\.)\s/.test(l)) // 去列表符号
+        .join(' ')
+        .replace(/[*`_]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (t.length >= 12) return t.slice(0, 110);
+    }
+    return '';
+  }
+
+  function splitArticle(md) {
+    const lines = String(md || '').replace(/\r\n?/g, '\n').split('\n');
+
+    // 一、标出代码块内的行
+    const inFence = [];
+    let fence = null;
+    for (let i = 0; i < lines.length; i++) {
+      const t = lines[i].trim();
+      if (fence === null) {
+        const m = t.match(/^(```+|~~~+)/);
+        if (m) { fence = m[1]; inFence[i] = true; continue; }
+        inFence[i] = false;
+      } else {
+        inFence[i] = true;
+        if (t.startsWith(fence)) fence = null;
+      }
+    }
+
+    // 二、只收代码块外的标题
+    const heads = [];
+    for (let i = 0; i < lines.length; i++) {
+      if (inFence[i]) continue;
+      const m = lines[i].match(/^(#{1,6})\s+(.+?)\s*$/);
+      if (m) heads.push({ i, level: m[1].length, text: m[2].trim() });
+    }
+
+    const chapters = [];
+    if (!heads.length) {
+      // 通篇没有标题：按篇幅切，别硬切成一课一课
+      const chunks = byLength(lines, 700);
+      if (chunks.length) {
+        chapters.push({
+          title: '', lessons: chunks.map((c, k) => ({ title: '第 ' + (k + 1) + ' 节', md: c })),
+        });
+      }
+    } else {
+      const has1 = heads.some(h => h.level === 1);
+      const has2 = heads.some(h => h.level === 2);
+      if (has1 && has2) {
+        // h1 是章，h2 是课 —— 最理想的结构
+        let cur = null, curLesson = null;
+        for (let n = 0; n < heads.length; n++) {
+          const h = heads[n];
+          const end = (n + 1 < heads.length) ? heads[n + 1].i : lines.length;
+          const body = lines.slice(h.i, end).join('\n').trim();
+          if (h.level === 1) {
+            curLesson = null;
+            cur = { title: h.text, lessons: [] };
+            chapters.push(cur);
+          } else if (h.level === 2) {
+            if (!cur) { cur = { title: '', lessons: [] }; chapters.push(cur); }
+            curLesson = { title: h.text, md: body };
+            cur.lessons.push(curLesson);
+          } else if (curLesson) {
+            curLesson.md += '\n\n' + body;          // h3+ 并入当前课
+          } else if (cur) {
+            cur.lessons.push({ title: h.text, md: body });
+          }
+        }
+        // 章下面直接是正文（没有 h2）：整章当一课
+        for (const ch of chapters) {
+          if (!ch.lessons.length) ch.lessons.push({ title: ch.title || '正文', md: '' });
+        }
+      } else {
+        // 只有单一层级：每个标题一课
+        const lv = has1 ? 1 : heads[0].level;
+        const use = heads.filter(h => h.level === lv);
+        const lessons = [];
+        for (let n = 0; n < use.length; n++) {
+          const h = use[n];
+          const end = (n + 1 < use.length) ? use[n + 1].i : lines.length;
+          lessons.push({ title: h.text, md: lines.slice(h.i, end).join('\n').trim() });
+        }
+        if (lessons.length) chapters.push({ title: '', lessons });
+      }
+    }
+    return chapters.filter(c => c.lessons.length);
+  }
+
+  /** 按篇幅切段，在空行处断开，不硬切 */
+  function byLength(lines, target) {
+    const out = [];
+    let buf = [], n = 0;
+    for (const ln of lines) {
+      buf.push(ln); n += ln.length;
+      if (n >= target && ln.trim() === '') { out.push(buf.join('\n').trim()); buf = []; n = 0; }
+    }
+    const tail = buf.join('\n').trim();
+    if (tail) out.push(tail);
+    return out.filter(x => x.length);
+  }
+
+  /**
+   * 补引言：al-book 约定课文第一行是 `# 标题`，紧接着 `> 一句话引言`。
+   * 导入的文章通常没有引言，没它目录和搜索结果里就是空的。
+   * 从正文第一段摘一句，总比空白强 —— 作者后面随手就能改。
+   */
+  function ensureLead(md, fallbackTitle) {
+    const src = String(md || '').trim();
+    if (!src) return '# ' + fallbackTitle + '\n\n> 待补充引言\n\n正文待写。\n';
+    if (/^#{1,6}\s+/m.test(src) && /^>\s+/m.test(src)) return src + '\n';
+    const lines = src.split('\n');
+    let head, rest = lines;
+    // 注意：首行可能是任意级别的标题（## 也算）。
+    // 只认 `^# ` 的话，`## 变量名` 不会被识别，于是又补一个 `# 变量名`，
+    // 同一课里出现两个标题 —— 所以要用 `#{1,6}`，并把级别统一提升成 h1。
+    const m = lines[0] && lines[0].match(/^#{1,6}\s+(.+?)\s*$/);
+    if (m) { head = '# ' + m[1]; rest = lines.slice(1); }
+    else head = '# ' + fallbackTitle;
+    while (rest.length && rest[0].trim() === '') rest.shift();
+    // 摘第一句当引言
+    let lead = '';
+    for (const ln of rest) {
+      const t = ln.trim();
+      if (!t || t.startsWith('#') || t.startsWith('>') || t.startsWith('```')) continue;
+      lead = t; break;
+    }
+    const cut = lead.search(/[。！？.!?]/);
+    if (cut > 0) lead = lead.slice(0, cut + 1);
+    if (lead.length > 60) lead = lead.slice(0, 60) + '…';
+    if (!lead) lead = fallbackTitle;
+
+    // 引言是从正文第一句摘来的，得把那句从正文里去掉 ——
+    // 否则读者会看到同一句话出现两遍：先是引言，紧接着又是正文开头。
+    const trimmed = [];
+    let done = false;
+    for (const ln of rest) {
+      if (!done && ln.trim().startsWith(lead.slice(0, Math.min(12, lead.length)))) {
+        const left = ln.trim().slice(lead.length).trim();
+        if (left) trimmed.push(left);
+        done = true;
+        continue;
+      }
+      trimmed.push(ln);
+    }
+    if (done) rest = trimmed;
+    while (rest.length && rest[0].trim() === '') rest.shift();
+    return [head, '', '> ' + lead, ''].concat(rest).join('\n') + '\n';
   }
 
   function showImportDialog() {
@@ -1976,6 +2186,146 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
     }
   }
 
+  /* ================= 从文章导入的界面 ================= */
+
+  function showImportArticleDialog() {
+    const root = $('dev-root') || document.querySelector('.dev-wrap');
+    const box = document.createElement('div');
+    box.className = 'dev-modal';
+    box.innerHTML = `<div class="dev-modal-box wide">
+      <h3>${T('artTitle')}</h3>
+      <p class="dim" style="font-size:12.5px">${T('artDesc')}</p>
+      <div class="dev-form">
+        <label>${T('artName')}<input type="text" id="ar-title" placeholder="${T('artNamePh')}"></label>
+      </div>
+      <textarea id="ar-md" rows="12" spellcheck="false"
+        placeholder="${T('artPh')}" class="dev-md-input"></textarea>
+      <div class="dev-pick" id="ar-pick"></div>
+      <div id="ar-out" class="dev-out"></div>
+      <div class="dev-modal-actions">
+        <button class="dev-btn" id="ar-go">${T('artGo')}</button>
+        <button class="dev-btn ghost" id="ar-cancel">${T('cancel')}</button>
+      </div>
+    </div>`;
+    document.body.appendChild(box);
+    const close = () => box.remove();
+    $('ar-cancel').onclick = close;
+    box.onclick = e => { if (e.target === box) close(); };
+    setTimeout(() => $('ar-md').focus(), 120);
+
+    // 支持拖入 .md 文件
+    const ta = $('ar-md');
+    ta.addEventListener('dragover', e => { e.preventDefault(); ta.classList.add('drag'); });
+    ta.addEventListener('dragleave', () => ta.classList.remove('drag'));
+    ta.addEventListener('drop', async e => {
+      e.preventDefault();
+      ta.classList.remove('drag');
+      const f = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (!f) return;
+      if (!/\.(md|markdown|txt)$/i.test(f.name)) { alert(T('artBadFile')); return; }
+      ta.value = await f.text();
+      if (!$('ar-title').value.trim()) {
+        $('ar-title').value = f.name.replace(/\.(md|markdown|txt)$/i, '');
+      }
+      previewArticle();
+    });
+
+    // 边贴边预览会拆成什么样，别等导入完才知道
+    let timer = null;
+    ta.addEventListener('input', () => {
+      clearTimeout(timer);
+      timer = setTimeout(previewArticle, 400);
+    });
+
+    function previewArticle() {
+      const out = $('ar-out');
+      const md = ta.value;
+      if (!md.trim()) { out.innerHTML = ''; return; }
+      const chs = splitArticle(md);
+      const nL = chs.reduce((a, c) => a + c.lessons.length, 0);
+      out.innerHTML = `<div class="dev-step done"><span>✓</span>${
+        T('artPreview').replace('{c}', chs.length).replace('{l}', nL)}</div>` +
+        `<div class="dev-pick">` + chs.slice(0, 6).map(c =>
+          `<div class="dev-pick-i" style="cursor:default">
+             <b>${esc(c.title || T('artNoChapter'))}</b>
+             <span>${esc(c.lessons.map(x => x.title).join(' · ').slice(0, 90))}</span>
+           </div>`).join('') + (chs.length > 6 ? `<div class="dim" style="font-size:11.5px">…${
+          esc(T('artMore').replace('{n}', chs.length - 6))}</div>` : '') + `</div>`;
+    }
+
+    $('ar-go').onclick = () => {
+      const md = ta.value.trim();
+      if (!md) { alert(T('artEmpty')); return; }
+      const chs = splitArticle(md);
+      const nL = chs.reduce((a, c) => a + c.lessons.length, 0);
+      if (!nL) { alert(T('artNoSplit')); return; }
+
+      // 书名：用户填的 > 文章第一个 h1 > 默认
+      let title = $('ar-title').value.trim();
+      if (!title) {
+        const m = md.match(/^#\s+(.+?)\s*$/m);
+        title = m ? m[1] : T('artDefaultTitle');
+      }
+      title = title.slice(0, 60);
+
+      // id 只认 [a-z0-9-]（校验器硬性要求）。
+      // 中文标题做不出拼音，如果把汉字留在 id 里，albook.json 会报"id 不合法"，
+      // 表现就是：兴冲冲导入完，点发布被拦下，还看不出为什么。
+      // 所以纯中文标题一律回退到 'book'，再靠避重变成 book-2、book-3。
+      const slug = String(title).toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 24);
+      let id = /^[a-z0-9]/.test(slug) ? slug : 'book';
+      if (!id || id === '-') id = 'book';
+      const all = loadAll();
+      let nid = id, k = 2;
+      while (all[nid]) { nid = id + '-' + k; k++; }
+
+      const chapters = [];
+      let li = 0;
+      for (const c of chs) {
+        const lessons = [];
+        for (const l of c.lessons) {
+          li++;
+          const lid = String(li).padStart(2, '0');
+          lessons.push({ id: lid, title: l.title, md: ensureLead(l.md, l.title) });
+        }
+        // 章测默认不建 —— 文章本来就没题，建了也是空的，
+        // 反而会因为"一道题都没有"被教材模式卡住。
+        chapters.push({ title: c.title || T('artChapter').replace('{n}', chapters.length + 1),
+                        lessons, test: null, testMd: '' });
+      }
+
+      const b = {
+        id: nid,
+        repo: 'al-book-' + nid,
+        title,
+        subtitle: T('artSubtitle'),
+        desc: artSummary(md) || title,
+        stage: 'other',
+        level: '入门',
+        langs: [lang === 'zh' ? 'zh' : 'en'],
+        // 关键：文章没有题，设成 notes 才能过校验。
+        // 设成 textbook 会因为"一道题都没有"不予收录 —— 作者想做成教材
+        // 自己在书籍信息里改，然后加题。
+        kind: 'notes',
+        license: 'CC BY-NC 4.0',
+        author: { name: (Store.get(Store.K.OWNER, '')) || '' },
+        tags: [],
+        chapters,
+        importedFrom: { fromArticle: true, at: Date.now() },
+        published: null,
+        createdAt: Date.now(), updatedAt: Date.now(),
+      };
+
+      putBook(b);
+      close();
+      cur = b;
+      curLesson = { chIdx: 0, lsIdx: 0 };
+      mountEditor(root);
+      toast(T('artDone').replace('{c}', chapters.length).replace('{l}', li));
+    };
+  }
+
   /* ================= 挂载 ================= */
 
   const CSS = `
@@ -2146,6 +2496,15 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
   .dev-pick-i:hover{border-color:var(--accent)}
   .dev-pick-i span{font-size:11.5px;color:var(--faint)}
   .dev-out{margin:6px 0}
+
+  /* 文章导入：大文本框 + 拖拽高亮 */
+  .dev-md-input{width:100%;box-sizing:border-box;padding:11px 13px;margin-top:10px;
+    border:1px solid var(--border);border-radius:9px;background:transparent;color:var(--text);
+    font-size:13px;line-height:1.65;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    resize:vertical;min-height:200px}
+  .dev-md-input:focus{outline:none;border-color:var(--accent)}
+  .dev-md-input.drag{border-color:var(--accent);
+    background:color-mix(in srgb, var(--accent) 7%, transparent)}
 
   /* 书籍信息表单 */
   .dev-form{display:flex;flex-direction:column;gap:9px;margin:4px 0}
