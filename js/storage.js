@@ -47,6 +47,7 @@ const Store = (() => {
       READ_POS: 'readPos',   // 课内滚动位置 { [lessonKey]: { y, at } }
       IDE_FILES: 'ideFiles', // 代码实验室里的"我的文件" { [name]: { text, updatedAt } }
       SHELF: 'shelf',       // 看过的第三方书 { [repo]: { title, branch, at, ... } }
+      MYBOOKS: 'myBooks',   // 我发布过的书 [ "owner/repo" ] —— 刷新后据此直接恢复，不等搜索索引
       HOMETAB: 'homeTab',   // 首页当前看哪个书架：'official' | 'third'
       SYNCED_AT: 'syncedAt',
       DARK: 'dark'

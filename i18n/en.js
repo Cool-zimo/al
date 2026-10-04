@@ -18,7 +18,9 @@ window.I18N = {
     errEmpty: 'Paste your token first',
     err401: 'Token is invalid or expired — generate a new one',
     errNetwork: 'Cannot reach GitHub — check your connection',
-    errOther: 'Sign-in failed: '
+    errOther: 'Sign-in failed: ',
+    offlineHint: 'Cannot reach GitHub — login not verified (cached content still works)',
+    retry: 'Retry',
   },
 
   topbar: { home: 'Back to library', settings: 'Settings', sync: 'Sync' },
@@ -43,6 +45,8 @@ window.I18N = {
     official: "Official",
     third: "Community",
     badge: "Community",
+    mineBadge: "Mine",
+    mineNote: "Books tagged \"Mine\" are yours — shown regardless of the index. If validation fails, others cannot find them yet.",
     searchPh: "Search community books (title / author / repo)",
     searchAllPh: "Search book titles and contents",
     searchAllBtn: "Search",

@@ -18,7 +18,9 @@ window.I18N = {
     errEmpty: '先粘贴令牌',
     err401: '令牌无效或已过期，请重新生成',
     errNetwork: '连不上 GitHub，检查网络后重试',
-    errOther: '登录失败：'
+    errOther: '登录失败：',
+    offlineHint: '连不上 GitHub，登录状态没核实（已缓存的内容照常可用）',
+    retry: '重试',
   },
 
   topbar: { home: '回到书单', settings: '设置', sync: '同步' },
@@ -43,6 +45,8 @@ window.I18N = {
     official: "官方教材",
     third: "第三方教材",
     badge: "第三方",
+    mineBadge: "我的",
+    mineNote: "带「我的」角标的是你发布的书，不依赖收录索引，随时能看到。若校验未通过，其他人暂时搜不到它。",
     searchPh: "搜索书（书名 / 作者 / 仓库）",
     searchAllPh: "搜索教材名与目录",
     searchAllBtn: "搜索",

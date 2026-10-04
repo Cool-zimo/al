@@ -12,6 +12,7 @@
 const Gate = (() => {
   const $ = id => document.getElementById(id);
   let onSuccess = null;
+  let started = false;      // startApp 是否已经跑过（重新登录不该再跑一遍）
 
   function fill() {
     const g = window.I18N.gate;
@@ -69,22 +70,87 @@ const Gate = (() => {
     }
   }
 
+  function paintUser(login, avatar) {
+    if (login) $('username').textContent = login;
+    if (avatar) { const a = $('avatar'); a.src = avatar; a.hidden = false; }
+  }
+
+  /** 收起登录门。不 remove —— token 失效时要能再弹出来 */
+  function hideGate() {
+    const g = $('gate');
+    g.style.transition = 'opacity .28s';
+    g.style.opacity = '0';
+    setTimeout(() => g.classList.add('gate-gone'), 300);
+    $('app').hidden = false;
+  }
+
+  /** 重新弹登录门（后台复核发现 token 失效时） */
+  function showGate(msg) {
+    const g = $('gate');
+    if (!g) { location.reload(); return; }
+    g.classList.remove('gate-gone');
+    g.style.opacity = '1';
+    $('g-submit').disabled = false;
+    $('g-submit').textContent = window.I18N.gate.submit;
+    if (msg) err(msg);
+    setTimeout(() => $('g-token').focus(), 150);
+  }
+
   /** 登录成功：收起登录门，启动应用 */
   function enter(info) {
-    $('gate').style.transition = 'opacity .3s';
-    $('gate').style.opacity = '0';
-    setTimeout(() => { $('gate').remove(); }, 300);
-    $('app').hidden = false;
+    hideGate();
+    paintUser(info?.login, info?.avatar);
+    if (onSuccess && !started) { started = true; onSuccess(info); }
+  }
 
-    if (info?.login) {
-      $('username').textContent = info.login;
-      if (info.avatar) {
-        const a = $('avatar');
-        a.src = info.avatar;
-        a.hidden = false;
+  /* ---------- 后台复核 ----------
+   * 有本地 token 时先放人进去，再悄悄验一次。
+   * 之前是"验过才准进"，每次刷新都卡在登录页等 GitHub 往返（还发两次请求），
+   * 目标页面要等这一轮网络才出现 —— 明明本地有 token，白等。
+   */
+  async function reverify(token, tries = 0) {
+    try {
+      const info = await verify(token);
+      Store.set(Store.K.OWNER, info.login);
+      Store.set('avatar', info.avatar);
+      paintUser(info.login, info.avatar);
+      hideOfflineBanner();
+      return true;
+    } catch (e) {
+      const st = e && e.status;
+      if (st === 401 || st === 403) {
+        // 真的失效了：清掉，退回登录
+        Store.del(Store.K.TOKEN);
+        Store.del(Store.K.OWNER);
+        showGate(window.I18N.gate.err401);
+        return false;
       }
+      // 网络问题不算 token 失效 —— 不踢人，给个可重试的提示条
+      if (tries < 1) {
+        await new Promise(r => setTimeout(r, 1200));
+        return reverify(token, tries + 1);
+      }
+      showOfflineBanner();
+      return false;
     }
-    if (onSuccess) onSuccess(info);
+  }
+
+  function showOfflineBanner() {
+    if (document.getElementById('offline-banner')) return;
+    const b = document.createElement('div');
+    b.id = 'offline-banner';
+    b.className = 'offline-banner';
+    b.innerHTML = `<span>⚠️ ${window.I18N.gate.offlineHint}</span>` +
+      `<button type="button" id="offline-retry">${window.I18N.gate.retry}</button>`;
+    document.body.appendChild(b);
+    $('offline-retry').onclick = () => {
+      b.remove();
+      reverify(Store.get(Store.K.TOKEN, ''));
+    };
+  }
+  function hideOfflineBanner() {
+    const b = document.getElementById('offline-banner');
+    if (b) b.remove();
   }
 
   function init(successCb) {
@@ -102,22 +168,12 @@ const Gate = (() => {
       toggle.setAttribute('aria-expanded', String(open));
     };
 
-    // 已有 token：静默验证，通过直接进
+    // 已有 token：立刻进应用，验证放后台。
+    // 用户名/头像先用本地缓存的，验回来再刷新 —— 界面不用等网络。
     const saved = Store.get(Store.K.TOKEN, '');
     if (saved) {
-      $('g-submit').disabled = true;
-      $('g-submit').textContent = window.I18N.gate.submitting;
-      verify(saved)
-        .then(info => {
-          Store.set('avatar', info.avatar);
-          enter(info);
-        })
-        .catch(() => {
-          Store.del(Store.K.TOKEN);
-          Store.del(Store.K.OWNER);
-          $('g-submit').disabled = false;
-          $('g-submit').textContent = window.I18N.gate.submit;
-        });
+      enter({ login: Store.get(Store.K.OWNER, ''), avatar: Store.get('avatar', '') });
+      reverify(saved);
     } else {
       // 首次进入自动聚焦输入框
       setTimeout(() => $('g-token').focus(), 120);

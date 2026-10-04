@@ -782,6 +782,14 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
     const all = loadAll();
     const books = Object.values(all).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
 
+    // 把本地草稿里"已发布"的仓库登记给主站。
+    // 这样就算当初发布时的即时并入没生效（比如随后又刷新了页面），
+    // 下次打开首页也能按确切仓库名恢复，不用等 GitHub 搜索索引。
+    if (window.__registerMyBooks) {
+      window.__registerMyBooks(books.filter(b => b.published && b.published.repo)
+        .map(b => b.published.repo));
+    }
+
     root.innerHTML = `
       <div class="dev-head">
         <a class="dev-back" href="#/">${lang === 'zh' ? '← 回到书城' : '← Back to library'}</a>

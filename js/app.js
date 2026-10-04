@@ -359,11 +359,20 @@
       return `<div class="third-empty"><b>${escapeHtml(HT.noMatch)}</b>` +
         `<p>${escapeHtml(HT.thirdNote)}</p></div>`;
     }
-    const show = Math.min(homeThirdShown || HOME_THIRD_STEP, list.length);
+    // 自己发的书排前面 —— 那才是用户最可能想找的
+    const sorted = list.slice().sort((a, b) => (b.mine ? 1 : 0) - (a.mine ? 1 : 0));
+    const show = Math.min(homeThirdShown || HOME_THIRD_STEP, sorted.length);
     homeThirdShown = show;
-    let h = `<h2 class="home-stage">${escapeHtml(HT.third)} <span class="stage-n">${list.length}</span></h2>` +
-      `<div class="home-note">${escapeHtml(HT.thirdNote)}</div><div class="book-grid">`;
-    for (const b of list.slice(0, show)) h += bookCard(b, H);
+    let h = `<h2 class="home-stage">${escapeHtml(HT.third)} <span class="stage-n">${list.length}</span></h2>`;
+    // 只有自己能看到的书（未通过收录校验）：解释一下为什么别人看不到
+    const mineNotListed = sorted.filter(b => b.mine);
+    if (mineNotListed.length) {
+      h += `<div class="home-note mine-note">${escapeHtml(HT.mineNote)}</div>`;
+    } else {
+      h += `<div class="home-note">${escapeHtml(HT.thirdNote)}</div>`;
+    }
+    h += `<div class="book-grid">`;
+    for (const b of sorted.slice(0, show)) h += bookCard(b, H);
     h += `</div>`;
     if (show < list.length) {
       h += `<button class="third-more" data-more-third>${
@@ -396,7 +405,7 @@
   function bookCard(b, H) {
     return `
       <a class="book-card${b.ready ? '' : ' locked'}" href="#/book/${b.id}">
-        <div class="book-level">${escapeHtml(b.level)}${b.external ? ' · ' + (T().homeThird.badge) : ''}</div>
+        <div class="book-level">${escapeHtml(b.level)}${b.external ? ' · ' + (b.mine ? T().homeThird.mineBadge : T().homeThird.badge) : ''}</div>
         <div class="book-title">${escapeHtml(b.title)}</div>
         <div class="book-sub">${escapeHtml(b.subtitle)}</div>
         <div class="book-desc">${escapeHtml(b.desc)}</div>
@@ -410,6 +419,7 @@
   /** 重新拉第三方书（刷新按钮 / 发布新书后调用） */
   async function refreshExternal() {
     const before = new Set(Object.keys(EXTERNAL));
+    homeThirdShown = 0;            // 重新加载，分页从头开始
     BOOKS = BOOKS.filter(b => !b.external);
     for (const k of Object.keys(EXTERNAL)) delete EXTERNAL[k];
     await loadExternal();
@@ -1705,6 +1715,11 @@
   // 开发者平台发布成功后要能刷新首页的第三方书区
   window.__refreshExternal = () => { refreshExternal(); };
 
+  /** 开发者平台启动时把本地草稿里已发布的仓库登记进来 */
+  window.__registerMyBooks = (repos) => {
+    (repos || []).forEach(r => addMyBookRepo(r));
+  };
+
   /**
    * 刚发布的书直接按仓库名并入，不等搜索索引。
    *
@@ -1717,8 +1732,9 @@
     try {
       const e = await BookShelf.fetchEntry(api, fullName);
       if (!e) return false;
-      if (BOOKS.some(b => b.id === e.id)) return true;
-      if (!addExternal(e, e)) return false;
+      addMyBookRepo(fullName);          // 记住，刷新后不等索引也能恢复
+      if (BOOKS.some(b => b.id === e.id)) { publishThirdList(); return true; }
+      if (!addExternal(e, e, true)) return false;
       publishThirdList();
       renderHomeOrPending();
       return true;
@@ -1733,10 +1749,11 @@
    * 从 al-docs 读索引，把「通过校验且支持当前语言」的第三方书并入书单。
    * 失败时静默跳过 —— 索引站挂了不该影响官方书的使用。
    */
-  function addExternal(b, entry) {
+  function addExternal(b, entry, mine) {
     if (BOOKS.some(x => x.id === b.id)) return false;
     EXTERNAL[b.id] = { repo: b.repo, branch: b.branch || 'main', entry: entry || null };
     BOOKS.push({
+      mine: !!mine,
       id: b.id,
       title: b.title || b.id,
       subtitle: b.subtitle || '',
@@ -1754,7 +1771,52 @@
     return true;
   }
 
+  /** 我发布过的书：仓库名列表，本地持久 */
+  function myBookRepos() {
+    const v = Store.get(Store.K.MYBOOKS, []);
+    return Array.isArray(v) ? v : [];
+  }
+  function addMyBookRepo(fullName) {
+    if (!fullName) return;
+    const cur = myBookRepos();
+    if (cur.includes(fullName)) return;
+    cur.unshift(fullName);
+    Store.set(Store.K.MYBOOKS, cur.slice(0, 60));
+  }
+
+  /**
+   * 按确切仓库名恢复"我发布过的书"。
+   *
+   * 为什么必须走这条路：GitHub 的搜索索引有延迟 —— 刚建的仓库、刚打的 topic
+   * 要等几分钟甚至更久才出现在 topic:al-book 结果里。只靠搜索的话，
+   * 作者自己刚发布、刷新一下，自己的书反而消失了，非常困惑。
+   * 而我们知道确切的仓库名，可以直接读它的 albook.json，完全不用等索引。
+   */
+  async function restoreMyBooks() {
+    if (!api) return 0;
+    const repos = myBookRepos();
+    if (!repos.length) return 0;
+    let n = 0;
+    for (const full of repos) {
+      if (EXTERNAL[full]) { n++; continue; }   // 已并入
+      try {
+        const e = await BookShelf.fetchEntry(api, full);
+        if (!e) continue;
+        if (!BOOKS.some(b => b.id === e.id) && addExternal(e, e, true)) n++;
+      } catch (err) {
+        // 仓库被删了 / 转私有 / albook.json 没了 —— 静默跳过，不打扰
+        console.warn('[al] 恢复我的书失败:', full, err.message);
+      }
+    }
+    if (n) console.log(`[al] 恢复了 ${n} 本我发布过的书`);
+    return n;
+  }
+
   async function loadExternal() {
+    // 〇、先恢复"我发布过的书" —— 这一步不依赖搜索索引，刷新后立刻可见。
+    //     放在最前面，这样即使下面的搜索失败，自己的书也不会丢。
+    try { await restoreMyBooks(); } catch (e) { /* 不阻塞 */ }
+
     // 一、登录了：拿用户的 token 自己搜，不依赖中心索引站。
     //     额度是 5000 次/小时，而且能实时发现新书，不必等机器人 6 小时扫一次。
     if (api) {

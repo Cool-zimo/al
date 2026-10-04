@@ -125,6 +125,12 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
 .home-note {
   margin: -2px 0 16px; font-size: 12.5px; line-height: 1.7; color: var(--faint);
 }
+.home-note.mine-note {
+  padding: 8px 12px; border-radius: 8px;
+  color: var(--dim);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+}
 .third-empty {
   padding: 48px 20px; text-align: center; color: var(--faint);
 }
