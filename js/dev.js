@@ -50,7 +50,8 @@ const DevPlatform = (() => {
       publish: '🚀 发布到 GitHub', publishTitle: '发布《{t}》',
       visibility: '仓库可见性', pub: '公开（任何人可见，会被收录）', priv: '私有（只有你能看到，不会被收录）',
       startPublish: '开始发布', publishing: '发布中…',
-      stepCheck: '校验内容', stepRepo: '创建仓库', stepFiles: '推送文件', stepTopic: '打上 al-book 标记',
+      stepCheck: '校验内容', stepRepo: '创建仓库', stepFiles: '推送文件',
+      stepVerify: '核对已发布文件', stepTopic: '打上 al-book 标记',
       done: '完成', fail: '失败', publishOk: '发布成功！',
       publishFail: '发布失败', needLogin: '发布需要先登录 GitHub',
       repoCreated: '仓库已创建', filesPushed: '个文件已推送',
@@ -139,7 +140,8 @@ const DevPlatform = (() => {
       publish: '🚀 Publish to GitHub', publishTitle: 'Publish "{t}"',
       visibility: 'Repository visibility', pub: 'Public (visible to all, will be listed)', priv: 'Private (only you, will not be listed)',
       startPublish: 'Start publishing', publishing: 'Publishing…',
-      stepCheck: 'Validate content', stepRepo: 'Create repo', stepFiles: 'Push files', stepTopic: 'Add al-book topic',
+      stepCheck: 'Validate content', stepRepo: 'Create repo', stepFiles: 'Push files',
+      stepVerify: 'Verify published files', stepTopic: 'Add al-book topic',
       done: 'Done', fail: 'Failed', publishOk: 'Published!',
       publishFail: 'Publish failed', needLogin: 'Publishing requires signing in to GitHub',
       repoCreated: 'Repo created', filesPushed: 'files pushed',
@@ -210,6 +212,37 @@ const DevPlatform = (() => {
   };
   const T = k => (TXT[lang] && TXT[lang][k]) || k;
   const tf = (k, o) => T(k).replace(/\{(\w+)\}/g, (m, n) => (o && o[n] != null ? o[n] : m));
+
+  /* ================= 重名检查 =================
+   * 书名重复不管 id 是否不同，一律不让发：
+   *   · 对读者是干扰 —— 搜一个名字出来两本书，不知道看哪本
+   *   · 对原作者是侵权 —— 抄一本同名书冒充原作
+   * 比对前先规范化：去空格、转小写、全角转半角。
+   * 中文连写（"python自动化办公" vs "Python 自动化办公"）必须算同一个名字，
+   * 否则加个空格就能绕过。
+   */
+  function normTitle(t) {
+    return String(t || '')
+      .replace(/[\uFF01-\uFF5E]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)) // 全角→半角
+      .replace(/[\u3000\s]+/g, '')   // 去所有空白（含中文全角空格）
+      .toLowerCase()
+      .trim();
+  }
+
+  /** 已上架的书名（官方 + 第三方），由主站注入 */
+  function takenTitles() {
+    return Array.isArray(window.__takenTitles) ? window.__takenTitles : [];
+  }
+
+  /**
+   * 查重。跳过自己 —— 同一本书重新发布不该被自己拦下。
+   * @returns {null | {title, id, external, author, repo}}
+   */
+  function findDupTitle(book) {
+    const t = normTitle(book.title);
+    if (!t) return null;
+    return takenTitles().find(x => x.id !== book.id && normTitle(x.title) === t) || null;
+  }
 
   /* ================= 存储 ================= */
 
@@ -1560,7 +1593,8 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
     box.innerHTML = `<div class="dev-modal-box wide">
       <h3>${T('bookInfo')}</h3>
       <div class="dev-form">
-        <label>${T('fTitle')}<input type="text" id="bi-title" value="${esc(b.title)}"></label>
+        <label>${T('fTitle')}<input type="text" id="bi-title" value="${esc(b.title)}">
+          <i class="dup-warn" id="bi-dup" hidden></i></label>
         <label>${T('fSubtitle')}<input type="text" id="bi-sub" value="${esc(b.subtitle)}"></label>
         <label>${T('fDesc')}<textarea id="bi-desc" rows="3">${esc(b.desc)}</textarea></label>
         <div class="dev-form-row">
@@ -1596,6 +1630,24 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
     const close = () => box.remove();
     $('bi-cancel').onclick = close;
     box.onclick = e => { if (e.target === box) close(); };
+    // 改名时实时查重 —— 等到点发布才被拦，用户已经白写了一堆
+    const dupEl = $('bi-dup');
+    const checkDup = () => {
+      const t = $('bi-title').value.trim();
+      const d = findDupTitle({ ...b, title: t });
+      if (d) {
+        dupEl.hidden = false;
+        dupEl.textContent = '⚠ ' + T('dupTitle').replace('{t}', t).replace('{o}', d.title);
+        $('bi-title').classList.add('dup-bad');
+      } else {
+        dupEl.hidden = true;
+        $('bi-title').classList.remove('dup-bad');
+      }
+      return !d;
+    };
+    $('bi-title').oninput = checkDup;
+    checkDup();
+
     $('bi-ok').onclick = () => {
       b.title = $('bi-title').value.trim() || b.id;
       b.subtitle = $('bi-sub').value.trim();
@@ -1610,6 +1662,7 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
       if ($('bi-en').checked) L.push('en');
       b.langs = L.length ? L : ['zh'];
       b.repo = ($('bi-repo').value.trim() || 'al-book-' + b.id);
+      checkDup();
       putBook(b);
       const t = $('de-booktitle');
       if (t) t.value = b.title;
@@ -1679,7 +1732,8 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
     $('pb-go').onclick = async () => {
       const priv = document.querySelector('input[name=vis]:checked').value === 'private';
       const steps = $('pb-steps');
-      const names = [T('stepCheck'), T('stepRepo'), T('stepFiles'), T('stepTopic')];
+      const names = [T('stepCheck'), T('stepRepo'), T('stepFiles'),
+        T('stepVerify'), T('stepTopic')];
       const paint = (i, state, extra) => {
         steps.innerHTML = names.map((n, k) => {
           let cls = k < i ? 'done' : (k === i ? (state || 'run') : '');
@@ -1695,6 +1749,13 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
         const files = toFiles(b);
         const r0 = BookCheck.validate(files);
         if (!r0.ok) throw new Error(r0.errors.length + ' ' + T('mustFix'));
+
+        // 重名：id 不同也不行
+        const dup = findDupTitle(b);
+        if (dup) {
+          const who = dup.author ? `${dup.title}（${dup.author}）` : dup.title;
+          throw new Error(T('dupTitle').replace('{t}', b.title).replace('{o}', who));
+        }
 
         // 建仓库
         paint(1);
@@ -1714,25 +1775,39 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
         }
         const branch = await api.getDefaultBranch(owner, b.repo).catch(() => 'main');
 
-        // 推文件
+        // 推文件 —— 一次 commitTree，不用 contents API 一个个写。
+        //
+        // 之前就是这里出的事：6 路并发各提交一次，GitHub 的 contents API
+        // 每次提交都基于当前 HEAD，并发时后面的用的是过期的 base，直接 409；
+        // 再加上 autoInit 建出来的 README 没有 sha 会 422。实测 15 个文件里
+        // 挂了 5 个（33%），而错误被 catch 吞掉 —— 用户看到"发布成功"，
+        // 实际推上去的是半本书，albook.json 一旦缺失机器人就永远发现不了它。
+        //
+        // commitTree 是一次提交：要么全成要么全不成，不会留半截。
         paint(2);
         const paths = Object.keys(files);
-        let n = 0;
-        const queue = paths.slice();
-        async function worker() {
-          while (queue.length) {
-            const p = queue.shift();
-            try { await api.createOrUpdateFile(owner, b.repo, p, files[p], `publish: ${p}`, branch); n++; }
-            catch (e) { /* 单个失败不阻断 */ }
-            if (n % 5 === 0) paint(2, 'run', `${n}/${paths.length}`);
-          }
-        }
-        await Promise.all(Array.from({ length: Math.min(6, paths.length) }, worker));
-        paint(2, 'done', `${n} ${T('filesPushed')}`);
+        await api.commitTree(
+          owner, b.repo, branch,
+          `publish: ${b.title}`,
+          paths.map(p => ({ path: p, content: files[p] })),
+        );
+        paint(2, 'done', `${paths.length} ${T('filesPushed')}`);
 
-        // 打 topic
-        paint(3);
-        try { await api.setTopics(owner, b.repo, ['al-book']); } catch (e) {}
+        // 推完必须回头验一遍 —— 提交返回成功不等于文件真的都在。
+        // 尤其 albook.json：没了它机器人读不到这本书，书会凭空消失。
+        paint(3, 'run', T('verifying'));
+        const live = new Set(
+          (await api.getTree(owner, b.repo, branch))
+            .filter(x => x.type === 'blob').map(x => x.path));
+        const missing = paths.filter(p => !live.has(p));
+        if (missing.length) {
+          throw new Error(T('filesMissing').replace('{n}', missing.length) +
+            '：' + missing.slice(0, 3).join('、') + (missing.length > 3 ? ' …' : ''));
+        }
+
+        // 打 topic：这是机器人发现书的入口，失败必须让用户知道
+        paint(4);
+        await api.setTopics(owner, b.repo, ['al-book']);
 
         b.published = {
           repo: `${owner}/${b.repo}`, owner, name: b.repo, branch,
@@ -1741,8 +1816,10 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
           at: Date.now(),
         };
         putBook(b);
+        // 先按确切仓库名并入 —— 搜索索引有延迟，不能让作者刚发的书自己搜不到
+        if (window.__addExternalRepo) await window.__addExternalRepo(`${owner}/${b.repo}`);
         if (window.__refreshExternal) window.__refreshExternal();
-        paint(4, 'done');
+        paint(5, 'done');
         steps.innerHTML += `<div class="dev-step done"><span>🎉</span>${T('publishOk')}
           <a href="${esc(b.published.url)}" target="_blank" rel="noopener">${T('openRepo')}</a></div>`;
         $('pb-go').textContent = T('done');
@@ -1778,6 +1855,7 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
       </div>
       <p class="dim">${p.visibility === 'private' ? T('visWarn') : T('visPubNote')}</p>
       <div class="dev-modal-actions">
+        <button class="dev-btn ghost" id="mg-health">${T('health')}</button>
         <button class="dev-btn ghost" id="mg-report">${T('report')}</button>
         <button class="dev-btn danger" id="mg-unpub">${T('unpublish')}</button>
         <button class="dev-btn ghost" id="mg-close">${lang === 'zh' ? '关闭' : 'Close'}</button>
@@ -1801,6 +1879,19 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
     if ($('mg-public')) $('mg-public').onclick = () => switchVis(false);
     if ($('mg-private')) $('mg-private').onclick = () => switchVis(true);
     $('mg-report').onclick = () => showReport(b);
+    $('mg-health').onclick = async () => {
+      if (!api) { alert(T('needLogin')); return; }
+      const btn = $('mg-health');
+      btn.disabled = true; btn.textContent = T('healthRunning');
+      try {
+        const res = await checkPublished(b);
+        btn.disabled = false; btn.textContent = T('health');
+        showHealth(b, res);
+      } catch (e) {
+        btn.disabled = false; btn.textContent = T('health');
+        alert(T('healthFail') + '：' + (e.message || e));
+      }
+    };
     $('mg-unpub').onclick = () => {
       if (!confirm(T('unpublishConfirm'))) return;
       b.published = null;
@@ -1808,6 +1899,73 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
       box.remove();
       mountList(root);
     };
+  }
+
+  /* ================= 发布后体检 =================
+   * 为什么需要：之前发布用 contents API 并发提交，一部分文件会 409 失败但被吞掉，
+   * 用户看到"发布成功"，实际推上去的是半本书 —— 缺了 albook.json 机器人就永远
+   * 发现不了它，表现就是"发布了却搜不到"。改完发布流程后新书不会再这样，
+   * 但老书还残缺着，得有个地方能看出来并一键补发。
+   */
+  async function checkPublished(b) {
+    const p = b.published;
+    const files = toFiles(b);
+    const want = Object.keys(files);
+    const live = new Set(
+      (await api.getTree(p.owner, p.name, p.branch))
+        .filter(x => x.type === 'blob').map(x => x.path));
+    const missing = want.filter(x => !live.has(x));
+    // 最关键的两个：没了 albook.json 机器人发现不了，没了 toc 目录打不开
+    const fatal = missing.filter(x => x === 'albook.json' || /toc\.json$/.test(x));
+    let topics = [];
+    try {
+      const r = await api.getRepository(p.owner, p.name);
+      topics = r.topics || [];
+    } catch (e) { /* 读不到就当没有 */ }
+    return { missing, fatal, topics, hasTopic: topics.includes('al-book'), total: want.length };
+  }
+
+  function showHealth(b, res) {
+    const box = document.createElement('div');
+    box.className = 'dev-modal';
+    const okAll = !res.missing.length && res.hasTopic;
+    box.innerHTML = `<div class="dev-modal-box wide">
+      <h3>${tf('healthTitle', { t: b.title })}</h3>
+      <div class="dev-h">${okAll ? '✅ ' + T('healthOk') : '⚠ ' + T('healthBad')}</div>
+      <ul class="dev-check-list">
+        <li>${res.hasTopic ? '✓' : '✗'} topic: al-book ${res.hasTopic ? '' :
+          `<i class="dim">— ${T('healthNoTopic')}</i>`}</li>
+        <li>${res.missing.length ? '✗' : '✓'} ${tf('healthFiles',
+          { n: res.total - res.missing.length, t: res.total })}
+          ${res.missing.length ? `<i class="dim">— ${T('healthMissing')}：${
+            esc(res.missing.slice(0, 4).join('、'))}${res.missing.length > 4 ? ' …' : ''}</i>` : ''}
+        </li>
+      </ul>
+      ${res.missing.length ? `<p class="dim">${T('healthFixTip')}</p>` : ''}
+      <div class="dev-modal-actions">
+        ${res.missing.length ? `<button class="dev-btn" id="hl-repub">${T('republish')}</button>` : ''}
+        <button class="dev-btn ghost" id="hl-close">${lang === 'zh' ? '关闭' : 'Close'}</button>
+      </div>
+    </div>`;
+    document.body.appendChild(box);
+    const close = () => box.remove();
+    $('hl-close').onclick = close;
+    box.onclick = e => { if (e.target === box) close(); };
+    const rb = $('hl-repub');
+    if (rb) {
+      rb.onclick = async () => {
+        close();
+        try {
+          await api.commitTree(b.published.owner, b.published.name, b.published.branch,
+            `republish: ${b.title}`,
+            Object.keys(toFiles(b)).map(p => ({ path: p, content: toFiles(b)[p] })));
+          await api.setTopics(b.published.owner, b.published.name, ['al-book']);
+          toast(T('repubOk'));
+          if (window.__addExternalRepo) await window.__addExternalRepo(b.published.repo);
+          if (window.__refreshExternal) window.__refreshExternal();
+        } catch (e) { alert(T('publishFail') + '：' + (e.message || e)); }
+      };
+    }
   }
 
   /* ================= 挂载 ================= */
@@ -1995,6 +2153,15 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
     background:transparent;color:var(--text);font-size:13.5px;font-family:inherit}
   .dev-form-wide .dim{display:block;margin-top:5px;line-height:1.5}
   .dev-checks label{flex-direction:row;align-items:center;font-size:13px;color:var(--text)}
+
+  .dev-check-list{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+  .dev-check-list li{font-size:13px}
+  .dev-check-list .dim{font-style:normal;margin-left:6px}
+
+  /* 重名警告：书名输入框正下方，别让作者写完一堆才发现发不出去 */
+  .dup-warn{display:block;margin-top:4px;font-size:11.5px;font-weight:400;line-height:1.55;
+    color:#e0a33a;font-style:normal}
+  .dev-form input.dup-bad{border-color:#e0a33a}
 
   /* 弹窗 */
   .dev-modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;

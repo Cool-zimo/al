@@ -379,6 +379,14 @@
     window.__thirdBooks = BOOKS.filter(b => b.external).map(b => ({
       id: b.id, title: b.title, repo: b.repo, branch: b.branch || 'main',
     }));
+
+    // 已上架的书名，供开发者平台拦重名。
+    // 官方 + 第三方都算：同名书对读者是干扰，对原作者是版权问题。
+    window.__takenTitles = BOOKS.map(b => ({
+      title: b.title, id: b.id, external: !!b.external,
+      author: (b.author && b.author.name) || '',
+      repo: b.repo || '',
+    }));
     // 第三方书是异步并入的，可能晚于侧边栏渲染 —— 这里补一次，
     // 否则侧边栏永远显示"暂无"，要刷新才看得到
     refreshBookGroups();
@@ -1696,6 +1704,29 @@
 
   // 开发者平台发布成功后要能刷新首页的第三方书区
   window.__refreshExternal = () => { refreshExternal(); };
+
+  /**
+   * 刚发布的书直接按仓库名并入，不等搜索索引。
+   *
+   * GitHub 的搜索索引有延迟（新仓库 / 刚改的 topic 要等几分钟才出现在
+   * topic:al-book 结果里）。作者自己刚发完的书自己都搜不到，会很困惑 ——
+   * 但我们知道确切的仓库名，可以直接读它的 albook.json，不用等索引。
+   */
+  window.__addExternalRepo = async (fullName) => {
+    if (!api || !fullName) return false;
+    try {
+      const e = await BookShelf.fetchEntry(api, fullName);
+      if (!e) return false;
+      if (BOOKS.some(b => b.id === e.id)) return true;
+      if (!addExternal(e, e)) return false;
+      publishThirdList();
+      renderHomeOrPending();
+      return true;
+    } catch (err) {
+      console.warn('[al] 并入刚发布的书失败:', err.message);
+      return false;
+    }
+  };
 
   /* ================= 第三方书籍 ================= */
   /**
