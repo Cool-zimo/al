@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AnyLearn · 通学万义</title>
+<meta name="description" content="浏览器里真跑代码的编程教程，会记笔记、按艾宾浩斯曲线安排复习。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>🦉</text></svg>">
+<style>
+:root{
+  --brand-1:#6366f1; --brand-2:#22d3ee;
+  --grad:linear-gradient(135deg,var(--brand-1),var(--brand-2));
+  --bg:#0a0c11; --panel:#161a24; --border:#242a38;
+  --text:#e9ecf4; --dim:#9ba5b9; --faint:#6a7488;
+  --accent:#818cf8; --green:#34d399;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--text);
+  font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100%;padding:32px 22px;position:relative;overflow-x:hidden;
+}
+/* 背景光晕 —— 和主站一个调子 */
+body::before,body::after{
+  content:"";position:fixed;border-radius:50%;filter:blur(100px);z-index:0;pointer-events:none;
+}
+body::before{width:520px;height:520px;left:-140px;top:-160px;
+  background:radial-gradient(circle,rgba(99,102,241,.30),transparent 68%)}
+body::after{width:460px;height:460px;right:-120px;bottom:-150px;
+  background:radial-gradient(circle,rgba(34,211,238,.22),transparent 68%)}
+
+.wrap{position:relative;z-index:1;width:100%;max-width:560px;text-align:center}
+
+.logo{
+  width:76px;height:76px;margin:0 auto 18px;border-radius:22px;
+  display:grid;place-items:center;font-size:40px;
+  background:linear-gradient(135deg,rgba(99,102,241,.20),rgba(34,211,238,.20));
+  border:1px solid var(--border);
+  box-shadow:0 18px 46px -18px rgba(99,102,241,.7);
+  animation:float 5s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+
+h1{font-size:33px;font-weight:750;letter-spacing:-.02em;margin-bottom:7px}
+.slogan{
+  font-size:14px;color:var(--dim);margin-bottom:5px;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;font-weight:650;
+}
+.desc{font-size:13.5px;color:var(--faint);margin-bottom:32px;line-height:1.75}
+
+.picks{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:22px}
+.pick{
+  display:block;padding:20px 16px;border-radius:16px;text-decoration:none;color:inherit;
+  background:var(--panel);border:1px solid var(--border);
+  transition:.22s cubic-bezier(.22,.9,.3,1);position:relative;overflow:hidden;
+}
+.pick::before{
+  content:"";position:absolute;inset:0;opacity:0;transition:.22s;
+  background:linear-gradient(135deg,rgba(99,102,241,.10),rgba(34,211,238,.10));
+}
+.pick:hover{transform:translateY(-4px);border-color:#39425a;
+  box-shadow:0 16px 36px -16px rgba(0,0,0,.75)}
+.pick:hover::before{opacity:1}
+.pick .flag{font-size:26px;display:block;margin-bottom:9px;position:relative}
+.pick b{display:block;font-size:16px;font-weight:650;margin-bottom:3px;position:relative}
+.pick span{font-size:12px;color:var(--faint);position:relative}
+.pick .go{
+  display:inline-block;margin-top:11px;font-size:12px;font-weight:600;color:var(--accent);position:relative;
+}
+.pick:hover .go{transform:translateX(2px)}
+
+.auto{
+  font-size:12.5px;color:var(--faint);min-height:20px;
+}
+.auto b{color:var(--accent);font-weight:600}
+.auto button{
+  background:none;border:1px solid var(--border);color:var(--dim);
+  font:inherit;font-size:11.5px;padding:3px 11px;border-radius:8px;margin-left:7px;cursor:pointer;
+  transition:.18s;
+}
+.auto button:hover{border-color:var(--accent);color:var(--accent)}
+
+.foot{
+  margin-top:30px;font-size:11.5px;color:#4d566b;line-height:1.9;
+}
+.foot a{color:var(--faint);text-decoration:none;border-bottom:1px dotted #39425a}
+.foot a:hover{color:var(--accent)}
+
+@media(max-width:520px){
+  .picks{grid-template-columns:1fr}
+  h1{font-size:27px}
+  .logo{width:64px;height:64px;font-size:33px}
+}
+@media(prefers-reduced-motion:reduce){
+  .logo{animation:none}
+  .pick:hover{transform:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="logo">🦉</div>
+  <h1>AnyLearn</h1>
+  <div class="slogan">通学万义</div>
+  <p class="desc">浏览器里真跑代码的编程教程 · 会记笔记 · 按艾宾浩斯曲线安排复习</p>
+
+  <div class="picks">
+    <a class="pick" href="zh/">
+      <span class="flag">🇨🇳</span>
+      <b>中文</b>
+      <span>25 本教材 · 含官方与第三方</span>
+      <span class="go">进入 →</span>
+    </a>
+    <a class="pick" href="en/">
+      <span class="flag">🌐</span>
+      <b>English</b>
+      <span>25 textbooks · bilingual</span>
+      <span class="go">Enter →</span>
+    </a>
+  </div>
+
+  <div class="auto" id="auto"></div>
+
+  <div class="foot">
+    <a href="https://github.com/Cool-zimo/al">源码</a> ·
+    <a href="zh/search/">搜索教材</a> ·
+    <a href="https://cool-zimo.github.io/">作者主页</a>
+  </div>
+
+</div>
+
+<script>
+/* 按浏览器语言自动跳转，但给 4 秒反悔时间 —— 直接跳走的话，
+   想看另一种语言的人会被硬塞进不想要的版本。 */
+(function(){
+  var box=document.getElementById('auto');
+  if(!box) return;
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var langs=(navigator.languages||[navigator.language||'']).join(',').toLowerCase();
+  var zh=/^zh/.test(langs)||langs.indexOf(',zh')>-1||langs.indexOf('zh-')>-1;
+  var dest=zh?'zh/':'en/';
+  var name=zh?'中文':'English';
+
+  if(reduce){ box.textContent='检测到：'+name; return; }
+
+  var left=4, timer;
+  function draw(){
+    box.innerHTML='将在 <b>'+left+'</b> 秒后进入'+name+
+      '<button type="button" id="cancel">取消</button>';
+    var b=document.getElementById('cancel');
+    if(b) b.onclick=function(){ clearInterval(timer); box.textContent='已取消自动跳转'; };
+  }
+  draw();
+  timer=setInterval(function(){
+    left--;
+    if(left<=0){
+      clearInterval(timer);
+      box.textContent='正在进入'+name+'…';
+      location.href=dest;
+      return;
+    }
+    draw();
+  },1000);
+})();
+</script>
+</body>
+</html>
