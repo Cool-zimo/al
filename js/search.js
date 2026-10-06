@@ -189,6 +189,7 @@
       return Promise.all((d.items || []).map(function (it) {
         return fetch('https://api.github.com/repos/' + it.full_name + '/contents/albook.json', {
           headers: { Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json' },
+          cache: 'no-store',
         }).then(function (r) { return r.ok ? r.json() : null; })
           .then(function (f) {
             if (!f || !f.content) return null;

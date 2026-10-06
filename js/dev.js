@@ -962,7 +962,7 @@ hint: ${zh ? '多个参数用逗号分隔' : 'Separate multiple args with commas
   async function fetchBookForImport(full) {
     let repo = null, branch = 'main';
     try {
-      const r = await fetch(`https://api.github.com/repos/${full}`);
+      const r = await fetch(`https://api.github.com/repos/${full}`, { cache: 'no-store' });
       if (r.status === 404) throw new Error(T('impNotFound'));
       if (!r.ok) throw new Error('HTTP ' + r.status);
       repo = await r.json();

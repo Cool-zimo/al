@@ -27,7 +27,8 @@ class GitHubAPI {
     const res = await fetch(url, {
       method,
       headers: this._headers(opts.headers),
-      body: body === null ? undefined : JSON.stringify(body)
+      body: body === null ? undefined : JSON.stringify(body),
+      cache: 'no-store'   // 笔记/进度随设备而变，不能被浏览器缓存 60 秒
     });
 
     if (res.status === 204) return null;

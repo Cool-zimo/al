@@ -38,7 +38,8 @@ const Gate = (() => {
     let avatar = '';
     try {
       const r = await fetch('https://api.github.com/user', {
-        headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' }
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
+        cache: 'no-store'
       });
       if (r.ok) { const d = await r.json(); avatar = d.avatar_url || ''; }
     } catch (e) { /* 头像失败不影响登录 */ }
