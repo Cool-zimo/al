@@ -181,6 +181,7 @@
     }
     return fetch('https://api.github.com/search/repositories?q=topic:al-book&per_page=100', {
       headers: { Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json' },
+      cache: 'no-store',   // 别人刚发布的书要能立刻搜到
     }).then(function (r) {
       if (!r.ok) throw new Error(r.status);
       return r.json();
