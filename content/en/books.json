@@ -247,5 +247,14 @@
     "level": "Beginner",
     "ready": true,
     "note": "6 chapters, 30 lessons"
+  },
+  {
+    "id": "http-api-practice",
+    "title": "HTTP 与 API 实战",
+    "subtitle": "从 1969 年那次崩溃的传输，到你亲手写出一个 HTTP 终端",
+    "desc": "面向会一点 Python 语法、但没系统学过网络的人。拒绝速成：第 1 章讲清 HTTP 为什么长这样、谁发明的、每个版本为什么改；第 2 章把报文逐层拆开；第 3-5 章用 15 课把 requests 从第一个请求讲到文件上传；第 6 章封装出你自己的命令行工具。全书 30 课，每行代码都有注释，每段代码都有逐行拆解。",
+    "stage": "实战",
+    "level": "入门",
+    "ready": true
   }
 ]
